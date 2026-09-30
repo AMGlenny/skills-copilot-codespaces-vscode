@@ -217,7 +217,7 @@
                                 task_name: Trim(txtTaskName.Text),
                                 priority: {Value: ddTaskPriority.Selected.code},
                                 org_unit_key: Coalesce(varTask.org_unit_key, varTeam),
-                                contributes_to_type: {Value: Coalesce(cmbTaskContrib.Selected.type, "none")},
+                                contributes_to_type: If(IsBlank(cmbTaskContrib.Selected), Blank(), {Value: cmbTaskContrib.Selected.type}),
                                 contributes_to_key: cmbTaskContrib.Selected.key,
                                 contributes_to_note: Trim(txtTaskContribNote.Text),
                                 assigned_to: cmbTaskAssigned.Selected.email,

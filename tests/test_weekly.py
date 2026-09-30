@@ -83,7 +83,7 @@ class WellbeingViewTests(unittest.TestCase):
 
 class ValidationTests(unittest.TestCase):
     def test_task(self):
-        self.assertEqual(rules.validate_task({"task_name": "Do it", "contributes_to_type": "none"}), [])
+        self.assertEqual(rules.validate_task({"task_name": "Do it"}), [])
         self.assertTrue(rules.validate_task({"task_name": "  "}))
         self.assertTrue(rules.validate_task({"task_name": "x" * 256}))
         self.assertTrue(rules.validate_task({"task_name": "Do it", "contributes_to_type": "group"}))

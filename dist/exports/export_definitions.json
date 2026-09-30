@@ -1,0 +1,5059 @@
+{
+ "lookup_tables": {
+  "people": {
+   "list": "people",
+   "select": "Title,display_name"
+  },
+  "org_units": {
+   "list": "org_units",
+   "select": "Title,unit_name"
+  },
+  "groups": {
+   "list": "groups",
+   "select": "Title,group_name"
+  },
+  "measures": {
+   "list": "measures",
+   "select": "Title,measure_name"
+  }
+ },
+ "datasets": {
+  "full_model": {
+   "title": "Full data model",
+   "tables": [
+    {
+     "name": "measures",
+     "list": "measures",
+     "select": "Title,measure_name,source_ref,source_document,parent_measure_code,description,definition,measure_class,measure_type,unit,decimal_places,polarity,frequency,aggregation_method,expected_lag_days,category,data_source,org_unit_key,status,retired_date,retired_reason",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "measure_code",
+       "source": "Title",
+       "type": "text",
+       "description": "System key, e.g. PM-0001. Unique. Every other table links on this."
+      },
+      {
+       "name": "measure_name",
+       "source": "measure_name",
+       "type": "text",
+       "description": "Short name of the measure."
+      },
+      {
+       "name": "source_ref",
+       "source": "source_ref",
+       "type": "text",
+       "description": "Reference used in the source document, e.g. 1.01. Not unique: parent and child can share it."
+      },
+      {
+       "name": "source_document",
+       "source": "source_document",
+       "type": "text",
+       "description": "Document or framework the measure comes from."
+      },
+      {
+       "name": "parent_measure_code",
+       "source": "parent_measure_code",
+       "type": "text",
+       "description": "measure_code of the parent summary measure. Blank for top-level measures."
+      },
+      {
+       "name": "description",
+       "source": "description",
+       "type": "text",
+       "description": "What the measure tells you, in plain English."
+      },
+      {
+       "name": "definition",
+       "source": "definition",
+       "type": "text",
+       "description": "Definition and calculation method."
+      },
+      {
+       "name": "measure_class",
+       "source": "measure_class",
+       "type": "text",
+       "description": "measure, kpi or okr. Tolerance only applies to kpi and okr."
+      },
+      {
+       "name": "measure_type",
+       "source": "measure_type",
+       "type": "text",
+       "description": "summary, output or outcome."
+      },
+      {
+       "name": "unit",
+       "source": "unit",
+       "type": "text",
+       "description": "Unit of the value. percent is stored as 0 to 100 (58 means 58%). gbp is pounds. yes_no is stored as 1 or 0."
+      },
+      {
+       "name": "decimal_places",
+       "source": "decimal_places",
+       "type": "number",
+       "description": "Decimal places to show. Does not change the stored value."
+      },
+      {
+       "name": "polarity",
+       "source": "polarity",
+       "type": "text",
+       "description": "Which direction is good. Used for RAG."
+      },
+      {
+       "name": "frequency",
+       "source": "frequency",
+       "type": "text",
+       "description": "How often a value is recorded."
+      },
+      {
+       "name": "aggregation_method",
+       "source": "aggregation_method",
+       "type": "text",
+       "description": "How to roll values up to a longer period, e.g. monthly to quarterly. do_not_combine for values that must not be added or averaged."
+      },
+      {
+       "name": "expected_lag_days",
+       "source": "expected_lag_days",
+       "type": "number",
+       "description": "Usual days after period end before data is available. Blank means no expectation, so it is never flagged as late."
+      },
+      {
+       "name": "category",
+       "source": "category",
+       "type": "text",
+       "description": "Category code from the lookups list."
+      },
+      {
+       "name": "data_source",
+       "source": "data_source",
+       "type": "text",
+       "description": "Where the data comes from."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team that owns the measure."
+      },
+      {
+       "name": "status",
+       "source": "status",
+       "type": "text",
+       "description": "active or retired. Measures are never deleted."
+      },
+      {
+       "name": "retired_date",
+       "source": "retired_date",
+       "type": "date",
+       "description": "Date the measure was retired."
+      },
+      {
+       "name": "retired_reason",
+       "source": "retired_reason",
+       "type": "text",
+       "description": "Why the measure was retired."
+      }
+     ]
+    },
+    {
+     "name": "periods",
+     "list": "periods",
+     "select": "Title,period_type,period_label,start_date,end_date,financial_year,financial_quarter,academic_year,calendar_year",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "period_key",
+       "source": "Title",
+       "type": "text",
+       "description": "Period key, e.g. M-2026-09, Q-2026-27-Q2, T-2026-27-AUT."
+      },
+      {
+       "name": "period_type",
+       "source": "period_type",
+       "type": "text",
+       "description": "Matches a measure frequency."
+      },
+      {
+       "name": "period_label",
+       "source": "period_label",
+       "type": "text",
+       "description": "Display label, e.g. Q2 2026-27 or Autumn Term 2026."
+      },
+      {
+       "name": "start_date",
+       "source": "start_date",
+       "type": "date",
+       "description": "First day of the period."
+      },
+      {
+       "name": "end_date",
+       "source": "end_date",
+       "type": "date",
+       "description": "Last day of the period."
+      },
+      {
+       "name": "financial_year",
+       "source": "financial_year",
+       "type": "text",
+       "description": "UK financial year (April to March) containing the start date, e.g. 2026-27."
+      },
+      {
+       "name": "financial_quarter",
+       "source": "financial_quarter",
+       "type": "text",
+       "description": "Financial quarter containing the start date, e.g. 2026-27 Q2. Blank for periods longer than a quarter."
+      },
+      {
+       "name": "academic_year",
+       "source": "academic_year",
+       "type": "text",
+       "description": "Academic year (September to August) containing the start date."
+      },
+      {
+       "name": "calendar_year",
+       "source": "calendar_year",
+       "type": "number",
+       "description": "Calendar year containing the start date."
+      }
+     ]
+    },
+    {
+     "name": "measure_roles",
+     "list": "measure_roles",
+     "select": "Title,measure_code,email,role,active,start_date,end_date",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "role_key",
+       "source": "Title",
+       "type": "text",
+       "description": "measure_code|email|role. Unique."
+      },
+      {
+       "name": "measure_code",
+       "source": "measure_code",
+       "type": "text",
+       "description": "Measure."
+      },
+      {
+       "name": "email",
+       "source": "email",
+       "type": "text",
+       "description": "Person."
+      },
+      {
+       "name": "role",
+       "source": "role",
+       "type": "text",
+       "description": "owner, updater or approver."
+      },
+      {
+       "name": "active",
+       "source": "active",
+       "type": "bool",
+       "description": "Only active roles give access."
+      },
+      {
+       "name": "start_date",
+       "source": "start_date",
+       "type": "date",
+       "description": "Role start."
+      },
+      {
+       "name": "end_date",
+       "source": "end_date",
+       "type": "date",
+       "description": "Role end."
+      }
+     ]
+    },
+    {
+     "name": "people",
+     "list": "people",
+     "select": "Title,display_name,org_unit_key,app_role,active",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "email",
+       "source": "Title",
+       "type": "text",
+       "description": "Work email, lower case. Unique."
+      },
+      {
+       "name": "display_name",
+       "source": "display_name",
+       "type": "text",
+       "description": "Name shown in the app."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Default team. Pre-fills the weekly update."
+      },
+      {
+       "name": "app_role",
+       "source": "app_role",
+       "type": "text",
+       "description": "admin, standard or viewer. Measure rights come from measure_roles."
+      },
+      {
+       "name": "active",
+       "source": "active",
+       "type": "bool",
+       "description": "Leavers are made inactive, never deleted."
+      }
+     ]
+    },
+    {
+     "name": "org_units",
+     "list": "org_units",
+     "select": "Title,unit_name,unit_level,parent_key,active",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "org_unit_key",
+       "source": "Title",
+       "type": "text",
+       "description": "Key, e.g. WS-JOBS, TM-SDS, ST-SDS-A. Unique."
+      },
+      {
+       "name": "unit_name",
+       "source": "unit_name",
+       "type": "text",
+       "description": "Name as people know it."
+      },
+      {
+       "name": "unit_level",
+       "source": "unit_level",
+       "type": "text",
+       "description": "workstream, team or sub_team."
+      },
+      {
+       "name": "parent_key",
+       "source": "parent_key",
+       "type": "text",
+       "description": "Parent unit. Blank for workstreams."
+      },
+      {
+       "name": "active",
+       "source": "active",
+       "type": "bool",
+       "description": "Inactive units are hidden from new entries."
+      }
+     ]
+    },
+    {
+     "name": "groups",
+     "list": "groups",
+     "select": "Title,group_name,group_type,description,active",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "group_key",
+       "source": "Title",
+       "type": "text",
+       "description": "Group key, e.g. TH-JOBS. Unique."
+      },
+      {
+       "name": "group_name",
+       "source": "group_name",
+       "type": "text",
+       "description": "Name of the theme, programme or objective."
+      },
+      {
+       "name": "group_type",
+       "source": "group_type",
+       "type": "text",
+       "description": "theme, programme or objective."
+      },
+      {
+       "name": "description",
+       "source": "description",
+       "type": "text",
+       "description": "What it covers."
+      },
+      {
+       "name": "active",
+       "source": "active",
+       "type": "bool",
+       "description": "Inactive groups are hidden from new entries."
+      }
+     ]
+    },
+    {
+     "name": "measure_links",
+     "list": "measure_links",
+     "select": "Title,measure_code,group_key,relationship_type,active",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "link_key",
+       "source": "Title",
+       "type": "text",
+       "description": "measure_code|group_key. Unique."
+      },
+      {
+       "name": "measure_code",
+       "source": "measure_code",
+       "type": "text",
+       "description": "Measure."
+      },
+      {
+       "name": "group_key",
+       "source": "group_key",
+       "type": "text",
+       "description": "Group."
+      },
+      {
+       "name": "relationship_type",
+       "source": "relationship_type",
+       "type": "text",
+       "description": "primary, contributes_to or related."
+      },
+      {
+       "name": "active",
+       "source": "active",
+       "type": "bool",
+       "description": "Inactive links are kept for history."
+      }
+     ]
+    },
+    {
+     "name": "reference_values",
+     "list": "reference_values",
+     "select": "Title,measure_code,period_key,ref_type,ref_value,notes,active",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "ref_key",
+       "source": "Title",
+       "type": "text",
+       "description": "measure_code|period_key|ref_type. Unique."
+      },
+      {
+       "name": "measure_code",
+       "source": "measure_code",
+       "type": "text",
+       "description": "Measure."
+      },
+      {
+       "name": "period_key",
+       "source": "period_key",
+       "type": "text",
+       "description": "Period."
+      },
+      {
+       "name": "ref_type",
+       "source": "ref_type",
+       "type": "text",
+       "description": "target, tolerance, baseline or capacity. tolerance only for kpi and okr measures."
+      },
+      {
+       "name": "ref_value",
+       "source": "ref_value",
+       "type": "number",
+       "description": "The reference value, in the measure's unit."
+      },
+      {
+       "name": "notes",
+       "source": "notes",
+       "type": "text",
+       "description": "Where the value came from."
+      },
+      {
+       "name": "active",
+       "source": "active",
+       "type": "bool",
+       "description": "Inactive values are ignored."
+      }
+     ]
+    },
+    {
+     "name": "submissions",
+     "list": "submissions",
+     "select": "Title,measure_code,period_key,status,expected_by,current_version,approved_version,submitted_date,approved_by,approved_date",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "submission_key",
+       "source": "Title",
+       "type": "text",
+       "description": "measure_code|period_key. Unique."
+      },
+      {
+       "name": "measure_code",
+       "source": "measure_code",
+       "type": "text",
+       "description": "Measure."
+      },
+      {
+       "name": "period_key",
+       "source": "period_key",
+       "type": "text",
+       "description": "Period the data relates to."
+      },
+      {
+       "name": "status",
+       "source": "status",
+       "type": "text",
+       "description": "not_started, draft, submitted, returned or approved."
+      },
+      {
+       "name": "expected_by",
+       "source": "expected_by",
+       "type": "date",
+       "description": "Period end plus the measure's expected lag. Blank if no lag is set."
+      },
+      {
+       "name": "current_version",
+       "source": "current_version",
+       "type": "number",
+       "description": "Latest version number. 0 before anything is entered."
+      },
+      {
+       "name": "approved_version",
+       "source": "approved_version",
+       "type": "number",
+       "description": "Version used in reports. Blank until first approval."
+      },
+      {
+       "name": "submitted_date",
+       "source": "submitted_date",
+       "type": "datetime",
+       "description": "When the latest version was submitted."
+      },
+      {
+       "name": "approved_by",
+       "source": "approved_by",
+       "type": "text",
+       "description": "Email of the approver."
+      },
+      {
+       "name": "approved_date",
+       "source": "approved_date",
+       "type": "datetime",
+       "description": "When it was approved."
+      }
+     ]
+    },
+    {
+     "name": "approved_values",
+     "list": "submission_versions",
+     "select": "Title,submission_key,measure_code,period_key,version_no,value_number,value_text,value_missing,narrative,data_quality,submitted_date,rag_status",
+     "filter": "version_status eq 'approved'",
+     "main": false,
+     "columns": [
+      {
+       "name": "version_key",
+       "source": "Title",
+       "type": "text",
+       "description": "submission_key|v<version_no>. Unique."
+      },
+      {
+       "name": "submission_key",
+       "source": "submission_key",
+       "type": "text",
+       "description": "Submission."
+      },
+      {
+       "name": "measure_code",
+       "source": "measure_code",
+       "type": "text",
+       "description": "Measure (copied from the submission for filtering)."
+      },
+      {
+       "name": "period_key",
+       "source": "period_key",
+       "type": "text",
+       "description": "Period (copied from the submission for filtering)."
+      },
+      {
+       "name": "version_no",
+       "source": "version_no",
+       "type": "number",
+       "description": "1, 2, 3 and so on."
+      },
+      {
+       "name": "value_number",
+       "source": "value_number",
+       "type": "number",
+       "description": "The value for all units except text. percent 0 to 100, yes_no 1 or 0."
+      },
+      {
+       "name": "value_text",
+       "source": "value_text",
+       "type": "text",
+       "description": "The value for text measures only."
+      },
+      {
+       "name": "value_missing",
+       "source": "value_missing",
+       "type": "bool",
+       "description": "Yes if no value could be provided. Narrative then required."
+      },
+      {
+       "name": "narrative",
+       "source": "narrative",
+       "type": "text",
+       "description": "Updater's commentary. Required if the value is missing or off track."
+      },
+      {
+       "name": "data_quality",
+       "source": "data_quality",
+       "type": "text",
+       "description": "verified, provisional, estimated or unverified."
+      },
+      {
+       "name": "submitted_date",
+       "source": "submitted_date",
+       "type": "datetime",
+       "description": "When this version was submitted."
+      },
+      {
+       "name": "rag_status",
+       "source": "rag_status",
+       "type": "text",
+       "description": "RAG worked out at approval using polarity and the period's target and tolerance."
+      }
+     ]
+    },
+    {
+     "name": "values_flat",
+     "list": "rpt_values",
+     "select": "Title,measure_code,measure_name,source_ref,parent_measure_code,measure_class,measure_type,category,unit,polarity,frequency,aggregation_method,owner_name,owner_email,org_unit_key,period_key,period_type,period_label,period_start,period_end,financial_year,financial_quarter,value_number,value_text,value_missing,narrative,data_quality,version_no,approved_by,approved_date,target_value,tolerance_value,baseline_value,capacity_value,rag_status,is_latest,refreshed_at",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "submission_key",
+       "source": "Title",
+       "type": "text",
+       "description": "measure_code|period_key. Unique."
+      },
+      {
+       "name": "measure_code",
+       "source": "measure_code",
+       "type": "text",
+       "description": "Measure."
+      },
+      {
+       "name": "measure_name",
+       "source": "measure_name",
+       "type": "text",
+       "description": "Measure name."
+      },
+      {
+       "name": "source_ref",
+       "source": "source_ref",
+       "type": "text",
+       "description": "Source document reference."
+      },
+      {
+       "name": "parent_measure_code",
+       "source": "parent_measure_code",
+       "type": "text",
+       "description": "Parent measure."
+      },
+      {
+       "name": "measure_class",
+       "source": "measure_class",
+       "type": "text",
+       "description": "measure, kpi or okr."
+      },
+      {
+       "name": "measure_type",
+       "source": "measure_type",
+       "type": "text",
+       "description": "summary, output or outcome."
+      },
+      {
+       "name": "category",
+       "source": "category",
+       "type": "text",
+       "description": "Category code."
+      },
+      {
+       "name": "unit",
+       "source": "unit",
+       "type": "text",
+       "description": "Unit."
+      },
+      {
+       "name": "polarity",
+       "source": "polarity",
+       "type": "text",
+       "description": "Polarity."
+      },
+      {
+       "name": "frequency",
+       "source": "frequency",
+       "type": "text",
+       "description": "Frequency."
+      },
+      {
+       "name": "aggregation_method",
+       "source": "aggregation_method",
+       "type": "text",
+       "description": "How to roll up."
+      },
+      {
+       "name": "owner_name",
+       "source": "owner_name",
+       "type": "text",
+       "description": "Measure owner."
+      },
+      {
+       "name": "owner_email",
+       "source": "owner_email",
+       "type": "text",
+       "description": "Measure owner email."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Owning team."
+      },
+      {
+       "name": "period_key",
+       "source": "period_key",
+       "type": "text",
+       "description": "Period."
+      },
+      {
+       "name": "period_type",
+       "source": "period_type",
+       "type": "text",
+       "description": "Period type."
+      },
+      {
+       "name": "period_label",
+       "source": "period_label",
+       "type": "text",
+       "description": "Period label."
+      },
+      {
+       "name": "period_start",
+       "source": "period_start",
+       "type": "date",
+       "description": "Period start date."
+      },
+      {
+       "name": "period_end",
+       "source": "period_end",
+       "type": "date",
+       "description": "Period end date."
+      },
+      {
+       "name": "financial_year",
+       "source": "financial_year",
+       "type": "text",
+       "description": "Financial year."
+      },
+      {
+       "name": "financial_quarter",
+       "source": "financial_quarter",
+       "type": "text",
+       "description": "Financial quarter."
+      },
+      {
+       "name": "value_number",
+       "source": "value_number",
+       "type": "number",
+       "description": "Approved value (not text measures)."
+      },
+      {
+       "name": "value_text",
+       "source": "value_text",
+       "type": "text",
+       "description": "Approved value (text measures)."
+      },
+      {
+       "name": "value_missing",
+       "source": "value_missing",
+       "type": "bool",
+       "description": "Yes if no value was provided."
+      },
+      {
+       "name": "narrative",
+       "source": "narrative",
+       "type": "text",
+       "description": "Approved narrative."
+      },
+      {
+       "name": "data_quality",
+       "source": "data_quality",
+       "type": "text",
+       "description": "Data quality flag."
+      },
+      {
+       "name": "version_no",
+       "source": "version_no",
+       "type": "number",
+       "description": "Approved version number."
+      },
+      {
+       "name": "approved_by",
+       "source": "approved_by",
+       "type": "text",
+       "description": "Approver email."
+      },
+      {
+       "name": "approved_date",
+       "source": "approved_date",
+       "type": "datetime",
+       "description": "Approval time."
+      },
+      {
+       "name": "target_value",
+       "source": "target_value",
+       "type": "number",
+       "description": "Target for the period."
+      },
+      {
+       "name": "tolerance_value",
+       "source": "tolerance_value",
+       "type": "number",
+       "description": "Tolerance for the period (kpi and okr only)."
+      },
+      {
+       "name": "baseline_value",
+       "source": "baseline_value",
+       "type": "number",
+       "description": "Baseline for the period."
+      },
+      {
+       "name": "capacity_value",
+       "source": "capacity_value",
+       "type": "number",
+       "description": "Capacity or throughput for the period."
+      },
+      {
+       "name": "rag_status",
+       "source": "rag_status",
+       "type": "text",
+       "description": "green, amber, red, no_target, no_data or not_applicable."
+      },
+      {
+       "name": "is_latest",
+       "source": "is_latest",
+       "type": "bool",
+       "description": "Yes on the most recent approved period for the measure."
+      },
+      {
+       "name": "refreshed_at",
+       "source": "refreshed_at",
+       "type": "datetime",
+       "description": "When this row was last rebuilt."
+      }
+     ]
+    },
+    {
+     "name": "weekly_updates",
+     "list": "weekly_updates",
+     "select": "Title,week_start,email,org_unit_key,successes,communication,workload,submitted_at",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "update_key",
+       "source": "Title",
+       "type": "text",
+       "description": "email|week_start. Unique."
+      },
+      {
+       "name": "week_start",
+       "source": "week_start",
+       "type": "date",
+       "description": "Monday of the week."
+      },
+      {
+       "name": "email",
+       "source": "email",
+       "type": "text",
+       "description": "Person."
+      },
+      {
+       "name": "person_name",
+       "lookup_from": "email",
+       "type": "text",
+       "description": "Name of the person.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team at the time of the update."
+      },
+      {
+       "name": "team_name",
+       "lookup_from": "org_unit_key",
+       "type": "text",
+       "description": "Team name.",
+       "lookup": [
+        {
+         "table": "org_units",
+         "field": "unit_name"
+        }
+       ]
+      },
+      {
+       "name": "successes",
+       "source": "successes",
+       "type": "text",
+       "description": "Successes had or heard about."
+      },
+      {
+       "name": "communication",
+       "source": "communication",
+       "type": "text",
+       "description": "Anything that would help if more widely known."
+      },
+      {
+       "name": "workload",
+       "source": "workload",
+       "type": "text",
+       "description": "light, manageable, heavy or overloaded."
+      },
+      {
+       "name": "submitted_at",
+       "source": "submitted_at",
+       "type": "datetime",
+       "description": "When it was saved."
+      }
+     ]
+    },
+    {
+     "name": "tasks",
+     "list": "tasks",
+     "select": "Title,task_name,priority,status,org_unit_key,contributes_to_type,contributes_to_key,contributes_to_note,raised_by,date_raised,assigned_to,completed_by,completed_date,notes",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "task_code",
+       "source": "Title",
+       "type": "text",
+       "description": "Key, e.g. TSK-00001. Unique."
+      },
+      {
+       "name": "task_name",
+       "source": "task_name",
+       "type": "text",
+       "description": "What needs doing."
+      },
+      {
+       "name": "priority",
+       "source": "priority",
+       "type": "text",
+       "description": "must, should or could."
+      },
+      {
+       "name": "status",
+       "source": "status",
+       "type": "text",
+       "description": "open, complete or cancelled."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team."
+      },
+      {
+       "name": "team_name",
+       "lookup_from": "org_unit_key",
+       "type": "text",
+       "description": "Team name.",
+       "lookup": [
+        {
+         "table": "org_units",
+         "field": "unit_name"
+        }
+       ]
+      },
+      {
+       "name": "contributes_to_type",
+       "source": "contributes_to_type",
+       "type": "text",
+       "description": "group or measure. Blank if it doesn't contribute to anything specific."
+      },
+      {
+       "name": "contributes_to_key",
+       "source": "contributes_to_key",
+       "type": "text",
+       "description": "group_key or measure_code this work supports."
+      },
+      {
+       "name": "contributes_to_name",
+       "lookup_from": "contributes_to_key",
+       "type": "text",
+       "description": "Name of the group or measure the task supports.",
+       "lookup": [
+        {
+         "table": "groups",
+         "field": "group_name"
+        },
+        {
+         "table": "measures",
+         "field": "measure_name"
+        }
+       ]
+      },
+      {
+       "name": "contributes_to_note",
+       "source": "contributes_to_note",
+       "type": "text",
+       "description": "Optional extra detail on the aim."
+      },
+      {
+       "name": "raised_by",
+       "source": "raised_by",
+       "type": "text",
+       "description": "Who added it."
+      },
+      {
+       "name": "raised_by_name",
+       "lookup_from": "raised_by",
+       "type": "text",
+       "description": "Who raised it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "date_raised",
+       "source": "date_raised",
+       "type": "date",
+       "description": "When it was added."
+      },
+      {
+       "name": "assigned_to",
+       "source": "assigned_to",
+       "type": "text",
+       "description": "Who is doing it."
+      },
+      {
+       "name": "assigned_to_name",
+       "lookup_from": "assigned_to",
+       "type": "text",
+       "description": "Who is doing it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "completed_by",
+       "source": "completed_by",
+       "type": "text",
+       "description": "Who completed it."
+      },
+      {
+       "name": "completed_by_name",
+       "lookup_from": "completed_by",
+       "type": "text",
+       "description": "Who completed it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "completed_date",
+       "source": "completed_date",
+       "type": "date",
+       "description": "When it was completed or cancelled."
+      },
+      {
+       "name": "notes",
+       "source": "notes",
+       "type": "text",
+       "description": "Notes."
+      }
+     ]
+    },
+    {
+     "name": "problems",
+     "list": "problems",
+     "select": "Title,problem_title,problem_statement,status,impact,urgency,org_unit_key,raised_by,raised_on,problem_owner,target_resolution_date,closed_date,resolution,contributes_to_type,contributes_to_key,notes",
+     "filter": "",
+     "main": false,
+     "columns": [
+      {
+       "name": "problem_code",
+       "source": "Title",
+       "type": "text",
+       "description": "Key, e.g. PRB-00001. Unique."
+      },
+      {
+       "name": "problem_title",
+       "source": "problem_title",
+       "type": "text",
+       "description": "Short title."
+      },
+      {
+       "name": "problem_statement",
+       "source": "problem_statement",
+       "type": "text",
+       "description": "What the problem is."
+      },
+      {
+       "name": "status",
+       "source": "status",
+       "type": "text",
+       "description": "open or closed."
+      },
+      {
+       "name": "impact",
+       "source": "impact",
+       "type": "text",
+       "description": "low, medium or high."
+      },
+      {
+       "name": "urgency",
+       "source": "urgency",
+       "type": "text",
+       "description": "low, medium or high."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team."
+      },
+      {
+       "name": "team_name",
+       "lookup_from": "org_unit_key",
+       "type": "text",
+       "description": "Team name.",
+       "lookup": [
+        {
+         "table": "org_units",
+         "field": "unit_name"
+        }
+       ]
+      },
+      {
+       "name": "raised_by",
+       "source": "raised_by",
+       "type": "text",
+       "description": "Who raised it."
+      },
+      {
+       "name": "raised_by_name",
+       "lookup_from": "raised_by",
+       "type": "text",
+       "description": "Who raised it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "raised_on",
+       "source": "raised_on",
+       "type": "date",
+       "description": "When it was raised."
+      },
+      {
+       "name": "problem_owner",
+       "source": "problem_owner",
+       "type": "text",
+       "description": "Who owns resolving it."
+      },
+      {
+       "name": "problem_owner_name",
+       "lookup_from": "problem_owner",
+       "type": "text",
+       "description": "Who owns resolving it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "target_resolution_date",
+       "source": "target_resolution_date",
+       "type": "date",
+       "description": "When it should be resolved by."
+      },
+      {
+       "name": "closed_date",
+       "source": "closed_date",
+       "type": "date",
+       "description": "When it was closed."
+      },
+      {
+       "name": "resolution",
+       "source": "resolution",
+       "type": "text",
+       "description": "How it was resolved."
+      },
+      {
+       "name": "contributes_to_type",
+       "source": "contributes_to_type",
+       "type": "text",
+       "description": "group or measure. Blank if it doesn't contribute to anything specific."
+      },
+      {
+       "name": "contributes_to_key",
+       "source": "contributes_to_key",
+       "type": "text",
+       "description": "group_key or measure_code affected."
+      },
+      {
+       "name": "contributes_to_name",
+       "lookup_from": "contributes_to_key",
+       "type": "text",
+       "description": "Name of the group or measure affected.",
+       "lookup": [
+        {
+         "table": "groups",
+         "field": "group_name"
+        },
+        {
+         "table": "measures",
+         "field": "measure_name"
+        }
+       ]
+      },
+      {
+       "name": "notes",
+       "source": "notes",
+       "type": "text",
+       "description": "Context."
+      }
+     ]
+    }
+   ],
+   "dictionary": [
+    [
+     "measures",
+     "measure_code",
+     "text",
+     "System key, e.g. PM-0001. Unique. Every other table links on this."
+    ],
+    [
+     "measures",
+     "measure_name",
+     "text",
+     "Short name of the measure."
+    ],
+    [
+     "measures",
+     "source_ref",
+     "text",
+     "Reference used in the source document, e.g. 1.01. Not unique: parent and child can share it."
+    ],
+    [
+     "measures",
+     "source_document",
+     "text",
+     "Document or framework the measure comes from."
+    ],
+    [
+     "measures",
+     "parent_measure_code",
+     "text",
+     "measure_code of the parent summary measure. Blank for top-level measures."
+    ],
+    [
+     "measures",
+     "description",
+     "text",
+     "What the measure tells you, in plain English."
+    ],
+    [
+     "measures",
+     "definition",
+     "text",
+     "Definition and calculation method."
+    ],
+    [
+     "measures",
+     "measure_class",
+     "text",
+     "measure, kpi or okr. Tolerance only applies to kpi and okr."
+    ],
+    [
+     "measures",
+     "measure_type",
+     "text",
+     "summary, output or outcome."
+    ],
+    [
+     "measures",
+     "unit",
+     "text",
+     "Unit of the value. percent is stored as 0 to 100 (58 means 58%). gbp is pounds. yes_no is stored as 1 or 0."
+    ],
+    [
+     "measures",
+     "decimal_places",
+     "number",
+     "Decimal places to show. Does not change the stored value."
+    ],
+    [
+     "measures",
+     "polarity",
+     "text",
+     "Which direction is good. Used for RAG."
+    ],
+    [
+     "measures",
+     "frequency",
+     "text",
+     "How often a value is recorded."
+    ],
+    [
+     "measures",
+     "aggregation_method",
+     "text",
+     "How to roll values up to a longer period, e.g. monthly to quarterly. do_not_combine for values that must not be added or averaged."
+    ],
+    [
+     "measures",
+     "expected_lag_days",
+     "number",
+     "Usual days after period end before data is available. Blank means no expectation, so it is never flagged as late."
+    ],
+    [
+     "measures",
+     "category",
+     "text",
+     "Category code from the lookups list."
+    ],
+    [
+     "measures",
+     "data_source",
+     "text",
+     "Where the data comes from."
+    ],
+    [
+     "measures",
+     "org_unit_key",
+     "text",
+     "Team that owns the measure."
+    ],
+    [
+     "measures",
+     "status",
+     "text",
+     "active or retired. Measures are never deleted."
+    ],
+    [
+     "measures",
+     "retired_date",
+     "date",
+     "Date the measure was retired."
+    ],
+    [
+     "measures",
+     "retired_reason",
+     "text",
+     "Why the measure was retired."
+    ],
+    [
+     "periods",
+     "period_key",
+     "text",
+     "Period key, e.g. M-2026-09, Q-2026-27-Q2, T-2026-27-AUT."
+    ],
+    [
+     "periods",
+     "period_type",
+     "text",
+     "Matches a measure frequency."
+    ],
+    [
+     "periods",
+     "period_label",
+     "text",
+     "Display label, e.g. Q2 2026-27 or Autumn Term 2026."
+    ],
+    [
+     "periods",
+     "start_date",
+     "date",
+     "First day of the period."
+    ],
+    [
+     "periods",
+     "end_date",
+     "date",
+     "Last day of the period."
+    ],
+    [
+     "periods",
+     "financial_year",
+     "text",
+     "UK financial year (April to March) containing the start date, e.g. 2026-27."
+    ],
+    [
+     "periods",
+     "financial_quarter",
+     "text",
+     "Financial quarter containing the start date, e.g. 2026-27 Q2. Blank for periods longer than a quarter."
+    ],
+    [
+     "periods",
+     "academic_year",
+     "text",
+     "Academic year (September to August) containing the start date."
+    ],
+    [
+     "periods",
+     "calendar_year",
+     "number",
+     "Calendar year containing the start date."
+    ],
+    [
+     "measure_roles",
+     "role_key",
+     "text",
+     "measure_code|email|role. Unique."
+    ],
+    [
+     "measure_roles",
+     "measure_code",
+     "text",
+     "Measure."
+    ],
+    [
+     "measure_roles",
+     "email",
+     "text",
+     "Person."
+    ],
+    [
+     "measure_roles",
+     "role",
+     "text",
+     "owner, updater or approver."
+    ],
+    [
+     "measure_roles",
+     "active",
+     "bool",
+     "Only active roles give access."
+    ],
+    [
+     "measure_roles",
+     "start_date",
+     "date",
+     "Role start."
+    ],
+    [
+     "measure_roles",
+     "end_date",
+     "date",
+     "Role end."
+    ],
+    [
+     "people",
+     "email",
+     "text",
+     "Work email, lower case. Unique."
+    ],
+    [
+     "people",
+     "display_name",
+     "text",
+     "Name shown in the app."
+    ],
+    [
+     "people",
+     "org_unit_key",
+     "text",
+     "Default team. Pre-fills the weekly update."
+    ],
+    [
+     "people",
+     "app_role",
+     "text",
+     "admin, standard or viewer. Measure rights come from measure_roles."
+    ],
+    [
+     "people",
+     "active",
+     "bool",
+     "Leavers are made inactive, never deleted."
+    ],
+    [
+     "org_units",
+     "org_unit_key",
+     "text",
+     "Key, e.g. WS-JOBS, TM-SDS, ST-SDS-A. Unique."
+    ],
+    [
+     "org_units",
+     "unit_name",
+     "text",
+     "Name as people know it."
+    ],
+    [
+     "org_units",
+     "unit_level",
+     "text",
+     "workstream, team or sub_team."
+    ],
+    [
+     "org_units",
+     "parent_key",
+     "text",
+     "Parent unit. Blank for workstreams."
+    ],
+    [
+     "org_units",
+     "active",
+     "bool",
+     "Inactive units are hidden from new entries."
+    ],
+    [
+     "groups",
+     "group_key",
+     "text",
+     "Group key, e.g. TH-JOBS. Unique."
+    ],
+    [
+     "groups",
+     "group_name",
+     "text",
+     "Name of the theme, programme or objective."
+    ],
+    [
+     "groups",
+     "group_type",
+     "text",
+     "theme, programme or objective."
+    ],
+    [
+     "groups",
+     "description",
+     "text",
+     "What it covers."
+    ],
+    [
+     "groups",
+     "active",
+     "bool",
+     "Inactive groups are hidden from new entries."
+    ],
+    [
+     "measure_links",
+     "link_key",
+     "text",
+     "measure_code|group_key. Unique."
+    ],
+    [
+     "measure_links",
+     "measure_code",
+     "text",
+     "Measure."
+    ],
+    [
+     "measure_links",
+     "group_key",
+     "text",
+     "Group."
+    ],
+    [
+     "measure_links",
+     "relationship_type",
+     "text",
+     "primary, contributes_to or related."
+    ],
+    [
+     "measure_links",
+     "active",
+     "bool",
+     "Inactive links are kept for history."
+    ],
+    [
+     "reference_values",
+     "ref_key",
+     "text",
+     "measure_code|period_key|ref_type. Unique."
+    ],
+    [
+     "reference_values",
+     "measure_code",
+     "text",
+     "Measure."
+    ],
+    [
+     "reference_values",
+     "period_key",
+     "text",
+     "Period."
+    ],
+    [
+     "reference_values",
+     "ref_type",
+     "text",
+     "target, tolerance, baseline or capacity. tolerance only for kpi and okr measures."
+    ],
+    [
+     "reference_values",
+     "ref_value",
+     "number",
+     "The reference value, in the measure's unit."
+    ],
+    [
+     "reference_values",
+     "notes",
+     "text",
+     "Where the value came from."
+    ],
+    [
+     "reference_values",
+     "active",
+     "bool",
+     "Inactive values are ignored."
+    ],
+    [
+     "submissions",
+     "submission_key",
+     "text",
+     "measure_code|period_key. Unique."
+    ],
+    [
+     "submissions",
+     "measure_code",
+     "text",
+     "Measure."
+    ],
+    [
+     "submissions",
+     "period_key",
+     "text",
+     "Period the data relates to."
+    ],
+    [
+     "submissions",
+     "status",
+     "text",
+     "not_started, draft, submitted, returned or approved."
+    ],
+    [
+     "submissions",
+     "expected_by",
+     "date",
+     "Period end plus the measure's expected lag. Blank if no lag is set."
+    ],
+    [
+     "submissions",
+     "current_version",
+     "number",
+     "Latest version number. 0 before anything is entered."
+    ],
+    [
+     "submissions",
+     "approved_version",
+     "number",
+     "Version used in reports. Blank until first approval."
+    ],
+    [
+     "submissions",
+     "submitted_date",
+     "datetime",
+     "When the latest version was submitted."
+    ],
+    [
+     "submissions",
+     "approved_by",
+     "text",
+     "Email of the approver."
+    ],
+    [
+     "submissions",
+     "approved_date",
+     "datetime",
+     "When it was approved."
+    ],
+    [
+     "approved_values",
+     "version_key",
+     "text",
+     "submission_key|v<version_no>. Unique."
+    ],
+    [
+     "approved_values",
+     "submission_key",
+     "text",
+     "Submission."
+    ],
+    [
+     "approved_values",
+     "measure_code",
+     "text",
+     "Measure (copied from the submission for filtering)."
+    ],
+    [
+     "approved_values",
+     "period_key",
+     "text",
+     "Period (copied from the submission for filtering)."
+    ],
+    [
+     "approved_values",
+     "version_no",
+     "number",
+     "1, 2, 3 and so on."
+    ],
+    [
+     "approved_values",
+     "value_number",
+     "number",
+     "The value for all units except text. percent 0 to 100, yes_no 1 or 0."
+    ],
+    [
+     "approved_values",
+     "value_text",
+     "text",
+     "The value for text measures only."
+    ],
+    [
+     "approved_values",
+     "value_missing",
+     "bool",
+     "Yes if no value could be provided. Narrative then required."
+    ],
+    [
+     "approved_values",
+     "narrative",
+     "text",
+     "Updater's commentary. Required if the value is missing or off track."
+    ],
+    [
+     "approved_values",
+     "data_quality",
+     "text",
+     "verified, provisional, estimated or unverified."
+    ],
+    [
+     "approved_values",
+     "submitted_date",
+     "datetime",
+     "When this version was submitted."
+    ],
+    [
+     "approved_values",
+     "rag_status",
+     "text",
+     "RAG worked out at approval using polarity and the period's target and tolerance."
+    ],
+    [
+     "values_flat",
+     "submission_key",
+     "text",
+     "measure_code|period_key. Unique."
+    ],
+    [
+     "values_flat",
+     "measure_code",
+     "text",
+     "Measure."
+    ],
+    [
+     "values_flat",
+     "measure_name",
+     "text",
+     "Measure name."
+    ],
+    [
+     "values_flat",
+     "source_ref",
+     "text",
+     "Source document reference."
+    ],
+    [
+     "values_flat",
+     "parent_measure_code",
+     "text",
+     "Parent measure."
+    ],
+    [
+     "values_flat",
+     "measure_class",
+     "text",
+     "measure, kpi or okr."
+    ],
+    [
+     "values_flat",
+     "measure_type",
+     "text",
+     "summary, output or outcome."
+    ],
+    [
+     "values_flat",
+     "category",
+     "text",
+     "Category code."
+    ],
+    [
+     "values_flat",
+     "unit",
+     "text",
+     "Unit."
+    ],
+    [
+     "values_flat",
+     "polarity",
+     "text",
+     "Polarity."
+    ],
+    [
+     "values_flat",
+     "frequency",
+     "text",
+     "Frequency."
+    ],
+    [
+     "values_flat",
+     "aggregation_method",
+     "text",
+     "How to roll up."
+    ],
+    [
+     "values_flat",
+     "owner_name",
+     "text",
+     "Measure owner."
+    ],
+    [
+     "values_flat",
+     "owner_email",
+     "text",
+     "Measure owner email."
+    ],
+    [
+     "values_flat",
+     "org_unit_key",
+     "text",
+     "Owning team."
+    ],
+    [
+     "values_flat",
+     "period_key",
+     "text",
+     "Period."
+    ],
+    [
+     "values_flat",
+     "period_type",
+     "text",
+     "Period type."
+    ],
+    [
+     "values_flat",
+     "period_label",
+     "text",
+     "Period label."
+    ],
+    [
+     "values_flat",
+     "period_start",
+     "date",
+     "Period start date."
+    ],
+    [
+     "values_flat",
+     "period_end",
+     "date",
+     "Period end date."
+    ],
+    [
+     "values_flat",
+     "financial_year",
+     "text",
+     "Financial year."
+    ],
+    [
+     "values_flat",
+     "financial_quarter",
+     "text",
+     "Financial quarter."
+    ],
+    [
+     "values_flat",
+     "value_number",
+     "number",
+     "Approved value (not text measures)."
+    ],
+    [
+     "values_flat",
+     "value_text",
+     "text",
+     "Approved value (text measures)."
+    ],
+    [
+     "values_flat",
+     "value_missing",
+     "bool",
+     "Yes if no value was provided."
+    ],
+    [
+     "values_flat",
+     "narrative",
+     "text",
+     "Approved narrative."
+    ],
+    [
+     "values_flat",
+     "data_quality",
+     "text",
+     "Data quality flag."
+    ],
+    [
+     "values_flat",
+     "version_no",
+     "number",
+     "Approved version number."
+    ],
+    [
+     "values_flat",
+     "approved_by",
+     "text",
+     "Approver email."
+    ],
+    [
+     "values_flat",
+     "approved_date",
+     "datetime",
+     "Approval time."
+    ],
+    [
+     "values_flat",
+     "target_value",
+     "number",
+     "Target for the period."
+    ],
+    [
+     "values_flat",
+     "tolerance_value",
+     "number",
+     "Tolerance for the period (kpi and okr only)."
+    ],
+    [
+     "values_flat",
+     "baseline_value",
+     "number",
+     "Baseline for the period."
+    ],
+    [
+     "values_flat",
+     "capacity_value",
+     "number",
+     "Capacity or throughput for the period."
+    ],
+    [
+     "values_flat",
+     "rag_status",
+     "text",
+     "green, amber, red, no_target, no_data or not_applicable."
+    ],
+    [
+     "values_flat",
+     "is_latest",
+     "bool",
+     "Yes on the most recent approved period for the measure."
+    ],
+    [
+     "values_flat",
+     "refreshed_at",
+     "datetime",
+     "When this row was last rebuilt."
+    ],
+    [
+     "weekly_updates",
+     "update_key",
+     "text",
+     "email|week_start. Unique."
+    ],
+    [
+     "weekly_updates",
+     "week_start",
+     "date",
+     "Monday of the week."
+    ],
+    [
+     "weekly_updates",
+     "email",
+     "text",
+     "Person."
+    ],
+    [
+     "weekly_updates",
+     "person_name",
+     "text",
+     "Name of the person."
+    ],
+    [
+     "weekly_updates",
+     "org_unit_key",
+     "text",
+     "Team at the time of the update."
+    ],
+    [
+     "weekly_updates",
+     "team_name",
+     "text",
+     "Team name."
+    ],
+    [
+     "weekly_updates",
+     "successes",
+     "text",
+     "Successes had or heard about."
+    ],
+    [
+     "weekly_updates",
+     "communication",
+     "text",
+     "Anything that would help if more widely known."
+    ],
+    [
+     "weekly_updates",
+     "workload",
+     "text",
+     "light, manageable, heavy or overloaded."
+    ],
+    [
+     "weekly_updates",
+     "submitted_at",
+     "datetime",
+     "When it was saved."
+    ],
+    [
+     "tasks",
+     "task_code",
+     "text",
+     "Key, e.g. TSK-00001. Unique."
+    ],
+    [
+     "tasks",
+     "task_name",
+     "text",
+     "What needs doing."
+    ],
+    [
+     "tasks",
+     "priority",
+     "text",
+     "must, should or could."
+    ],
+    [
+     "tasks",
+     "status",
+     "text",
+     "open, complete or cancelled."
+    ],
+    [
+     "tasks",
+     "org_unit_key",
+     "text",
+     "Team."
+    ],
+    [
+     "tasks",
+     "team_name",
+     "text",
+     "Team name."
+    ],
+    [
+     "tasks",
+     "contributes_to_type",
+     "text",
+     "group or measure. Blank if it doesn't contribute to anything specific."
+    ],
+    [
+     "tasks",
+     "contributes_to_key",
+     "text",
+     "group_key or measure_code this work supports."
+    ],
+    [
+     "tasks",
+     "contributes_to_name",
+     "text",
+     "Name of the group or measure the task supports."
+    ],
+    [
+     "tasks",
+     "contributes_to_note",
+     "text",
+     "Optional extra detail on the aim."
+    ],
+    [
+     "tasks",
+     "raised_by",
+     "text",
+     "Who added it."
+    ],
+    [
+     "tasks",
+     "raised_by_name",
+     "text",
+     "Who raised it."
+    ],
+    [
+     "tasks",
+     "date_raised",
+     "date",
+     "When it was added."
+    ],
+    [
+     "tasks",
+     "assigned_to",
+     "text",
+     "Who is doing it."
+    ],
+    [
+     "tasks",
+     "assigned_to_name",
+     "text",
+     "Who is doing it."
+    ],
+    [
+     "tasks",
+     "completed_by",
+     "text",
+     "Who completed it."
+    ],
+    [
+     "tasks",
+     "completed_by_name",
+     "text",
+     "Who completed it."
+    ],
+    [
+     "tasks",
+     "completed_date",
+     "date",
+     "When it was completed or cancelled."
+    ],
+    [
+     "tasks",
+     "notes",
+     "text",
+     "Notes."
+    ],
+    [
+     "problems",
+     "problem_code",
+     "text",
+     "Key, e.g. PRB-00001. Unique."
+    ],
+    [
+     "problems",
+     "problem_title",
+     "text",
+     "Short title."
+    ],
+    [
+     "problems",
+     "problem_statement",
+     "text",
+     "What the problem is."
+    ],
+    [
+     "problems",
+     "status",
+     "text",
+     "open or closed."
+    ],
+    [
+     "problems",
+     "impact",
+     "text",
+     "low, medium or high."
+    ],
+    [
+     "problems",
+     "urgency",
+     "text",
+     "low, medium or high."
+    ],
+    [
+     "problems",
+     "org_unit_key",
+     "text",
+     "Team."
+    ],
+    [
+     "problems",
+     "team_name",
+     "text",
+     "Team name."
+    ],
+    [
+     "problems",
+     "raised_by",
+     "text",
+     "Who raised it."
+    ],
+    [
+     "problems",
+     "raised_by_name",
+     "text",
+     "Who raised it."
+    ],
+    [
+     "problems",
+     "raised_on",
+     "date",
+     "When it was raised."
+    ],
+    [
+     "problems",
+     "problem_owner",
+     "text",
+     "Who owns resolving it."
+    ],
+    [
+     "problems",
+     "problem_owner_name",
+     "text",
+     "Who owns resolving it."
+    ],
+    [
+     "problems",
+     "target_resolution_date",
+     "date",
+     "When it should be resolved by."
+    ],
+    [
+     "problems",
+     "closed_date",
+     "date",
+     "When it was closed."
+    ],
+    [
+     "problems",
+     "resolution",
+     "text",
+     "How it was resolved."
+    ],
+    [
+     "problems",
+     "contributes_to_type",
+     "text",
+     "group or measure. Blank if it doesn't contribute to anything specific."
+    ],
+    [
+     "problems",
+     "contributes_to_key",
+     "text",
+     "group_key or measure_code affected."
+    ],
+    [
+     "problems",
+     "contributes_to_name",
+     "text",
+     "Name of the group or measure affected."
+    ],
+    [
+     "problems",
+     "notes",
+     "text",
+     "Context."
+    ]
+   ],
+   "readme": "# Full data model\n\nEvery table in the model, for Power BI, Excel or AI tools. Approved values only; review comments, wellbeing and the audit log are never included.\n\nThe folder name and `export_info.txt` say when the export ran and what filter was used.\n\n## Files\n\n- `measures.csv` (sheet `measures` in the Excel file): One row per measure. Retired measures stay, with their history.\n- `periods.csv` (sheet `periods` in the Excel file): Central calendar. Every value joins to one period. Term rows are edited here by admins.\n- `measure_roles.csv` (sheet `measure_roles` in the Excel file): Who owns, updates and approves each measure. A measure can have several updaters.\n- `people.csv` (sheet `people` in the Excel file): Everyone who uses the system.\n- `org_units.csv` (sheet `org_units` in the Excel file): Workstream, team and sub-team hierarchy. Feeds every team dropdown.\n- `groups.csv` (sheet `groups` in the Excel file): Themes, programmes and objectives that measures and work contribute to.\n- `measure_links.csv` (sheet `measure_links` in the Excel file): Many-to-many links between measures and groups.\n- `reference_values.csv` (sheet `reference_values` in the Excel file): Optional targets, tolerances, baselines and capacities. Zero or more per measure per period.\n- `submissions.csv` (sheet `submissions` in the Excel file): One row per measure per period. Created as not_started when the period ends.\n- `approved_values.csv` (sheet `approved_values` in the Excel file): Every version of every value. Drafts are edited in place; each resubmission after a return is a new version.\n- `values_flat.csv` (sheet `values_flat` in the Excel file): Flat, read-only reporting table: one row per approved measure per period with every lookup filled in. Rebuilt by flows; export straight from here.\n- `weekly_updates.csv` (sheet `weekly_updates` in the Excel file): One row per person per week: successes, communication and workload.\n- `tasks.csv` (sheet `tasks` in the Excel file): One row per task for its whole life. Open tasks carry over each week; nobody re-enters them.\n- `problems.csv` (sheet `problems` in the Excel file): One row per problem for its whole life. Open problems carry over each week.\n- `data_dictionary.csv` (sheet `data_dictionary`): every column in this export, with its type and meaning.\n- `README_for_AI.md`: this file.\n\n## How to read this data\n\n- Every file is tidy: one row per record, one column per field, a single header row, no merged cells and no totals.\n- Column names are snake_case and mean the same thing in every file. `data_dictionary.csv` (or the `data_dictionary` sheet) describes every column.\n- Dates are `YYYY-MM-DD` (UK dates). Date-times are UTC in ISO 8601, for example `2026-09-30T06:00:00Z`.\n- Numbers are plain numbers. A blank cell means there is no value; it never means zero.\n- `percent` values are 0 to 100, so 58 means 58%. `gbp` is pounds. `yes_no` is 1 (yes) or 0 (no). `text` measures use `value_text`.\n- Only **approved** values are included. Drafts, returned values and reviewer comments are not.\n- `measure_code` (for example PM-0007) is the unique key for a measure. `source_ref` is the reference used in the source document and can repeat.\n- The financial year runs April to March. `financial_quarter` looks like `2026-27 Q2` (Q1 is April to June).\n- `rag_status`: `green` is on or better than target; `amber` is short of target but within tolerance; `red` is off track; `no_target` means no target was set; `no_data` means no value was provided; `not_applicable` means RAG isn't used for that measure.\n- `polarity` says whether higher or lower is better. `aggregation_method` says how to combine values into a longer period: sum, average, latest, max or min. `do_not_combine` means the values must not be added up or averaged.\n- `is_latest` is true on the most recent approved period for each measure.\n- Individual wellbeing, reviewer comments and the audit log are never included in exports.\n\n## How the tables join\n\n| From | Column | To |\n|---|---|---|\n| any table | `measure_code` | `measures.measure_code` |\n| any table | `period_key` | `periods.period_key` |\n| measures | `parent_measure_code` | `measures.measure_code` (parent summary measure) |\n| submissions, approved_values | `submission_key` | `submissions.submission_key` |\n| measure_links | `group_key` | `groups.group_key` |\n| measure_roles, weekly_updates | `email` | `people.email` |\n| most tables | `org_unit_key` | `org_units.org_unit_key` |\n| tasks, problems | `contributes_to_key` | `groups.group_key` or `measures.measure_code` (see `contributes_to_type`) |\n\n`values_flat` already has every lookup filled in, so for most questions it's the only table you need.\n",
+   "prompt": ""
+  },
+  "measures": {
+   "title": "Measure values",
+   "tables": [
+    {
+     "name": "values_flat",
+     "list": "rpt_values",
+     "select": "Title,measure_code,measure_name,source_ref,parent_measure_code,measure_class,measure_type,category,unit,polarity,frequency,aggregation_method,owner_name,owner_email,org_unit_key,period_key,period_type,period_label,period_start,period_end,financial_year,financial_quarter,value_number,value_text,value_missing,narrative,data_quality,version_no,approved_by,approved_date,target_value,tolerance_value,baseline_value,capacity_value,rag_status,is_latest,refreshed_at",
+     "filter": "",
+     "main": true,
+     "columns": [
+      {
+       "name": "submission_key",
+       "source": "Title",
+       "type": "text",
+       "description": "measure_code|period_key. Unique."
+      },
+      {
+       "name": "measure_code",
+       "source": "measure_code",
+       "type": "text",
+       "description": "Measure."
+      },
+      {
+       "name": "measure_name",
+       "source": "measure_name",
+       "type": "text",
+       "description": "Measure name."
+      },
+      {
+       "name": "source_ref",
+       "source": "source_ref",
+       "type": "text",
+       "description": "Source document reference."
+      },
+      {
+       "name": "parent_measure_code",
+       "source": "parent_measure_code",
+       "type": "text",
+       "description": "Parent measure."
+      },
+      {
+       "name": "measure_class",
+       "source": "measure_class",
+       "type": "text",
+       "description": "measure, kpi or okr."
+      },
+      {
+       "name": "measure_type",
+       "source": "measure_type",
+       "type": "text",
+       "description": "summary, output or outcome."
+      },
+      {
+       "name": "category",
+       "source": "category",
+       "type": "text",
+       "description": "Category code."
+      },
+      {
+       "name": "unit",
+       "source": "unit",
+       "type": "text",
+       "description": "Unit."
+      },
+      {
+       "name": "polarity",
+       "source": "polarity",
+       "type": "text",
+       "description": "Polarity."
+      },
+      {
+       "name": "frequency",
+       "source": "frequency",
+       "type": "text",
+       "description": "Frequency."
+      },
+      {
+       "name": "aggregation_method",
+       "source": "aggregation_method",
+       "type": "text",
+       "description": "How to roll up."
+      },
+      {
+       "name": "owner_name",
+       "source": "owner_name",
+       "type": "text",
+       "description": "Measure owner."
+      },
+      {
+       "name": "owner_email",
+       "source": "owner_email",
+       "type": "text",
+       "description": "Measure owner email."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Owning team."
+      },
+      {
+       "name": "period_key",
+       "source": "period_key",
+       "type": "text",
+       "description": "Period."
+      },
+      {
+       "name": "period_type",
+       "source": "period_type",
+       "type": "text",
+       "description": "Period type."
+      },
+      {
+       "name": "period_label",
+       "source": "period_label",
+       "type": "text",
+       "description": "Period label."
+      },
+      {
+       "name": "period_start",
+       "source": "period_start",
+       "type": "date",
+       "description": "Period start date."
+      },
+      {
+       "name": "period_end",
+       "source": "period_end",
+       "type": "date",
+       "description": "Period end date."
+      },
+      {
+       "name": "financial_year",
+       "source": "financial_year",
+       "type": "text",
+       "description": "Financial year."
+      },
+      {
+       "name": "financial_quarter",
+       "source": "financial_quarter",
+       "type": "text",
+       "description": "Financial quarter."
+      },
+      {
+       "name": "value_number",
+       "source": "value_number",
+       "type": "number",
+       "description": "Approved value (not text measures)."
+      },
+      {
+       "name": "value_text",
+       "source": "value_text",
+       "type": "text",
+       "description": "Approved value (text measures)."
+      },
+      {
+       "name": "value_missing",
+       "source": "value_missing",
+       "type": "bool",
+       "description": "Yes if no value was provided."
+      },
+      {
+       "name": "narrative",
+       "source": "narrative",
+       "type": "text",
+       "description": "Approved narrative."
+      },
+      {
+       "name": "data_quality",
+       "source": "data_quality",
+       "type": "text",
+       "description": "Data quality flag."
+      },
+      {
+       "name": "version_no",
+       "source": "version_no",
+       "type": "number",
+       "description": "Approved version number."
+      },
+      {
+       "name": "approved_by",
+       "source": "approved_by",
+       "type": "text",
+       "description": "Approver email."
+      },
+      {
+       "name": "approved_date",
+       "source": "approved_date",
+       "type": "datetime",
+       "description": "Approval time."
+      },
+      {
+       "name": "target_value",
+       "source": "target_value",
+       "type": "number",
+       "description": "Target for the period."
+      },
+      {
+       "name": "tolerance_value",
+       "source": "tolerance_value",
+       "type": "number",
+       "description": "Tolerance for the period (kpi and okr only)."
+      },
+      {
+       "name": "baseline_value",
+       "source": "baseline_value",
+       "type": "number",
+       "description": "Baseline for the period."
+      },
+      {
+       "name": "capacity_value",
+       "source": "capacity_value",
+       "type": "number",
+       "description": "Capacity or throughput for the period."
+      },
+      {
+       "name": "rag_status",
+       "source": "rag_status",
+       "type": "text",
+       "description": "green, amber, red, no_target, no_data or not_applicable."
+      },
+      {
+       "name": "is_latest",
+       "source": "is_latest",
+       "type": "bool",
+       "description": "Yes on the most recent approved period for the measure."
+      },
+      {
+       "name": "refreshed_at",
+       "source": "refreshed_at",
+       "type": "datetime",
+       "description": "When this row was last rebuilt."
+      }
+     ]
+    }
+   ],
+   "dictionary": [
+    [
+     "values_flat",
+     "submission_key",
+     "text",
+     "measure_code|period_key. Unique."
+    ],
+    [
+     "values_flat",
+     "measure_code",
+     "text",
+     "Measure."
+    ],
+    [
+     "values_flat",
+     "measure_name",
+     "text",
+     "Measure name."
+    ],
+    [
+     "values_flat",
+     "source_ref",
+     "text",
+     "Source document reference."
+    ],
+    [
+     "values_flat",
+     "parent_measure_code",
+     "text",
+     "Parent measure."
+    ],
+    [
+     "values_flat",
+     "measure_class",
+     "text",
+     "measure, kpi or okr."
+    ],
+    [
+     "values_flat",
+     "measure_type",
+     "text",
+     "summary, output or outcome."
+    ],
+    [
+     "values_flat",
+     "category",
+     "text",
+     "Category code."
+    ],
+    [
+     "values_flat",
+     "unit",
+     "text",
+     "Unit."
+    ],
+    [
+     "values_flat",
+     "polarity",
+     "text",
+     "Polarity."
+    ],
+    [
+     "values_flat",
+     "frequency",
+     "text",
+     "Frequency."
+    ],
+    [
+     "values_flat",
+     "aggregation_method",
+     "text",
+     "How to roll up."
+    ],
+    [
+     "values_flat",
+     "owner_name",
+     "text",
+     "Measure owner."
+    ],
+    [
+     "values_flat",
+     "owner_email",
+     "text",
+     "Measure owner email."
+    ],
+    [
+     "values_flat",
+     "org_unit_key",
+     "text",
+     "Owning team."
+    ],
+    [
+     "values_flat",
+     "period_key",
+     "text",
+     "Period."
+    ],
+    [
+     "values_flat",
+     "period_type",
+     "text",
+     "Period type."
+    ],
+    [
+     "values_flat",
+     "period_label",
+     "text",
+     "Period label."
+    ],
+    [
+     "values_flat",
+     "period_start",
+     "date",
+     "Period start date."
+    ],
+    [
+     "values_flat",
+     "period_end",
+     "date",
+     "Period end date."
+    ],
+    [
+     "values_flat",
+     "financial_year",
+     "text",
+     "Financial year."
+    ],
+    [
+     "values_flat",
+     "financial_quarter",
+     "text",
+     "Financial quarter."
+    ],
+    [
+     "values_flat",
+     "value_number",
+     "number",
+     "Approved value (not text measures)."
+    ],
+    [
+     "values_flat",
+     "value_text",
+     "text",
+     "Approved value (text measures)."
+    ],
+    [
+     "values_flat",
+     "value_missing",
+     "bool",
+     "Yes if no value was provided."
+    ],
+    [
+     "values_flat",
+     "narrative",
+     "text",
+     "Approved narrative."
+    ],
+    [
+     "values_flat",
+     "data_quality",
+     "text",
+     "Data quality flag."
+    ],
+    [
+     "values_flat",
+     "version_no",
+     "number",
+     "Approved version number."
+    ],
+    [
+     "values_flat",
+     "approved_by",
+     "text",
+     "Approver email."
+    ],
+    [
+     "values_flat",
+     "approved_date",
+     "datetime",
+     "Approval time."
+    ],
+    [
+     "values_flat",
+     "target_value",
+     "number",
+     "Target for the period."
+    ],
+    [
+     "values_flat",
+     "tolerance_value",
+     "number",
+     "Tolerance for the period (kpi and okr only)."
+    ],
+    [
+     "values_flat",
+     "baseline_value",
+     "number",
+     "Baseline for the period."
+    ],
+    [
+     "values_flat",
+     "capacity_value",
+     "number",
+     "Capacity or throughput for the period."
+    ],
+    [
+     "values_flat",
+     "rag_status",
+     "text",
+     "green, amber, red, no_target, no_data or not_applicable."
+    ],
+    [
+     "values_flat",
+     "is_latest",
+     "bool",
+     "Yes on the most recent approved period for the measure."
+    ],
+    [
+     "values_flat",
+     "refreshed_at",
+     "datetime",
+     "When this row was last rebuilt."
+    ]
+   ],
+   "readme": "# Measure values\n\nOne row per approved measure per period, with measure, owner, period, targets and RAG filled in. Works on its own with no joins.\n\nThe folder name and `export_info.txt` say when the export ran and what filter was used.\n\n## Files\n\n- `values_flat.csv` (sheet `values_flat` in the Excel file): Flat, read-only reporting table: one row per approved measure per period with every lookup filled in. Rebuilt by flows; export straight from here.\n- `data_dictionary.csv` (sheet `data_dictionary`): every column in this export, with its type and meaning.\n- `README_for_AI.md`: this file.\n\n## How to read this data\n\n- Every file is tidy: one row per record, one column per field, a single header row, no merged cells and no totals.\n- Column names are snake_case and mean the same thing in every file. `data_dictionary.csv` (or the `data_dictionary` sheet) describes every column.\n- Dates are `YYYY-MM-DD` (UK dates). Date-times are UTC in ISO 8601, for example `2026-09-30T06:00:00Z`.\n- Numbers are plain numbers. A blank cell means there is no value; it never means zero.\n- `percent` values are 0 to 100, so 58 means 58%. `gbp` is pounds. `yes_no` is 1 (yes) or 0 (no). `text` measures use `value_text`.\n- Only **approved** values are included. Drafts, returned values and reviewer comments are not.\n- `measure_code` (for example PM-0007) is the unique key for a measure. `source_ref` is the reference used in the source document and can repeat.\n- The financial year runs April to March. `financial_quarter` looks like `2026-27 Q2` (Q1 is April to June).\n- `rag_status`: `green` is on or better than target; `amber` is short of target but within tolerance; `red` is off track; `no_target` means no target was set; `no_data` means no value was provided; `not_applicable` means RAG isn't used for that measure.\n- `polarity` says whether higher or lower is better. `aggregation_method` says how to combine values into a longer period: sum, average, latest, max or min. `do_not_combine` means the values must not be added up or averaged.\n- `is_latest` is true on the most recent approved period for each measure.\n- Individual wellbeing, reviewer comments and the audit log are never included in exports.\n",
+   "prompt": ""
+  },
+  "weekly_work": {
+   "title": "Weekly work",
+   "tables": [
+    {
+     "name": "weekly_updates",
+     "list": "weekly_updates",
+     "select": "Title,week_start,email,org_unit_key,successes,communication,workload,submitted_at",
+     "filter": "",
+     "main": true,
+     "columns": [
+      {
+       "name": "update_key",
+       "source": "Title",
+       "type": "text",
+       "description": "email|week_start. Unique."
+      },
+      {
+       "name": "week_start",
+       "source": "week_start",
+       "type": "date",
+       "description": "Monday of the week."
+      },
+      {
+       "name": "email",
+       "source": "email",
+       "type": "text",
+       "description": "Person."
+      },
+      {
+       "name": "person_name",
+       "lookup_from": "email",
+       "type": "text",
+       "description": "Name of the person.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team at the time of the update."
+      },
+      {
+       "name": "team_name",
+       "lookup_from": "org_unit_key",
+       "type": "text",
+       "description": "Team name.",
+       "lookup": [
+        {
+         "table": "org_units",
+         "field": "unit_name"
+        }
+       ]
+      },
+      {
+       "name": "successes",
+       "source": "successes",
+       "type": "text",
+       "description": "Successes had or heard about."
+      },
+      {
+       "name": "communication",
+       "source": "communication",
+       "type": "text",
+       "description": "Anything that would help if more widely known."
+      },
+      {
+       "name": "workload",
+       "source": "workload",
+       "type": "text",
+       "description": "light, manageable, heavy or overloaded."
+      },
+      {
+       "name": "submitted_at",
+       "source": "submitted_at",
+       "type": "datetime",
+       "description": "When it was saved."
+      }
+     ]
+    },
+    {
+     "name": "tasks",
+     "list": "tasks",
+     "select": "Title,task_name,priority,status,org_unit_key,contributes_to_type,contributes_to_key,contributes_to_note,raised_by,date_raised,assigned_to,completed_by,completed_date,notes",
+     "filter": "",
+     "main": true,
+     "columns": [
+      {
+       "name": "task_code",
+       "source": "Title",
+       "type": "text",
+       "description": "Key, e.g. TSK-00001. Unique."
+      },
+      {
+       "name": "task_name",
+       "source": "task_name",
+       "type": "text",
+       "description": "What needs doing."
+      },
+      {
+       "name": "priority",
+       "source": "priority",
+       "type": "text",
+       "description": "must, should or could."
+      },
+      {
+       "name": "status",
+       "source": "status",
+       "type": "text",
+       "description": "open, complete or cancelled."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team."
+      },
+      {
+       "name": "team_name",
+       "lookup_from": "org_unit_key",
+       "type": "text",
+       "description": "Team name.",
+       "lookup": [
+        {
+         "table": "org_units",
+         "field": "unit_name"
+        }
+       ]
+      },
+      {
+       "name": "contributes_to_type",
+       "source": "contributes_to_type",
+       "type": "text",
+       "description": "group or measure. Blank if it doesn't contribute to anything specific."
+      },
+      {
+       "name": "contributes_to_key",
+       "source": "contributes_to_key",
+       "type": "text",
+       "description": "group_key or measure_code this work supports."
+      },
+      {
+       "name": "contributes_to_name",
+       "lookup_from": "contributes_to_key",
+       "type": "text",
+       "description": "Name of the group or measure the task supports.",
+       "lookup": [
+        {
+         "table": "groups",
+         "field": "group_name"
+        },
+        {
+         "table": "measures",
+         "field": "measure_name"
+        }
+       ]
+      },
+      {
+       "name": "contributes_to_note",
+       "source": "contributes_to_note",
+       "type": "text",
+       "description": "Optional extra detail on the aim."
+      },
+      {
+       "name": "raised_by",
+       "source": "raised_by",
+       "type": "text",
+       "description": "Who added it."
+      },
+      {
+       "name": "raised_by_name",
+       "lookup_from": "raised_by",
+       "type": "text",
+       "description": "Who raised it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "date_raised",
+       "source": "date_raised",
+       "type": "date",
+       "description": "When it was added."
+      },
+      {
+       "name": "assigned_to",
+       "source": "assigned_to",
+       "type": "text",
+       "description": "Who is doing it."
+      },
+      {
+       "name": "assigned_to_name",
+       "lookup_from": "assigned_to",
+       "type": "text",
+       "description": "Who is doing it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "completed_by",
+       "source": "completed_by",
+       "type": "text",
+       "description": "Who completed it."
+      },
+      {
+       "name": "completed_by_name",
+       "lookup_from": "completed_by",
+       "type": "text",
+       "description": "Who completed it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "completed_date",
+       "source": "completed_date",
+       "type": "date",
+       "description": "When it was completed or cancelled."
+      },
+      {
+       "name": "notes",
+       "source": "notes",
+       "type": "text",
+       "description": "Notes."
+      }
+     ]
+    },
+    {
+     "name": "problems",
+     "list": "problems",
+     "select": "Title,problem_title,problem_statement,status,impact,urgency,org_unit_key,raised_by,raised_on,problem_owner,target_resolution_date,closed_date,resolution,contributes_to_type,contributes_to_key,notes",
+     "filter": "",
+     "main": true,
+     "columns": [
+      {
+       "name": "problem_code",
+       "source": "Title",
+       "type": "text",
+       "description": "Key, e.g. PRB-00001. Unique."
+      },
+      {
+       "name": "problem_title",
+       "source": "problem_title",
+       "type": "text",
+       "description": "Short title."
+      },
+      {
+       "name": "problem_statement",
+       "source": "problem_statement",
+       "type": "text",
+       "description": "What the problem is."
+      },
+      {
+       "name": "status",
+       "source": "status",
+       "type": "text",
+       "description": "open or closed."
+      },
+      {
+       "name": "impact",
+       "source": "impact",
+       "type": "text",
+       "description": "low, medium or high."
+      },
+      {
+       "name": "urgency",
+       "source": "urgency",
+       "type": "text",
+       "description": "low, medium or high."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team."
+      },
+      {
+       "name": "team_name",
+       "lookup_from": "org_unit_key",
+       "type": "text",
+       "description": "Team name.",
+       "lookup": [
+        {
+         "table": "org_units",
+         "field": "unit_name"
+        }
+       ]
+      },
+      {
+       "name": "raised_by",
+       "source": "raised_by",
+       "type": "text",
+       "description": "Who raised it."
+      },
+      {
+       "name": "raised_by_name",
+       "lookup_from": "raised_by",
+       "type": "text",
+       "description": "Who raised it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "raised_on",
+       "source": "raised_on",
+       "type": "date",
+       "description": "When it was raised."
+      },
+      {
+       "name": "problem_owner",
+       "source": "problem_owner",
+       "type": "text",
+       "description": "Who owns resolving it."
+      },
+      {
+       "name": "problem_owner_name",
+       "lookup_from": "problem_owner",
+       "type": "text",
+       "description": "Who owns resolving it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "target_resolution_date",
+       "source": "target_resolution_date",
+       "type": "date",
+       "description": "When it should be resolved by."
+      },
+      {
+       "name": "closed_date",
+       "source": "closed_date",
+       "type": "date",
+       "description": "When it was closed."
+      },
+      {
+       "name": "resolution",
+       "source": "resolution",
+       "type": "text",
+       "description": "How it was resolved."
+      },
+      {
+       "name": "contributes_to_type",
+       "source": "contributes_to_type",
+       "type": "text",
+       "description": "group or measure. Blank if it doesn't contribute to anything specific."
+      },
+      {
+       "name": "contributes_to_key",
+       "source": "contributes_to_key",
+       "type": "text",
+       "description": "group_key or measure_code affected."
+      },
+      {
+       "name": "contributes_to_name",
+       "lookup_from": "contributes_to_key",
+       "type": "text",
+       "description": "Name of the group or measure affected.",
+       "lookup": [
+        {
+         "table": "groups",
+         "field": "group_name"
+        },
+        {
+         "table": "measures",
+         "field": "measure_name"
+        }
+       ]
+      },
+      {
+       "name": "notes",
+       "source": "notes",
+       "type": "text",
+       "description": "Context."
+      }
+     ]
+    }
+   ],
+   "dictionary": [
+    [
+     "weekly_updates",
+     "update_key",
+     "text",
+     "email|week_start. Unique."
+    ],
+    [
+     "weekly_updates",
+     "week_start",
+     "date",
+     "Monday of the week."
+    ],
+    [
+     "weekly_updates",
+     "email",
+     "text",
+     "Person."
+    ],
+    [
+     "weekly_updates",
+     "person_name",
+     "text",
+     "Name of the person."
+    ],
+    [
+     "weekly_updates",
+     "org_unit_key",
+     "text",
+     "Team at the time of the update."
+    ],
+    [
+     "weekly_updates",
+     "team_name",
+     "text",
+     "Team name."
+    ],
+    [
+     "weekly_updates",
+     "successes",
+     "text",
+     "Successes had or heard about."
+    ],
+    [
+     "weekly_updates",
+     "communication",
+     "text",
+     "Anything that would help if more widely known."
+    ],
+    [
+     "weekly_updates",
+     "workload",
+     "text",
+     "light, manageable, heavy or overloaded."
+    ],
+    [
+     "weekly_updates",
+     "submitted_at",
+     "datetime",
+     "When it was saved."
+    ],
+    [
+     "tasks",
+     "task_code",
+     "text",
+     "Key, e.g. TSK-00001. Unique."
+    ],
+    [
+     "tasks",
+     "task_name",
+     "text",
+     "What needs doing."
+    ],
+    [
+     "tasks",
+     "priority",
+     "text",
+     "must, should or could."
+    ],
+    [
+     "tasks",
+     "status",
+     "text",
+     "open, complete or cancelled."
+    ],
+    [
+     "tasks",
+     "org_unit_key",
+     "text",
+     "Team."
+    ],
+    [
+     "tasks",
+     "team_name",
+     "text",
+     "Team name."
+    ],
+    [
+     "tasks",
+     "contributes_to_type",
+     "text",
+     "group or measure. Blank if it doesn't contribute to anything specific."
+    ],
+    [
+     "tasks",
+     "contributes_to_key",
+     "text",
+     "group_key or measure_code this work supports."
+    ],
+    [
+     "tasks",
+     "contributes_to_name",
+     "text",
+     "Name of the group or measure the task supports."
+    ],
+    [
+     "tasks",
+     "contributes_to_note",
+     "text",
+     "Optional extra detail on the aim."
+    ],
+    [
+     "tasks",
+     "raised_by",
+     "text",
+     "Who added it."
+    ],
+    [
+     "tasks",
+     "raised_by_name",
+     "text",
+     "Who raised it."
+    ],
+    [
+     "tasks",
+     "date_raised",
+     "date",
+     "When it was added."
+    ],
+    [
+     "tasks",
+     "assigned_to",
+     "text",
+     "Who is doing it."
+    ],
+    [
+     "tasks",
+     "assigned_to_name",
+     "text",
+     "Who is doing it."
+    ],
+    [
+     "tasks",
+     "completed_by",
+     "text",
+     "Who completed it."
+    ],
+    [
+     "tasks",
+     "completed_by_name",
+     "text",
+     "Who completed it."
+    ],
+    [
+     "tasks",
+     "completed_date",
+     "date",
+     "When it was completed or cancelled."
+    ],
+    [
+     "tasks",
+     "notes",
+     "text",
+     "Notes."
+    ],
+    [
+     "problems",
+     "problem_code",
+     "text",
+     "Key, e.g. PRB-00001. Unique."
+    ],
+    [
+     "problems",
+     "problem_title",
+     "text",
+     "Short title."
+    ],
+    [
+     "problems",
+     "problem_statement",
+     "text",
+     "What the problem is."
+    ],
+    [
+     "problems",
+     "status",
+     "text",
+     "open or closed."
+    ],
+    [
+     "problems",
+     "impact",
+     "text",
+     "low, medium or high."
+    ],
+    [
+     "problems",
+     "urgency",
+     "text",
+     "low, medium or high."
+    ],
+    [
+     "problems",
+     "org_unit_key",
+     "text",
+     "Team."
+    ],
+    [
+     "problems",
+     "team_name",
+     "text",
+     "Team name."
+    ],
+    [
+     "problems",
+     "raised_by",
+     "text",
+     "Who raised it."
+    ],
+    [
+     "problems",
+     "raised_by_name",
+     "text",
+     "Who raised it."
+    ],
+    [
+     "problems",
+     "raised_on",
+     "date",
+     "When it was raised."
+    ],
+    [
+     "problems",
+     "problem_owner",
+     "text",
+     "Who owns resolving it."
+    ],
+    [
+     "problems",
+     "problem_owner_name",
+     "text",
+     "Who owns resolving it."
+    ],
+    [
+     "problems",
+     "target_resolution_date",
+     "date",
+     "When it should be resolved by."
+    ],
+    [
+     "problems",
+     "closed_date",
+     "date",
+     "When it was closed."
+    ],
+    [
+     "problems",
+     "resolution",
+     "text",
+     "How it was resolved."
+    ],
+    [
+     "problems",
+     "contributes_to_type",
+     "text",
+     "group or measure. Blank if it doesn't contribute to anything specific."
+    ],
+    [
+     "problems",
+     "contributes_to_key",
+     "text",
+     "group_key or measure_code affected."
+    ],
+    [
+     "problems",
+     "contributes_to_name",
+     "text",
+     "Name of the group or measure affected."
+    ],
+    [
+     "problems",
+     "notes",
+     "text",
+     "Context."
+    ]
+   ],
+   "readme": "# Weekly work\n\nWeekly updates (successes, communication, workload), tasks and problems, with names filled in. Wellbeing is never included.\n\nThe folder name and `export_info.txt` say when the export ran and what filter was used.\n\n## Files\n\n- `weekly_updates.csv` (sheet `weekly_updates` in the Excel file): One row per person per week: successes, communication and workload.\n- `tasks.csv` (sheet `tasks` in the Excel file): One row per task for its whole life. Open tasks carry over each week; nobody re-enters them.\n- `problems.csv` (sheet `problems` in the Excel file): One row per problem for its whole life. Open problems carry over each week.\n- `data_dictionary.csv` (sheet `data_dictionary`): every column in this export, with its type and meaning.\n- `README_for_AI.md`: this file.\n\n## How to read this data\n\n- Every file is tidy: one row per record, one column per field, a single header row, no merged cells and no totals.\n- Column names are snake_case and mean the same thing in every file. `data_dictionary.csv` (or the `data_dictionary` sheet) describes every column.\n- Dates are `YYYY-MM-DD` (UK dates). Date-times are UTC in ISO 8601, for example `2026-09-30T06:00:00Z`.\n- Numbers are plain numbers. A blank cell means there is no value; it never means zero.\n- `percent` values are 0 to 100, so 58 means 58%. `gbp` is pounds. `yes_no` is 1 (yes) or 0 (no). `text` measures use `value_text`.\n- Only **approved** values are included. Drafts, returned values and reviewer comments are not.\n- `measure_code` (for example PM-0007) is the unique key for a measure. `source_ref` is the reference used in the source document and can repeat.\n- The financial year runs April to March. `financial_quarter` looks like `2026-27 Q2` (Q1 is April to June).\n- `rag_status`: `green` is on or better than target; `amber` is short of target but within tolerance; `red` is off track; `no_target` means no target was set; `no_data` means no value was provided; `not_applicable` means RAG isn't used for that measure.\n- `polarity` says whether higher or lower is better. `aggregation_method` says how to combine values into a longer period: sum, average, latest, max or min. `do_not_combine` means the values must not be added up or averaged.\n- `is_latest` is true on the most recent approved period for each measure.\n- Individual wellbeing, reviewer comments and the audit log are never included in exports.\n",
+   "prompt": ""
+  },
+  "quarter_pack": {
+   "title": "Quarterly report pack",
+   "tables": [
+    {
+     "name": "quarter_values",
+     "list": "rpt_values",
+     "select": "Title,measure_code,measure_name,source_ref,parent_measure_code,measure_class,measure_type,category,unit,polarity,frequency,aggregation_method,owner_name,owner_email,org_unit_key,period_key,period_type,period_label,period_start,period_end,financial_year,financial_quarter,value_number,value_text,value_missing,narrative,data_quality,version_no,approved_by,approved_date,target_value,tolerance_value,baseline_value,capacity_value,rag_status,is_latest,refreshed_at",
+     "filter": "financial_quarter eq '{quarter_label}'",
+     "main": false,
+     "columns": [
+      {
+       "name": "submission_key",
+       "source": "Title",
+       "type": "text",
+       "description": "measure_code|period_key. Unique."
+      },
+      {
+       "name": "measure_code",
+       "source": "measure_code",
+       "type": "text",
+       "description": "Measure."
+      },
+      {
+       "name": "measure_name",
+       "source": "measure_name",
+       "type": "text",
+       "description": "Measure name."
+      },
+      {
+       "name": "source_ref",
+       "source": "source_ref",
+       "type": "text",
+       "description": "Source document reference."
+      },
+      {
+       "name": "parent_measure_code",
+       "source": "parent_measure_code",
+       "type": "text",
+       "description": "Parent measure."
+      },
+      {
+       "name": "measure_class",
+       "source": "measure_class",
+       "type": "text",
+       "description": "measure, kpi or okr."
+      },
+      {
+       "name": "measure_type",
+       "source": "measure_type",
+       "type": "text",
+       "description": "summary, output or outcome."
+      },
+      {
+       "name": "category",
+       "source": "category",
+       "type": "text",
+       "description": "Category code."
+      },
+      {
+       "name": "unit",
+       "source": "unit",
+       "type": "text",
+       "description": "Unit."
+      },
+      {
+       "name": "polarity",
+       "source": "polarity",
+       "type": "text",
+       "description": "Polarity."
+      },
+      {
+       "name": "frequency",
+       "source": "frequency",
+       "type": "text",
+       "description": "Frequency."
+      },
+      {
+       "name": "aggregation_method",
+       "source": "aggregation_method",
+       "type": "text",
+       "description": "How to roll up."
+      },
+      {
+       "name": "owner_name",
+       "source": "owner_name",
+       "type": "text",
+       "description": "Measure owner."
+      },
+      {
+       "name": "owner_email",
+       "source": "owner_email",
+       "type": "text",
+       "description": "Measure owner email."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Owning team."
+      },
+      {
+       "name": "period_key",
+       "source": "period_key",
+       "type": "text",
+       "description": "Period."
+      },
+      {
+       "name": "period_type",
+       "source": "period_type",
+       "type": "text",
+       "description": "Period type."
+      },
+      {
+       "name": "period_label",
+       "source": "period_label",
+       "type": "text",
+       "description": "Period label."
+      },
+      {
+       "name": "period_start",
+       "source": "period_start",
+       "type": "date",
+       "description": "Period start date."
+      },
+      {
+       "name": "period_end",
+       "source": "period_end",
+       "type": "date",
+       "description": "Period end date."
+      },
+      {
+       "name": "financial_year",
+       "source": "financial_year",
+       "type": "text",
+       "description": "Financial year."
+      },
+      {
+       "name": "financial_quarter",
+       "source": "financial_quarter",
+       "type": "text",
+       "description": "Financial quarter."
+      },
+      {
+       "name": "value_number",
+       "source": "value_number",
+       "type": "number",
+       "description": "Approved value (not text measures)."
+      },
+      {
+       "name": "value_text",
+       "source": "value_text",
+       "type": "text",
+       "description": "Approved value (text measures)."
+      },
+      {
+       "name": "value_missing",
+       "source": "value_missing",
+       "type": "bool",
+       "description": "Yes if no value was provided."
+      },
+      {
+       "name": "narrative",
+       "source": "narrative",
+       "type": "text",
+       "description": "Approved narrative."
+      },
+      {
+       "name": "data_quality",
+       "source": "data_quality",
+       "type": "text",
+       "description": "Data quality flag."
+      },
+      {
+       "name": "version_no",
+       "source": "version_no",
+       "type": "number",
+       "description": "Approved version number."
+      },
+      {
+       "name": "approved_by",
+       "source": "approved_by",
+       "type": "text",
+       "description": "Approver email."
+      },
+      {
+       "name": "approved_date",
+       "source": "approved_date",
+       "type": "datetime",
+       "description": "Approval time."
+      },
+      {
+       "name": "target_value",
+       "source": "target_value",
+       "type": "number",
+       "description": "Target for the period."
+      },
+      {
+       "name": "tolerance_value",
+       "source": "tolerance_value",
+       "type": "number",
+       "description": "Tolerance for the period (kpi and okr only)."
+      },
+      {
+       "name": "baseline_value",
+       "source": "baseline_value",
+       "type": "number",
+       "description": "Baseline for the period."
+      },
+      {
+       "name": "capacity_value",
+       "source": "capacity_value",
+       "type": "number",
+       "description": "Capacity or throughput for the period."
+      },
+      {
+       "name": "rag_status",
+       "source": "rag_status",
+       "type": "text",
+       "description": "green, amber, red, no_target, no_data or not_applicable."
+      },
+      {
+       "name": "is_latest",
+       "source": "is_latest",
+       "type": "bool",
+       "description": "Yes on the most recent approved period for the measure."
+      },
+      {
+       "name": "refreshed_at",
+       "source": "refreshed_at",
+       "type": "datetime",
+       "description": "When this row was last rebuilt."
+      }
+     ]
+    },
+    {
+     "name": "latest_values",
+     "list": "rpt_values",
+     "select": "Title,measure_code,measure_name,source_ref,parent_measure_code,measure_class,measure_type,category,unit,polarity,frequency,aggregation_method,owner_name,owner_email,org_unit_key,period_key,period_type,period_label,period_start,period_end,financial_year,financial_quarter,value_number,value_text,value_missing,narrative,data_quality,version_no,approved_by,approved_date,target_value,tolerance_value,baseline_value,capacity_value,rag_status,is_latest,refreshed_at",
+     "filter": "is_latest eq 1",
+     "main": false,
+     "columns": [
+      {
+       "name": "submission_key",
+       "source": "Title",
+       "type": "text",
+       "description": "measure_code|period_key. Unique."
+      },
+      {
+       "name": "measure_code",
+       "source": "measure_code",
+       "type": "text",
+       "description": "Measure."
+      },
+      {
+       "name": "measure_name",
+       "source": "measure_name",
+       "type": "text",
+       "description": "Measure name."
+      },
+      {
+       "name": "source_ref",
+       "source": "source_ref",
+       "type": "text",
+       "description": "Source document reference."
+      },
+      {
+       "name": "parent_measure_code",
+       "source": "parent_measure_code",
+       "type": "text",
+       "description": "Parent measure."
+      },
+      {
+       "name": "measure_class",
+       "source": "measure_class",
+       "type": "text",
+       "description": "measure, kpi or okr."
+      },
+      {
+       "name": "measure_type",
+       "source": "measure_type",
+       "type": "text",
+       "description": "summary, output or outcome."
+      },
+      {
+       "name": "category",
+       "source": "category",
+       "type": "text",
+       "description": "Category code."
+      },
+      {
+       "name": "unit",
+       "source": "unit",
+       "type": "text",
+       "description": "Unit."
+      },
+      {
+       "name": "polarity",
+       "source": "polarity",
+       "type": "text",
+       "description": "Polarity."
+      },
+      {
+       "name": "frequency",
+       "source": "frequency",
+       "type": "text",
+       "description": "Frequency."
+      },
+      {
+       "name": "aggregation_method",
+       "source": "aggregation_method",
+       "type": "text",
+       "description": "How to roll up."
+      },
+      {
+       "name": "owner_name",
+       "source": "owner_name",
+       "type": "text",
+       "description": "Measure owner."
+      },
+      {
+       "name": "owner_email",
+       "source": "owner_email",
+       "type": "text",
+       "description": "Measure owner email."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Owning team."
+      },
+      {
+       "name": "period_key",
+       "source": "period_key",
+       "type": "text",
+       "description": "Period."
+      },
+      {
+       "name": "period_type",
+       "source": "period_type",
+       "type": "text",
+       "description": "Period type."
+      },
+      {
+       "name": "period_label",
+       "source": "period_label",
+       "type": "text",
+       "description": "Period label."
+      },
+      {
+       "name": "period_start",
+       "source": "period_start",
+       "type": "date",
+       "description": "Period start date."
+      },
+      {
+       "name": "period_end",
+       "source": "period_end",
+       "type": "date",
+       "description": "Period end date."
+      },
+      {
+       "name": "financial_year",
+       "source": "financial_year",
+       "type": "text",
+       "description": "Financial year."
+      },
+      {
+       "name": "financial_quarter",
+       "source": "financial_quarter",
+       "type": "text",
+       "description": "Financial quarter."
+      },
+      {
+       "name": "value_number",
+       "source": "value_number",
+       "type": "number",
+       "description": "Approved value (not text measures)."
+      },
+      {
+       "name": "value_text",
+       "source": "value_text",
+       "type": "text",
+       "description": "Approved value (text measures)."
+      },
+      {
+       "name": "value_missing",
+       "source": "value_missing",
+       "type": "bool",
+       "description": "Yes if no value was provided."
+      },
+      {
+       "name": "narrative",
+       "source": "narrative",
+       "type": "text",
+       "description": "Approved narrative."
+      },
+      {
+       "name": "data_quality",
+       "source": "data_quality",
+       "type": "text",
+       "description": "Data quality flag."
+      },
+      {
+       "name": "version_no",
+       "source": "version_no",
+       "type": "number",
+       "description": "Approved version number."
+      },
+      {
+       "name": "approved_by",
+       "source": "approved_by",
+       "type": "text",
+       "description": "Approver email."
+      },
+      {
+       "name": "approved_date",
+       "source": "approved_date",
+       "type": "datetime",
+       "description": "Approval time."
+      },
+      {
+       "name": "target_value",
+       "source": "target_value",
+       "type": "number",
+       "description": "Target for the period."
+      },
+      {
+       "name": "tolerance_value",
+       "source": "tolerance_value",
+       "type": "number",
+       "description": "Tolerance for the period (kpi and okr only)."
+      },
+      {
+       "name": "baseline_value",
+       "source": "baseline_value",
+       "type": "number",
+       "description": "Baseline for the period."
+      },
+      {
+       "name": "capacity_value",
+       "source": "capacity_value",
+       "type": "number",
+       "description": "Capacity or throughput for the period."
+      },
+      {
+       "name": "rag_status",
+       "source": "rag_status",
+       "type": "text",
+       "description": "green, amber, red, no_target, no_data or not_applicable."
+      },
+      {
+       "name": "is_latest",
+       "source": "is_latest",
+       "type": "bool",
+       "description": "Yes on the most recent approved period for the measure."
+      },
+      {
+       "name": "refreshed_at",
+       "source": "refreshed_at",
+       "type": "datetime",
+       "description": "When this row was last rebuilt."
+      }
+     ]
+    },
+    {
+     "name": "tasks",
+     "list": "tasks",
+     "select": "Title,task_name,priority,status,org_unit_key,contributes_to_type,contributes_to_key,contributes_to_note,raised_by,date_raised,assigned_to,completed_by,completed_date,notes",
+     "filter": "(completed_date gt '{window_start}' and completed_date le '{window_end}') or status eq 'open'",
+     "main": false,
+     "columns": [
+      {
+       "name": "task_code",
+       "source": "Title",
+       "type": "text",
+       "description": "Key, e.g. TSK-00001. Unique."
+      },
+      {
+       "name": "task_name",
+       "source": "task_name",
+       "type": "text",
+       "description": "What needs doing."
+      },
+      {
+       "name": "priority",
+       "source": "priority",
+       "type": "text",
+       "description": "must, should or could."
+      },
+      {
+       "name": "status",
+       "source": "status",
+       "type": "text",
+       "description": "open, complete or cancelled."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team."
+      },
+      {
+       "name": "team_name",
+       "lookup_from": "org_unit_key",
+       "type": "text",
+       "description": "Team name.",
+       "lookup": [
+        {
+         "table": "org_units",
+         "field": "unit_name"
+        }
+       ]
+      },
+      {
+       "name": "contributes_to_type",
+       "source": "contributes_to_type",
+       "type": "text",
+       "description": "group or measure. Blank if it doesn't contribute to anything specific."
+      },
+      {
+       "name": "contributes_to_key",
+       "source": "contributes_to_key",
+       "type": "text",
+       "description": "group_key or measure_code this work supports."
+      },
+      {
+       "name": "contributes_to_name",
+       "lookup_from": "contributes_to_key",
+       "type": "text",
+       "description": "Name of the group or measure the task supports.",
+       "lookup": [
+        {
+         "table": "groups",
+         "field": "group_name"
+        },
+        {
+         "table": "measures",
+         "field": "measure_name"
+        }
+       ]
+      },
+      {
+       "name": "contributes_to_note",
+       "source": "contributes_to_note",
+       "type": "text",
+       "description": "Optional extra detail on the aim."
+      },
+      {
+       "name": "raised_by",
+       "source": "raised_by",
+       "type": "text",
+       "description": "Who added it."
+      },
+      {
+       "name": "raised_by_name",
+       "lookup_from": "raised_by",
+       "type": "text",
+       "description": "Who raised it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "date_raised",
+       "source": "date_raised",
+       "type": "date",
+       "description": "When it was added."
+      },
+      {
+       "name": "assigned_to",
+       "source": "assigned_to",
+       "type": "text",
+       "description": "Who is doing it."
+      },
+      {
+       "name": "assigned_to_name",
+       "lookup_from": "assigned_to",
+       "type": "text",
+       "description": "Who is doing it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "completed_by",
+       "source": "completed_by",
+       "type": "text",
+       "description": "Who completed it."
+      },
+      {
+       "name": "completed_by_name",
+       "lookup_from": "completed_by",
+       "type": "text",
+       "description": "Who completed it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "completed_date",
+       "source": "completed_date",
+       "type": "date",
+       "description": "When it was completed or cancelled."
+      },
+      {
+       "name": "notes",
+       "source": "notes",
+       "type": "text",
+       "description": "Notes."
+      }
+     ]
+    },
+    {
+     "name": "problems",
+     "list": "problems",
+     "select": "Title,problem_title,problem_statement,status,impact,urgency,org_unit_key,raised_by,raised_on,problem_owner,target_resolution_date,closed_date,resolution,contributes_to_type,contributes_to_key,notes",
+     "filter": "(raised_on gt '{window_start}' and raised_on le '{window_end}') or (closed_date gt '{window_start}' and closed_date le '{window_end}') or status eq 'open'",
+     "main": false,
+     "columns": [
+      {
+       "name": "problem_code",
+       "source": "Title",
+       "type": "text",
+       "description": "Key, e.g. PRB-00001. Unique."
+      },
+      {
+       "name": "problem_title",
+       "source": "problem_title",
+       "type": "text",
+       "description": "Short title."
+      },
+      {
+       "name": "problem_statement",
+       "source": "problem_statement",
+       "type": "text",
+       "description": "What the problem is."
+      },
+      {
+       "name": "status",
+       "source": "status",
+       "type": "text",
+       "description": "open or closed."
+      },
+      {
+       "name": "impact",
+       "source": "impact",
+       "type": "text",
+       "description": "low, medium or high."
+      },
+      {
+       "name": "urgency",
+       "source": "urgency",
+       "type": "text",
+       "description": "low, medium or high."
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team."
+      },
+      {
+       "name": "team_name",
+       "lookup_from": "org_unit_key",
+       "type": "text",
+       "description": "Team name.",
+       "lookup": [
+        {
+         "table": "org_units",
+         "field": "unit_name"
+        }
+       ]
+      },
+      {
+       "name": "raised_by",
+       "source": "raised_by",
+       "type": "text",
+       "description": "Who raised it."
+      },
+      {
+       "name": "raised_by_name",
+       "lookup_from": "raised_by",
+       "type": "text",
+       "description": "Who raised it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "raised_on",
+       "source": "raised_on",
+       "type": "date",
+       "description": "When it was raised."
+      },
+      {
+       "name": "problem_owner",
+       "source": "problem_owner",
+       "type": "text",
+       "description": "Who owns resolving it."
+      },
+      {
+       "name": "problem_owner_name",
+       "lookup_from": "problem_owner",
+       "type": "text",
+       "description": "Who owns resolving it.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "target_resolution_date",
+       "source": "target_resolution_date",
+       "type": "date",
+       "description": "When it should be resolved by."
+      },
+      {
+       "name": "closed_date",
+       "source": "closed_date",
+       "type": "date",
+       "description": "When it was closed."
+      },
+      {
+       "name": "resolution",
+       "source": "resolution",
+       "type": "text",
+       "description": "How it was resolved."
+      },
+      {
+       "name": "contributes_to_type",
+       "source": "contributes_to_type",
+       "type": "text",
+       "description": "group or measure. Blank if it doesn't contribute to anything specific."
+      },
+      {
+       "name": "contributes_to_key",
+       "source": "contributes_to_key",
+       "type": "text",
+       "description": "group_key or measure_code affected."
+      },
+      {
+       "name": "contributes_to_name",
+       "lookup_from": "contributes_to_key",
+       "type": "text",
+       "description": "Name of the group or measure affected.",
+       "lookup": [
+        {
+         "table": "groups",
+         "field": "group_name"
+        },
+        {
+         "table": "measures",
+         "field": "measure_name"
+        }
+       ]
+      },
+      {
+       "name": "notes",
+       "source": "notes",
+       "type": "text",
+       "description": "Context."
+      }
+     ]
+    },
+    {
+     "name": "weekly_updates",
+     "list": "weekly_updates",
+     "select": "Title,week_start,email,org_unit_key,successes,communication,workload,submitted_at",
+     "filter": "week_start gt '{window_start}' and week_start le '{window_end}'",
+     "main": false,
+     "columns": [
+      {
+       "name": "update_key",
+       "source": "Title",
+       "type": "text",
+       "description": "email|week_start. Unique."
+      },
+      {
+       "name": "week_start",
+       "source": "week_start",
+       "type": "date",
+       "description": "Monday of the week."
+      },
+      {
+       "name": "email",
+       "source": "email",
+       "type": "text",
+       "description": "Person."
+      },
+      {
+       "name": "person_name",
+       "lookup_from": "email",
+       "type": "text",
+       "description": "Name of the person.",
+       "lookup": [
+        {
+         "table": "people",
+         "field": "display_name"
+        }
+       ]
+      },
+      {
+       "name": "org_unit_key",
+       "source": "org_unit_key",
+       "type": "text",
+       "description": "Team at the time of the update."
+      },
+      {
+       "name": "team_name",
+       "lookup_from": "org_unit_key",
+       "type": "text",
+       "description": "Team name.",
+       "lookup": [
+        {
+         "table": "org_units",
+         "field": "unit_name"
+        }
+       ]
+      },
+      {
+       "name": "successes",
+       "source": "successes",
+       "type": "text",
+       "description": "Successes had or heard about."
+      },
+      {
+       "name": "communication",
+       "source": "communication",
+       "type": "text",
+       "description": "Anything that would help if more widely known."
+      },
+      {
+       "name": "workload",
+       "source": "workload",
+       "type": "text",
+       "description": "light, manageable, heavy or overloaded."
+      },
+      {
+       "name": "submitted_at",
+       "source": "submitted_at",
+       "type": "datetime",
+       "description": "When it was saved."
+      }
+     ]
+    }
+   ],
+   "dictionary": [
+    [
+     "quarter_values",
+     "submission_key",
+     "text",
+     "measure_code|period_key. Unique."
+    ],
+    [
+     "quarter_values",
+     "measure_code",
+     "text",
+     "Measure."
+    ],
+    [
+     "quarter_values",
+     "measure_name",
+     "text",
+     "Measure name."
+    ],
+    [
+     "quarter_values",
+     "source_ref",
+     "text",
+     "Source document reference."
+    ],
+    [
+     "quarter_values",
+     "parent_measure_code",
+     "text",
+     "Parent measure."
+    ],
+    [
+     "quarter_values",
+     "measure_class",
+     "text",
+     "measure, kpi or okr."
+    ],
+    [
+     "quarter_values",
+     "measure_type",
+     "text",
+     "summary, output or outcome."
+    ],
+    [
+     "quarter_values",
+     "category",
+     "text",
+     "Category code."
+    ],
+    [
+     "quarter_values",
+     "unit",
+     "text",
+     "Unit."
+    ],
+    [
+     "quarter_values",
+     "polarity",
+     "text",
+     "Polarity."
+    ],
+    [
+     "quarter_values",
+     "frequency",
+     "text",
+     "Frequency."
+    ],
+    [
+     "quarter_values",
+     "aggregation_method",
+     "text",
+     "How to roll up."
+    ],
+    [
+     "quarter_values",
+     "owner_name",
+     "text",
+     "Measure owner."
+    ],
+    [
+     "quarter_values",
+     "owner_email",
+     "text",
+     "Measure owner email."
+    ],
+    [
+     "quarter_values",
+     "org_unit_key",
+     "text",
+     "Owning team."
+    ],
+    [
+     "quarter_values",
+     "period_key",
+     "text",
+     "Period."
+    ],
+    [
+     "quarter_values",
+     "period_type",
+     "text",
+     "Period type."
+    ],
+    [
+     "quarter_values",
+     "period_label",
+     "text",
+     "Period label."
+    ],
+    [
+     "quarter_values",
+     "period_start",
+     "date",
+     "Period start date."
+    ],
+    [
+     "quarter_values",
+     "period_end",
+     "date",
+     "Period end date."
+    ],
+    [
+     "quarter_values",
+     "financial_year",
+     "text",
+     "Financial year."
+    ],
+    [
+     "quarter_values",
+     "financial_quarter",
+     "text",
+     "Financial quarter."
+    ],
+    [
+     "quarter_values",
+     "value_number",
+     "number",
+     "Approved value (not text measures)."
+    ],
+    [
+     "quarter_values",
+     "value_text",
+     "text",
+     "Approved value (text measures)."
+    ],
+    [
+     "quarter_values",
+     "value_missing",
+     "bool",
+     "Yes if no value was provided."
+    ],
+    [
+     "quarter_values",
+     "narrative",
+     "text",
+     "Approved narrative."
+    ],
+    [
+     "quarter_values",
+     "data_quality",
+     "text",
+     "Data quality flag."
+    ],
+    [
+     "quarter_values",
+     "version_no",
+     "number",
+     "Approved version number."
+    ],
+    [
+     "quarter_values",
+     "approved_by",
+     "text",
+     "Approver email."
+    ],
+    [
+     "quarter_values",
+     "approved_date",
+     "datetime",
+     "Approval time."
+    ],
+    [
+     "quarter_values",
+     "target_value",
+     "number",
+     "Target for the period."
+    ],
+    [
+     "quarter_values",
+     "tolerance_value",
+     "number",
+     "Tolerance for the period (kpi and okr only)."
+    ],
+    [
+     "quarter_values",
+     "baseline_value",
+     "number",
+     "Baseline for the period."
+    ],
+    [
+     "quarter_values",
+     "capacity_value",
+     "number",
+     "Capacity or throughput for the period."
+    ],
+    [
+     "quarter_values",
+     "rag_status",
+     "text",
+     "green, amber, red, no_target, no_data or not_applicable."
+    ],
+    [
+     "quarter_values",
+     "is_latest",
+     "bool",
+     "Yes on the most recent approved period for the measure."
+    ],
+    [
+     "quarter_values",
+     "refreshed_at",
+     "datetime",
+     "When this row was last rebuilt."
+    ],
+    [
+     "latest_values",
+     "submission_key",
+     "text",
+     "measure_code|period_key. Unique."
+    ],
+    [
+     "latest_values",
+     "measure_code",
+     "text",
+     "Measure."
+    ],
+    [
+     "latest_values",
+     "measure_name",
+     "text",
+     "Measure name."
+    ],
+    [
+     "latest_values",
+     "source_ref",
+     "text",
+     "Source document reference."
+    ],
+    [
+     "latest_values",
+     "parent_measure_code",
+     "text",
+     "Parent measure."
+    ],
+    [
+     "latest_values",
+     "measure_class",
+     "text",
+     "measure, kpi or okr."
+    ],
+    [
+     "latest_values",
+     "measure_type",
+     "text",
+     "summary, output or outcome."
+    ],
+    [
+     "latest_values",
+     "category",
+     "text",
+     "Category code."
+    ],
+    [
+     "latest_values",
+     "unit",
+     "text",
+     "Unit."
+    ],
+    [
+     "latest_values",
+     "polarity",
+     "text",
+     "Polarity."
+    ],
+    [
+     "latest_values",
+     "frequency",
+     "text",
+     "Frequency."
+    ],
+    [
+     "latest_values",
+     "aggregation_method",
+     "text",
+     "How to roll up."
+    ],
+    [
+     "latest_values",
+     "owner_name",
+     "text",
+     "Measure owner."
+    ],
+    [
+     "latest_values",
+     "owner_email",
+     "text",
+     "Measure owner email."
+    ],
+    [
+     "latest_values",
+     "org_unit_key",
+     "text",
+     "Owning team."
+    ],
+    [
+     "latest_values",
+     "period_key",
+     "text",
+     "Period."
+    ],
+    [
+     "latest_values",
+     "period_type",
+     "text",
+     "Period type."
+    ],
+    [
+     "latest_values",
+     "period_label",
+     "text",
+     "Period label."
+    ],
+    [
+     "latest_values",
+     "period_start",
+     "date",
+     "Period start date."
+    ],
+    [
+     "latest_values",
+     "period_end",
+     "date",
+     "Period end date."
+    ],
+    [
+     "latest_values",
+     "financial_year",
+     "text",
+     "Financial year."
+    ],
+    [
+     "latest_values",
+     "financial_quarter",
+     "text",
+     "Financial quarter."
+    ],
+    [
+     "latest_values",
+     "value_number",
+     "number",
+     "Approved value (not text measures)."
+    ],
+    [
+     "latest_values",
+     "value_text",
+     "text",
+     "Approved value (text measures)."
+    ],
+    [
+     "latest_values",
+     "value_missing",
+     "bool",
+     "Yes if no value was provided."
+    ],
+    [
+     "latest_values",
+     "narrative",
+     "text",
+     "Approved narrative."
+    ],
+    [
+     "latest_values",
+     "data_quality",
+     "text",
+     "Data quality flag."
+    ],
+    [
+     "latest_values",
+     "version_no",
+     "number",
+     "Approved version number."
+    ],
+    [
+     "latest_values",
+     "approved_by",
+     "text",
+     "Approver email."
+    ],
+    [
+     "latest_values",
+     "approved_date",
+     "datetime",
+     "Approval time."
+    ],
+    [
+     "latest_values",
+     "target_value",
+     "number",
+     "Target for the period."
+    ],
+    [
+     "latest_values",
+     "tolerance_value",
+     "number",
+     "Tolerance for the period (kpi and okr only)."
+    ],
+    [
+     "latest_values",
+     "baseline_value",
+     "number",
+     "Baseline for the period."
+    ],
+    [
+     "latest_values",
+     "capacity_value",
+     "number",
+     "Capacity or throughput for the period."
+    ],
+    [
+     "latest_values",
+     "rag_status",
+     "text",
+     "green, amber, red, no_target, no_data or not_applicable."
+    ],
+    [
+     "latest_values",
+     "is_latest",
+     "bool",
+     "Yes on the most recent approved period for the measure."
+    ],
+    [
+     "latest_values",
+     "refreshed_at",
+     "datetime",
+     "When this row was last rebuilt."
+    ],
+    [
+     "tasks",
+     "task_code",
+     "text",
+     "Key, e.g. TSK-00001. Unique."
+    ],
+    [
+     "tasks",
+     "task_name",
+     "text",
+     "What needs doing."
+    ],
+    [
+     "tasks",
+     "priority",
+     "text",
+     "must, should or could."
+    ],
+    [
+     "tasks",
+     "status",
+     "text",
+     "open, complete or cancelled."
+    ],
+    [
+     "tasks",
+     "org_unit_key",
+     "text",
+     "Team."
+    ],
+    [
+     "tasks",
+     "team_name",
+     "text",
+     "Team name."
+    ],
+    [
+     "tasks",
+     "contributes_to_type",
+     "text",
+     "group or measure. Blank if it doesn't contribute to anything specific."
+    ],
+    [
+     "tasks",
+     "contributes_to_key",
+     "text",
+     "group_key or measure_code this work supports."
+    ],
+    [
+     "tasks",
+     "contributes_to_name",
+     "text",
+     "Name of the group or measure the task supports."
+    ],
+    [
+     "tasks",
+     "contributes_to_note",
+     "text",
+     "Optional extra detail on the aim."
+    ],
+    [
+     "tasks",
+     "raised_by",
+     "text",
+     "Who added it."
+    ],
+    [
+     "tasks",
+     "raised_by_name",
+     "text",
+     "Who raised it."
+    ],
+    [
+     "tasks",
+     "date_raised",
+     "date",
+     "When it was added."
+    ],
+    [
+     "tasks",
+     "assigned_to",
+     "text",
+     "Who is doing it."
+    ],
+    [
+     "tasks",
+     "assigned_to_name",
+     "text",
+     "Who is doing it."
+    ],
+    [
+     "tasks",
+     "completed_by",
+     "text",
+     "Who completed it."
+    ],
+    [
+     "tasks",
+     "completed_by_name",
+     "text",
+     "Who completed it."
+    ],
+    [
+     "tasks",
+     "completed_date",
+     "date",
+     "When it was completed or cancelled."
+    ],
+    [
+     "tasks",
+     "notes",
+     "text",
+     "Notes."
+    ],
+    [
+     "problems",
+     "problem_code",
+     "text",
+     "Key, e.g. PRB-00001. Unique."
+    ],
+    [
+     "problems",
+     "problem_title",
+     "text",
+     "Short title."
+    ],
+    [
+     "problems",
+     "problem_statement",
+     "text",
+     "What the problem is."
+    ],
+    [
+     "problems",
+     "status",
+     "text",
+     "open or closed."
+    ],
+    [
+     "problems",
+     "impact",
+     "text",
+     "low, medium or high."
+    ],
+    [
+     "problems",
+     "urgency",
+     "text",
+     "low, medium or high."
+    ],
+    [
+     "problems",
+     "org_unit_key",
+     "text",
+     "Team."
+    ],
+    [
+     "problems",
+     "team_name",
+     "text",
+     "Team name."
+    ],
+    [
+     "problems",
+     "raised_by",
+     "text",
+     "Who raised it."
+    ],
+    [
+     "problems",
+     "raised_by_name",
+     "text",
+     "Who raised it."
+    ],
+    [
+     "problems",
+     "raised_on",
+     "date",
+     "When it was raised."
+    ],
+    [
+     "problems",
+     "problem_owner",
+     "text",
+     "Who owns resolving it."
+    ],
+    [
+     "problems",
+     "problem_owner_name",
+     "text",
+     "Who owns resolving it."
+    ],
+    [
+     "problems",
+     "target_resolution_date",
+     "date",
+     "When it should be resolved by."
+    ],
+    [
+     "problems",
+     "closed_date",
+     "date",
+     "When it was closed."
+    ],
+    [
+     "problems",
+     "resolution",
+     "text",
+     "How it was resolved."
+    ],
+    [
+     "problems",
+     "contributes_to_type",
+     "text",
+     "group or measure. Blank if it doesn't contribute to anything specific."
+    ],
+    [
+     "problems",
+     "contributes_to_key",
+     "text",
+     "group_key or measure_code affected."
+    ],
+    [
+     "problems",
+     "contributes_to_name",
+     "text",
+     "Name of the group or measure affected."
+    ],
+    [
+     "problems",
+     "notes",
+     "text",
+     "Context."
+    ],
+    [
+     "weekly_updates",
+     "update_key",
+     "text",
+     "email|week_start. Unique."
+    ],
+    [
+     "weekly_updates",
+     "week_start",
+     "date",
+     "Monday of the week."
+    ],
+    [
+     "weekly_updates",
+     "email",
+     "text",
+     "Person."
+    ],
+    [
+     "weekly_updates",
+     "person_name",
+     "text",
+     "Name of the person."
+    ],
+    [
+     "weekly_updates",
+     "org_unit_key",
+     "text",
+     "Team at the time of the update."
+    ],
+    [
+     "weekly_updates",
+     "team_name",
+     "text",
+     "Team name."
+    ],
+    [
+     "weekly_updates",
+     "successes",
+     "text",
+     "Successes had or heard about."
+    ],
+    [
+     "weekly_updates",
+     "communication",
+     "text",
+     "Anything that would help if more widely known."
+    ],
+    [
+     "weekly_updates",
+     "workload",
+     "text",
+     "light, manageable, heavy or overloaded."
+    ],
+    [
+     "weekly_updates",
+     "submitted_at",
+     "datetime",
+     "When it was saved."
+    ]
+   ],
+   "readme": "# Quarterly report pack\n\nEverything needed to write the quarterly report for one financial quarter: the quarter's approved values, the latest value of every measure, work completed, open work, problems, and successes. Comes with a prompt for drafting the report with AI.\n\nThe folder name and `export_info.txt` say when the export ran and what filter was used.\n\n## Files\n\n- `quarter_values.csv` (sheet `quarter_values` in the Excel file): Flat, read-only reporting table: one row per approved measure per period with every lookup filled in. Rebuilt by flows; export straight from here.\n- `latest_values.csv` (sheet `latest_values` in the Excel file): Flat, read-only reporting table: one row per approved measure per period with every lookup filled in. Rebuilt by flows; export straight from here.\n- `tasks.csv` (sheet `tasks` in the Excel file): One row per task for its whole life. Open tasks carry over each week; nobody re-enters them.\n- `problems.csv` (sheet `problems` in the Excel file): One row per problem for its whole life. Open problems carry over each week.\n- `weekly_updates.csv` (sheet `weekly_updates` in the Excel file): One row per person per week: successes, communication and workload.\n- `data_dictionary.csv` (sheet `data_dictionary`): every column in this export, with its type and meaning.\n- `README_for_AI.md`: this file.\n- `prompt_quarterly_report.md`: a prompt for drafting the quarterly report from these files.\n\n## How to read this data\n\n- Every file is tidy: one row per record, one column per field, a single header row, no merged cells and no totals.\n- Column names are snake_case and mean the same thing in every file. `data_dictionary.csv` (or the `data_dictionary` sheet) describes every column.\n- Dates are `YYYY-MM-DD` (UK dates). Date-times are UTC in ISO 8601, for example `2026-09-30T06:00:00Z`.\n- Numbers are plain numbers. A blank cell means there is no value; it never means zero.\n- `percent` values are 0 to 100, so 58 means 58%. `gbp` is pounds. `yes_no` is 1 (yes) or 0 (no). `text` measures use `value_text`.\n- Only **approved** values are included. Drafts, returned values and reviewer comments are not.\n- `measure_code` (for example PM-0007) is the unique key for a measure. `source_ref` is the reference used in the source document and can repeat.\n- The financial year runs April to March. `financial_quarter` looks like `2026-27 Q2` (Q1 is April to June).\n- `rag_status`: `green` is on or better than target; `amber` is short of target but within tolerance; `red` is off track; `no_target` means no target was set; `no_data` means no value was provided; `not_applicable` means RAG isn't used for that measure.\n- `polarity` says whether higher or lower is better. `aggregation_method` says how to combine values into a longer period: sum, average, latest, max or min. `do_not_combine` means the values must not be added up or averaged.\n- `is_latest` is true on the most recent approved period for each measure.\n- Individual wellbeing, reviewer comments and the audit log are never included in exports.\n\n## What's in each table\n\n- `quarter_values`: approved values for periods that start in the quarter (daily, weekly, fortnightly, monthly and quarterly measures).\n- `latest_values`: the latest approved value of every measure, which covers annual, calendar-year, academic-year and term measures.\n- `tasks`: tasks completed in the quarter, plus everything still open.\n- `problems`: problems raised or closed in the quarter, plus everything still open.\n- `weekly_updates`: successes, communication and workload from every weekly update in the quarter.\n",
+   "prompt": "# Prompt: draft the quarterly performance report\n\nUse this with Microsoft 365 Copilot or any other AI tool your organisation allows. Attach, or point it at, the files in this folder, then paste everything below the line.\n\nYou can also use the pack without AI: open the Excel file and work through the sheets in the order of the report sections below.\n\n---\n\nYou are helping write the quarterly performance report for {quarter}. Use **only** the attached files. Read `README_for_AI.md` and `data_dictionary.csv` first so you understand every column.\n\nWrite the report in plain UK English, for senior leaders who have two minutes. Use these sections:\n\n1. **Summary** (five bullet points at most): overall position, the biggest improvement, the biggest concern, and what needs a decision.\n2. **Measures**, grouped by `category`:\n   - a table with measure (`source_ref` and `measure_name`), latest value with its unit, target, RAG and the direction of travel from the previous period;\n   - for every red or amber measure, one or two sentences from its `narrative` explaining why and what is being done.\n3. **Delivery**: the main work completed this quarter (`tasks` with `status` complete), grouped by what it `contributes_to_name`, and notable successes from `weekly_updates`.\n4. **Problems and risks**: open problems with high impact or high urgency, who owns them and their target date, then problems resolved this quarter.\n5. **Data notes**: measures with `no_data`, values marked `provisional` or `estimated` in `data_quality`, and measures with no target.\n\nRules:\n- Never invent or estimate numbers. If something isn't in the files, say \"not available\".\n- Quote measure codes (for example PM-0007) so every statement can be checked.\n- Percentages are stored as 0 to 100: show 58 as 58%.\n- Use `polarity` when you describe change: for lower-is-better measures, a fall is an improvement.\n- Use `aggregation_method` if you combine monthly or weekly values into a quarter figure, and say that you did.\n- Don't name individuals when you describe problems or workload; use team names.\n- Finish with a short list of questions the report owner should check before publishing.\n"
+  }
+ }
+}

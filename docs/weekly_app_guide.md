@@ -24,7 +24,7 @@ These steps assume setup (lists and permissions) is already done.
 
 1. **Create the app.** In Power Apps, choose **Create**, then **Blank app**, then **Blank canvas app**. Name it `PMS Weekly` and pick the **Tablet** format. The layout adapts to phones.
 2. **Settings.** Go to **Settings**, then **Display**, and turn **off** "Scale to fit". Then go to **General** and set the **Data row limit** to **2000**.
-3. **Data.** Add a **SharePoint** connection to your site and tick these lists: `people`, `org_units`, `groups`, `measures`, `settings`, `weekly_updates`, `wellbeing_checkins`, `tasks`, `problems`.
+3. **Data.** Add a **SharePoint** connection to your site and tick these lists: `people`, `org_units`, `groups`, `measures`, `settings`, `weekly_updates`, `wellbeing_checkins`, `tasks`, `problems`, `export_requests`.
 4. **App formulas.** Open [`powerapps/weekly/App.pfx`](../powerapps/weekly/App.pfx):
    - Select **App** in the tree view and paste the **App.Formulas** block into the `Formulas` property.
    - Paste the **App.OnStart** block into `OnStart`.

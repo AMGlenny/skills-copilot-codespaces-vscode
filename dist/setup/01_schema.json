@@ -300,7 +300,7 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Choice\" Name=\"aggregation_method\" StaticName=\"aggregation_method\" DisplayName=\"aggregation_method\" Description=\"How to roll values up to a longer period, e.g. monthly to quarterly.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>none</Default><CHOICES><CHOICE>sum</CHOICE><CHOICE>average</CHOICE><CHOICE>latest</CHOICE><CHOICE>max</CHOICE><CHOICE>min</CHOICE><CHOICE>none</CHOICE></CHOICES></Field>",
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"aggregation_method\" StaticName=\"aggregation_method\" DisplayName=\"aggregation_method\" Description=\"How to roll values up to a longer period, e.g. monthly to quarterly. do_not_combine for values that must not be added or averaged.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>do_not_combine</Default><CHOICES><CHOICE>sum</CHOICE><CHOICE>average</CHOICE><CHOICE>latest</CHOICE><CHOICE>max</CHOICE><CHOICE>min</CHOICE><CHOICE>do_not_combine</CHOICE></CHOICES></Field>",
     "Options": 24
    }
   }
@@ -3146,7 +3146,7 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Choice\" Name=\"contributes_to_type\" StaticName=\"contributes_to_type\" DisplayName=\"contributes_to_type\" Description=\"group, measure or none.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>none</Default><CHOICES><CHOICE>group</CHOICE><CHOICE>measure</CHOICE><CHOICE>none</CHOICE></CHOICES></Field>",
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"contributes_to_type\" StaticName=\"contributes_to_type\" DisplayName=\"contributes_to_type\" Description=\"group or measure. Blank if it doesn't contribute to anything specific.\" Required=\"FALSE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>group</CHOICE><CHOICE>measure</CHOICE></CHOICES></Field>",
     "Options": 24
    }
   }
@@ -3660,7 +3660,7 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Choice\" Name=\"contributes_to_type\" StaticName=\"contributes_to_type\" DisplayName=\"contributes_to_type\" Description=\"group, measure or none.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>none</Default><CHOICES><CHOICE>group</CHOICE><CHOICE>measure</CHOICE><CHOICE>none</CHOICE></CHOICES></Field>",
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"contributes_to_type\" StaticName=\"contributes_to_type\" DisplayName=\"contributes_to_type\" Description=\"group or measure. Blank if it doesn't contribute to anything specific.\" Required=\"FALSE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>group</CHOICE><CHOICE>measure</CHOICE></CHOICES></Field>",
     "Options": 24
    }
   }
@@ -4389,7 +4389,7 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Boolean\" Name=\"keep_history\" StaticName=\"keep_history\" DisplayName=\"keep_history\" Description=\"Also keep a dated copy as well as /latest.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"keep_history\" StaticName=\"keep_history\" DisplayName=\"keep_history\" Description=\"Keep dated copies as well as /latest. Dated copies are always kept for now; automatic clean-up is a later feature.\" Required=\"FALSE\"><Default>1</Default></Field>",
     "Options": 24
    }
   }
@@ -4453,6 +4453,312 @@
  },
  {
   "step": 225,
+  "description": "Create list export_requests",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "export_requests",
+   "Description": "Queue of exports. The apps and the scheduler add a row; the PMSExportRun flow picks it up, writes the files and fills in the link.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 226,
+  "description": "export_requests: rename Title to request_ref",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "request_ref",
+   "Description": "Reference, e.g. REQ-20261001-0930-ab12. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 227,
+  "description": "export_requests: make request_ref unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 228,
+  "description": "export_requests: add column dataset",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"dataset\" StaticName=\"dataset\" DisplayName=\"dataset\" Description=\"full_model, measures, weekly_work or quarter_pack.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>full_model</CHOICE><CHOICE>measures</CHOICE><CHOICE>weekly_work</CHOICE><CHOICE>quarter_pack</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 229,
+  "description": "export_requests: add column job_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"job_code\" StaticName=\"job_code\" DisplayName=\"job_code\" Description=\"The export_jobs row that asked for it. Blank for on-demand exports.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 230,
+  "description": "export_requests: add column quarter_label",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"quarter_label\" StaticName=\"quarter_label\" DisplayName=\"quarter_label\" Description=\"For quarter packs: the financial quarter, e.g. 2026-27 Q2.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 231,
+  "description": "export_requests: add column odata_filter",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"odata_filter\" StaticName=\"odata_filter\" DisplayName=\"odata_filter\" Description=\"Optional filter applied to the dataset's main tables, e.g. financial_year eq '2026-27'.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 232,
+  "description": "export_requests: add column filter_label",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"filter_label\" StaticName=\"filter_label\" DisplayName=\"filter_label\" Description=\"The filter in plain English, shown in the email and README.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 233,
+  "description": "export_requests: add column folder_path",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"folder_path\" StaticName=\"folder_path\" DisplayName=\"folder_path\" Description=\"Folder in the snapshots library.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 234,
+  "description": "export_requests: add column requested_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"requested_by\" StaticName=\"requested_by\" DisplayName=\"requested_by\" Description=\"Who asked for it. Blank for scheduled jobs.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 235,
+  "description": "export_requests: add column requested_at",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"requested_at\" StaticName=\"requested_at\" DisplayName=\"requested_at\" Description=\"When it was asked for.\" Required=\"TRUE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 236,
+  "description": "export_requests: add column status",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"status\" StaticName=\"status\" DisplayName=\"status\" Description=\"queued, running, done or failed.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>queued</Default><CHOICES><CHOICE>queued</CHOICE><CHOICE>running</CHOICE><CHOICE>done</CHOICE><CHOICE>failed</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 237,
+  "description": "export_requests: add column output_url",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"output_url\" StaticName=\"output_url\" DisplayName=\"output_url\" Description=\"Link to the folder holding the files.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 238,
+  "description": "export_requests: add column message",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"message\" StaticName=\"message\" DisplayName=\"message\" Description=\"What happened, including any error.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 239,
+  "description": "export_requests: add column completed_at",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"completed_at\" StaticName=\"completed_at\" DisplayName=\"completed_at\" Description=\"When it finished.\" Required=\"FALSE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 240,
+  "description": "export_requests: item-level permissions",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_requests')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "ReadSecurity": 2,
+   "WriteSecurity": 2
+  }
+ },
+ {
+  "step": 241,
   "description": "Create list rpt_values",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -4472,7 +4778,7 @@
   }
  },
  {
-  "step": 226,
+  "step": 242,
   "description": "rpt_values: rename Title to submission_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/getbyinternalnameortitle('Title')",
@@ -4493,7 +4799,7 @@
   }
  },
  {
-  "step": 227,
+  "step": 243,
   "description": "rpt_values: make submission_key unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/getbyinternalnameortitle('Title')",
@@ -4511,7 +4817,7 @@
   }
  },
  {
-  "step": 228,
+  "step": 244,
   "description": "rpt_values: add column measure_code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4530,7 +4836,7 @@
   }
  },
  {
-  "step": 229,
+  "step": 245,
   "description": "rpt_values: add column measure_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4549,7 +4855,7 @@
   }
  },
  {
-  "step": 230,
+  "step": 246,
   "description": "rpt_values: add column source_ref",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4568,7 +4874,7 @@
   }
  },
  {
-  "step": 231,
+  "step": 247,
   "description": "rpt_values: add column parent_measure_code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4587,7 +4893,7 @@
   }
  },
  {
-  "step": 232,
+  "step": 248,
   "description": "rpt_values: add column measure_class",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4606,7 +4912,7 @@
   }
  },
  {
-  "step": 233,
+  "step": 249,
   "description": "rpt_values: add column measure_type",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4625,7 +4931,7 @@
   }
  },
  {
-  "step": 234,
+  "step": 250,
   "description": "rpt_values: add column category",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4644,7 +4950,7 @@
   }
  },
  {
-  "step": 235,
+  "step": 251,
   "description": "rpt_values: add column unit",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4663,7 +4969,7 @@
   }
  },
  {
-  "step": 236,
+  "step": 252,
   "description": "rpt_values: add column polarity",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4682,7 +4988,7 @@
   }
  },
  {
-  "step": 237,
+  "step": 253,
   "description": "rpt_values: add column frequency",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4701,7 +5007,7 @@
   }
  },
  {
-  "step": 238,
+  "step": 254,
   "description": "rpt_values: add column aggregation_method",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4720,7 +5026,7 @@
   }
  },
  {
-  "step": 239,
+  "step": 255,
   "description": "rpt_values: add column owner_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4739,7 +5045,7 @@
   }
  },
  {
-  "step": 240,
+  "step": 256,
   "description": "rpt_values: add column owner_email",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4758,7 +5064,7 @@
   }
  },
  {
-  "step": 241,
+  "step": 257,
   "description": "rpt_values: add column org_unit_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4777,7 +5083,7 @@
   }
  },
  {
-  "step": 242,
+  "step": 258,
   "description": "rpt_values: add column period_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4796,7 +5102,7 @@
   }
  },
  {
-  "step": 243,
+  "step": 259,
   "description": "rpt_values: add column period_type",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4815,7 +5121,7 @@
   }
  },
  {
-  "step": 244,
+  "step": 260,
   "description": "rpt_values: add column period_label",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4834,7 +5140,7 @@
   }
  },
  {
-  "step": 245,
+  "step": 261,
   "description": "rpt_values: add column period_start",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4853,7 +5159,7 @@
   }
  },
  {
-  "step": 246,
+  "step": 262,
   "description": "rpt_values: add column period_end",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4872,7 +5178,7 @@
   }
  },
  {
-  "step": 247,
+  "step": 263,
   "description": "rpt_values: add column financial_year",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4891,7 +5197,7 @@
   }
  },
  {
-  "step": 248,
+  "step": 264,
   "description": "rpt_values: add column financial_quarter",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4910,7 +5216,7 @@
   }
  },
  {
-  "step": 249,
+  "step": 265,
   "description": "rpt_values: add column value_number",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4929,7 +5235,7 @@
   }
  },
  {
-  "step": 250,
+  "step": 266,
   "description": "rpt_values: add column value_text",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4948,7 +5254,7 @@
   }
  },
  {
-  "step": 251,
+  "step": 267,
   "description": "rpt_values: add column value_missing",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4967,7 +5273,7 @@
   }
  },
  {
-  "step": 252,
+  "step": 268,
   "description": "rpt_values: add column narrative",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4986,7 +5292,7 @@
   }
  },
  {
-  "step": 253,
+  "step": 269,
   "description": "rpt_values: add column data_quality",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5005,7 +5311,7 @@
   }
  },
  {
-  "step": 254,
+  "step": 270,
   "description": "rpt_values: add column version_no",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5024,7 +5330,7 @@
   }
  },
  {
-  "step": 255,
+  "step": 271,
   "description": "rpt_values: add column approved_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5043,7 +5349,7 @@
   }
  },
  {
-  "step": 256,
+  "step": 272,
   "description": "rpt_values: add column approved_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5062,7 +5368,7 @@
   }
  },
  {
-  "step": 257,
+  "step": 273,
   "description": "rpt_values: add column target_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5081,7 +5387,7 @@
   }
  },
  {
-  "step": 258,
+  "step": 274,
   "description": "rpt_values: add column tolerance_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5100,7 +5406,7 @@
   }
  },
  {
-  "step": 259,
+  "step": 275,
   "description": "rpt_values: add column baseline_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5119,7 +5425,7 @@
   }
  },
  {
-  "step": 260,
+  "step": 276,
   "description": "rpt_values: add column capacity_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5138,7 +5444,7 @@
   }
  },
  {
-  "step": 261,
+  "step": 277,
   "description": "rpt_values: add column rag_status",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5157,7 +5463,7 @@
   }
  },
  {
-  "step": 262,
+  "step": 278,
   "description": "rpt_values: add column is_latest",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5176,7 +5482,7 @@
   }
  },
  {
-  "step": 263,
+  "step": 279,
   "description": "rpt_values: add column refreshed_at",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5195,7 +5501,7 @@
   }
  },
  {
-  "step": 264,
+  "step": 280,
   "description": "rpt_values: add view latest_values",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/views/add",
@@ -5231,7 +5537,7 @@
   }
  },
  {
-  "step": 265,
+  "step": 281,
   "description": "Create document library snapshots",
   "method": "POST",
   "uri": "_api/web/lists",

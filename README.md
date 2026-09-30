@@ -22,8 +22,8 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 | 1. Data foundation | Lists, columns, indexes, views, periods, sample data, data dictionary, setup | **Done** |
 | 2. Weekly updates app | Daily and weekly tool for tasks, problems, successes, workload and wellbeing | **Done**: [build guide](docs/weekly_app_guide.md) |
 | 3. Measures app | Entry, review, versions, audit, notifications, reminders, RAG, target setting | **Done**: [build guide](docs/measures_app_guide.md) |
-| 4. Exports | On-demand CSV and xlsx with a data dictionary, scheduled snapshots, quarterly report pack, AI prompt template | Next |
-| 5. Hardening | WCAG 2.2 AA checks, mobile, volume testing | |
+| 4. Exports | On-demand CSV and xlsx with a data dictionary, scheduled snapshots, quarterly report pack, AI prompt template | **Done**: [exports guide](docs/exports_guide.md) |
+| 5. Hardening | WCAG 2.2 AA checks, mobile, volume testing | Next |
 
 ## Getting started
 
@@ -31,7 +31,8 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 2. Read [docs/data_model.md](docs/data_model.md) for how the data fits together.
 3. Build the weekly updates app with [docs/weekly_app_guide.md](docs/weekly_app_guide.md).
 4. Build the measures app and its flows with [docs/measures_app_guide.md](docs/measures_app_guide.md).
-5. To add a measure, see [docs/adding_a_measure.md](docs/adding_a_measure.md).
+5. Set up exports and snapshots with [docs/exports_guide.md](docs/exports_guide.md) and [flows/export_run.md](flows/export_run.md).
+6. To add a measure, see [docs/adding_a_measure.md](docs/adding_a_measure.md).
 
 ## What's in the repository
 
@@ -42,9 +43,13 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 | `pms/rules.py` | Business rules (RAG, validation, expected-by dates, weekly carry-forward, wellbeing visibility). The apps and flows must match these. |
 | `pms/workflow.py` | The approval workflow (who can do what, versions, audit, reporting rows, scheduled jobs). The flows mirror it step by step. |
 | `pms/seed.py` | Fictional sample data covering every frequency and workflow state |
+| `pms/exports.py` | Export datasets, the tidy-file rules, the README for AI and the quarterly report prompt |
 | `pms/sharepoint.py`, `pms/docs.py` | Generators for the setup requests, data dictionary and diagram |
 | `dist/setup/*.json` | Setup requests, run by the setup flow or the PnP script |
 | `dist/seed_csv/*.csv` | Sample data as tidy CSV, one file per table. Handy for testing Power BI. |
+| `dist/exports/export_definitions.json` | What the export flow reads. Upload it to `/snapshots/_config/`. |
+| `dist/sample_exports/` | What each export looks like, built from the sample data. Try Power BI or Copilot on these. |
+| `office_scripts/PMSExport.ts` | Office Script that writes the Excel and CSV files. Checked against the Python version by the tests. |
 | `dist/data_dictionary.csv` | Every column, with its type, allowed values and links |
 | `docs/` | Guides, data model, generated data dictionary and diagram |
 | `powerapps/weekly/`, `powerapps/measures/` | The two apps: app formulas and screens as YAML to paste into Power Apps Studio |
@@ -111,4 +116,5 @@ The tests check, among other things:
 - Automatic priority score from impact and urgency
 - Weekly progress notes on tasks
 - Copilot Studio agent
+- Automatic clean-up of old dated snapshot folders
 - Migration from the old Meeting Submission Tool

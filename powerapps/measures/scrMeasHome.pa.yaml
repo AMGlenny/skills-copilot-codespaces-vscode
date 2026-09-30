@@ -86,6 +86,19 @@
                             grp_label, If(status.Value = "returned", "Returned for changes", !IsBlank(expected_by) && expected_by < Today(), "Expected, not received", status.Value = "draft", "Draft", "Awaiting data")
                         )
                     );
+                    // Choices for the export buttons.
+                    ClearCollect(
+                        colExportFy,
+                        {label: "All years", fy: ""},
+                        ForAll(SortByColumns(Filter(periods, period_type.Value = "annual"), "start_date", SortOrder.Descending), {label: "FY " & financial_year, fy: financial_year})
+                    );
+                    ClearCollect(
+                        colExportQuarters,
+                        ForAll(
+                            FirstN(SortByColumns(Filter(periods, period_type.Value = "quarterly" && end_date < Today()), "start_date", SortOrder.Descending), 8),
+                            {label: financial_quarter}
+                        )
+                    );
                     // Approver's queue.
                     ClearCollect(
                         colToReview,
@@ -102,7 +115,7 @@
           Control: GroupContainer@1.3.0
           Variant: AutoLayout
           Properties:
-            Height: =If(fxIsNarrow, 110, 64)
+            Height: =If(fxIsNarrow, If(varTab = "all", 330, 110), If(varTab = "all", 112, 64))
             Fill: =clrPanel
             LayoutDirection: =LayoutDirection.Horizontal
             LayoutWrap: =true
@@ -153,6 +166,80 @@
                   FocusedBorderColor: =clrText
                   Width: =160
                   Height: =40
+            - ddMeasExportFy:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  Visible: =varTab = "all"
+                  Items: =colExportFy
+                  Value: =label
+                  AccessibleLabel: ="Financial year to export"
+                  BorderColor: =clrBorder
+                  Width: =150
+                  Height: =40
+            - btnMeasExportValues:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Visible: =varTab = "all"
+                  Text: ="Export values"
+                  Fill: =clrPanel
+                  Color: =clrAccent
+                  BorderColor: =clrAccent
+                  BorderThickness: =1
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =150
+                  Height: =40
+                  OnSelect: |-
+                    =Patch(export_requests, Defaults(export_requests), {
+                        request_ref: "REQ-" & Text(Now(), "yyyymmdd-hhmmss") & "-" & Left(Text(GUID()), 4),
+                        dataset: {Value: "measures"},
+                        odata_filter: If(IsBlank(ddMeasExportFy.Selected.fy), Blank(), "financial_year eq '" & ddMeasExportFy.Selected.fy & "'"),
+                        filter_label: ddMeasExportFy.Selected.label,
+                        folder_path: "on_demand",
+                        requested_by: fxMe,
+                        requested_at: Now(),
+                        status: {Value: "queued"}
+                    });
+                    If(IsEmpty(Errors(export_requests)),
+                       Notify("Export requested. You'll get an email with a link to the CSV and Excel files in a few minutes.", NotificationType.Success),
+                       Notify("The export request didn't save. Please try again.", NotificationType.Error))
+            - ddMeasExportQuarter:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  Visible: =varTab = "all"
+                  Items: =colExportQuarters
+                  Value: =label
+                  AccessibleLabel: ="Financial quarter for the report pack"
+                  BorderColor: =clrBorder
+                  Width: =150
+                  Height: =40
+            - btnMeasExportPack:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Visible: =varTab = "all"
+                  Text: ="Quarterly report pack"
+                  Fill: =clrPanel
+                  Color: =clrAccent
+                  BorderColor: =clrAccent
+                  BorderThickness: =1
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =200
+                  Height: =40
+                  OnSelect: |-
+                    =Patch(export_requests, Defaults(export_requests), {
+                        request_ref: "REQ-" & Text(Now(), "yyyymmdd-hhmmss") & "-" & Left(Text(GUID()), 4),
+                        dataset: {Value: "quarter_pack"},
+                        quarter_label: ddMeasExportQuarter.Selected.label,
+                        filter_label: "Financial quarter " & ddMeasExportQuarter.Selected.label,
+                        folder_path: "on_demand",
+                        requested_by: fxMe,
+                        requested_at: Now(),
+                        status: {Value: "queued"}
+                    });
+                    If(IsEmpty(Errors(export_requests)),
+                       Notify("Report pack requested. You'll get an email with a link in a few minutes.", NotificationType.Success),
+                       Notify("The request didn't save. Please try again.", NotificationType.Error))
             - txtMeasSearch:
                 Control: Classic/TextInput@2.3.2
                 Properties:

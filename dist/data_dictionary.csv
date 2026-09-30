@@ -12,7 +12,7 @@ measures,unit,choice,true,false,false,number|percent|gbp|count|yes_no|text,,Unit
 measures,decimal_places,whole number,false,false,false,,,Decimal places to show. Does not change the stored value.
 measures,polarity,choice,true,false,false,higher_is_better|lower_is_better|neither,,Which direction is good. Used for RAG.
 measures,frequency,choice,true,true,false,daily|weekly|fortnightly|monthly|quarterly|annual|calendar_year|academic_year|term,,How often a value is recorded.
-measures,aggregation_method,choice,true,false,false,sum|average|latest|max|min|none,,"How to roll values up to a longer period, e.g. monthly to quarterly."
+measures,aggregation_method,choice,true,false,false,sum|average|latest|max|min|do_not_combine,,"How to roll values up to a longer period, e.g. monthly to quarterly. do_not_combine for values that must not be added or averaged."
 measures,expected_lag_days,whole number,false,false,false,,,"Usual days after period end before data is available. Blank means no expectation, so it is never flagged as late."
 measures,category,text,false,true,false,,lookups.code,Category code from the lookups list.
 measures,data_source,text,false,false,false,,,Where the data comes from.
@@ -119,7 +119,7 @@ tasks,task_code,text,true,true,true,,,"Key, e.g. TSK-00001. Unique."
 tasks,task_name,text,true,false,false,,,What needs doing.
 tasks,priority,choice,true,false,false,must|should|could,,"must, should or could."
 tasks,org_unit_key,text,true,true,false,,org_units.org_unit_key,Team.
-tasks,contributes_to_type,choice,true,false,false,group|measure|none,,"group, measure or none."
+tasks,contributes_to_type,choice,false,false,false,group|measure,,group or measure. Blank if it doesn't contribute to anything specific.
 tasks,contributes_to_key,text,false,true,false,,,group_key or measure_code this work supports.
 tasks,contributes_to_note,long text,false,false,false,,,Optional extra detail on the aim.
 tasks,raised_by,text,true,true,false,,people.email,Who added it.
@@ -142,7 +142,7 @@ problems,target_resolution_date,date (YYYY-MM-DD),false,false,false,,,When it sh
 problems,status,choice,true,true,false,open|closed,,open or closed.
 problems,closed_date,date (YYYY-MM-DD),false,true,false,,,When it was closed.
 problems,resolution,long text,false,false,false,,,How it was resolved.
-problems,contributes_to_type,choice,true,false,false,group|measure|none,,"group, measure or none."
+problems,contributes_to_type,choice,false,false,false,group|measure,,group or measure. Blank if it doesn't contribute to anything specific.
 problems,contributes_to_key,text,false,true,false,,,group_key or measure_code affected.
 problems,notes,long text,false,false,false,,,Context.
 lookups,lookup_key,text,true,true,true,,,lookup_type|code. Unique.
@@ -170,10 +170,23 @@ export_jobs,format,choice,true,false,false,csv|xlsx|both,,"csv, xlsx or both."
 export_jobs,frequency,choice,true,false,false,daily|weekly|monthly|quarterly,,"daily, weekly, monthly or quarterly."
 export_jobs,run_day,whole number,false,false,false,,,Weekly: 1 (Mon) to 7. Monthly or quarterly: day of month. Ignored for daily.
 export_jobs,folder_path,text,true,false,false,,,Folder in the snapshots library.
-export_jobs,keep_history,true/false,false,false,false,,,Also keep a dated copy as well as /latest.
+export_jobs,keep_history,true/false,false,false,false,,,Keep dated copies as well as /latest. Dated copies are always kept for now; automatic clean-up is a later feature.
 export_jobs,active,true/false,false,false,false,,,Only active jobs run.
 export_jobs,last_run_at,"date-time (UTC, ISO 8601)",false,false,false,,,Written by the flow.
 export_jobs,last_run_status,text,false,false,false,,,Written by the flow.
+export_requests,request_ref,text,true,true,true,,,"Reference, e.g. REQ-20261001-0930-ab12. Unique."
+export_requests,dataset,choice,true,false,false,full_model|measures|weekly_work|quarter_pack,,"full_model, measures, weekly_work or quarter_pack."
+export_requests,job_code,text,false,false,false,,export_jobs.job_code,The export_jobs row that asked for it. Blank for on-demand exports.
+export_requests,quarter_label,text,false,false,false,,,"For quarter packs: the financial quarter, e.g. 2026-27 Q2."
+export_requests,odata_filter,long text,false,false,false,,,"Optional filter applied to the dataset's main tables, e.g. financial_year eq '2026-27'."
+export_requests,filter_label,text,false,false,false,,,"The filter in plain English, shown in the email and README."
+export_requests,folder_path,text,true,false,false,,,Folder in the snapshots library.
+export_requests,requested_by,text,false,true,false,,,Who asked for it. Blank for scheduled jobs.
+export_requests,requested_at,"date-time (UTC, ISO 8601)",true,false,false,,,When it was asked for.
+export_requests,status,choice,true,true,false,queued|running|done|failed,,"queued, running, done or failed."
+export_requests,output_url,long text,false,false,false,,,Link to the folder holding the files.
+export_requests,message,long text,false,false,false,,,"What happened, including any error."
+export_requests,completed_at,"date-time (UTC, ISO 8601)",false,false,false,,,When it finished.
 rpt_values,submission_key,text,true,true,true,,,measure_code|period_key. Unique.
 rpt_values,measure_code,text,true,true,false,,measures.measure_code,Measure.
 rpt_values,measure_name,text,false,false,false,,,Measure name.

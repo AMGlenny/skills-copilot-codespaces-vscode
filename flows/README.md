@@ -7,6 +7,8 @@
 | PMSReview | Measures app | Approver approves or returns; admin reopens | [review.md](review.md) |
 | PMSCreateExpected | Daily, 05:00 | Creates a `not_started` submission for every active measure when a period ends | [create_expected.md](create_expected.md) |
 | PMSReminders | Mondays, 07:45 | Emails each updater a list of values that are expected soon or already late | [reminders.md](reminders.md) |
+| PMSExportRun | New row in `export_requests` | Writes an export (CSV, Excel, data dictionary, README for AI) to the `snapshots` library | [export_run.md](export_run.md) |
+| PMSExportScheduler | Daily, 05:30 | Queues the export jobs that are due today | [export_scheduler.md](export_scheduler.md) |
 
 The exact behaviour of every flow is written down as Python in `pms/workflow.py` and checked by `tests/test_workflow.py`. If a flow and that file disagree, the file is right.
 

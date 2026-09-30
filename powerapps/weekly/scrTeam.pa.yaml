@@ -79,7 +79,7 @@
           Control: GroupContainer@1.3.0
           Variant: AutoLayout
           Properties:
-            Height: =If(fxIsNarrow, 170, 84)
+            Height: =If(fxIsNarrow, 230, 84)
             Fill: =clrPanel
             LayoutDirection: =LayoutDirection.Horizontal
             LayoutWrap: =true
@@ -145,6 +145,32 @@
                         BorderColor: =clrBorder
                         Height: =40
                         OnChange: =Set(varTeam, Self.Selected.org_unit_key); Select(btnLoadTeam)
+            - btnTeamExport:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="Export this team's work"
+                  Fill: =clrPanel
+                  Color: =clrAccent
+                  BorderColor: =clrAccent
+                  BorderThickness: =1
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =220
+                  Height: =40
+                  OnSelect: |-
+                    =Patch(export_requests, Defaults(export_requests), {
+                        request_ref: "REQ-" & Text(Now(), "yyyymmdd-hhmmss") & "-" & Left(Text(GUID()), 4),
+                        dataset: {Value: "weekly_work"},
+                        odata_filter: "org_unit_key eq '" & varTeam & "'",
+                        filter_label: "Team: " & LookUp(colTeams, org_unit_key = varTeam).path,
+                        folder_path: "on_demand",
+                        requested_by: fxMe,
+                        requested_at: Now(),
+                        status: {Value: "queued"}
+                    });
+                    If(IsEmpty(Errors(export_requests)),
+                       Notify("Export requested. You'll get an email with a link in a few minutes. Wellbeing is never included.", NotificationType.Success),
+                       Notify("The export request didn't save. Please try again.", NotificationType.Error))
             - btnLoadTeam:
                 Control: Classic/Button@2.2.0
                 Properties:

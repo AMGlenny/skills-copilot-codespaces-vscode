@@ -33,7 +33,7 @@ I haven't built app screens for this. They would repeat what the list forms alre
 
 1. **Flows**, following [flows/README.md](../flows/README.md). Build `PMSSaveValue`, `PMSReview`, `PMSCreateExpected` and `PMSReminders`.
 2. **Create the app.** Choose **Blank canvas app** in Tablet format, and name it `PMS Measures`. Go to **Settings**, then **Display**, and turn **off** "Scale to fit". Under **General**, set the **Data row limit** to **2000**.
-3. **Data.** Connect these SharePoint lists: `people`, `measures`, `measure_roles`, `periods`, `submissions`, `submission_versions`, `review_comments`, `reference_values`, `rpt_values`.
+3. **Data.** Connect these SharePoint lists: `people`, `measures`, `measure_roles`, `periods`, `submissions`, `submission_versions`, `review_comments`, `reference_values`, `rpt_values`, `export_requests`.
 4. **Flows in the app.** Open the Power Automate pane and add `PMSSaveValue` and `PMSReview`.
 5. **App formulas.** From [`powerapps/measures/App.pfx`](../powerapps/measures/App.pfx), paste the three blocks into `Formulas`, `StartScreen` and `OnStart`.
 6. **Screens.** Paste them in this order, following the instructions at the top of each file:

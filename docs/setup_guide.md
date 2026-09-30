@@ -14,8 +14,8 @@ This creates every list, column, index and view on a SharePoint site and loads t
 
 1. In the site, open **Documents** and create a folder called `pms-setup`.
 2. Upload these files from the `dist/setup` folder in this repository:
-   - `01_schema.json`: creates the lists, columns, indexes and views (265 steps)
-   - `02_seed.json`: loads the sample data (1,627 steps)
+   - `01_schema.json`: creates the lists, columns, indexes and views (281 steps)
+   - `02_seed.json`: loads the sample data (1,633 steps)
 
 ## 3. Build the setup flow (one off, about 10 minutes)
 
@@ -61,7 +61,7 @@ Save the flow.
 ## 4. Run it
 
 1. Run `PMS setup` with File name `01_schema.json`. It takes about 5 to 10 minutes.
-2. Open **Site contents**. You should see 20 lists and a `snapshots` library.
+2. Open **Site contents**. You should see 21 lists and a `snapshots` library.
 3. Run it again with File name `02_seed.json`. It takes about 30 to 50 minutes. If you want it faster, set the loop's parallelism to 10 for this run only.
 4. Open `pms-setup/errors-*.json`. It should contain `[]`.
 
@@ -93,6 +93,10 @@ There are two patterns:
 2. Tick **Site Visitors**, click **Edit User Permissions** and choose **Contribute without delete**.
 
 The setup flow has already set `weekly_updates` so people can only edit their own update. You can check this under **List settings**, then **Advanced settings**, then **Item-level permissions**.
+
+**Export requests.** Do the same for `export_requests` (stop inheriting, then give Site Visitors **Contribute without delete**). The setup flow has already set it so people only see and edit their own requests. The export flow, running as the service account, sees them all.
+
+**Snapshots library.** Leave it on the site default: Visitors can read, Owners can edit. The `_config` folder holds the export definitions, so only owners should change it.
 
 **d. Lock down wellbeing**
 1. Open `wellbeing_checkins`, then **List settings**, then **Permissions for this list**, and click **Stop inheriting permissions**.

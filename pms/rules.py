@@ -137,8 +137,8 @@ def validate_task(task):
         errors.append("Enter a task name.")
     elif len(name) > 255:
         errors.append("Task name must be 255 characters or fewer.")
-    if (task.get("contributes_to_type") or "none") != "none" and not task.get("contributes_to_key"):
-        errors.append("Choose what the task contributes to, or choose none.")
+    if bool(task.get("contributes_to_type")) != bool(task.get("contributes_to_key")):
+        errors.append("Choose what the task contributes to, or leave it blank.")
     return errors
 
 

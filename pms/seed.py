@@ -94,6 +94,8 @@ SETTINGS = [
     ("snapshot_library", "snapshots", "Document library that scheduled exports write to."),
     ("reopen_allowed_role", "admin", "App role allowed to reopen an approved value."),
     ("measures_app_url", "https://apps.powerapps.com/play/REPLACE-WITH-APP-ID", "Link to the measures app, used in notification emails. Replace after publishing the app."),
+    ("export_definitions_path", "/snapshots/_config/export_definitions.json", "Export definitions the export flow reads. Upload dist/exports/export_definitions.json here."),
+    ("export_template_path", "/snapshots/_config/export_template.xlsx", "Blank workbook the export flow copies for each Excel export."),
     ("weekly_app_url", "https://apps.powerapps.com/play/REPLACE-WITH-APP-ID", "Link to the weekly updates app."),
 ]
 
@@ -110,7 +112,7 @@ DOC_N = "Five-Year Environment Plan"
 
 MEASURES = [
     dict(code="PM-0001", name="Good jobs and skills: overall assessment", ref="1", doc=DOC_A, parent=None,
-         cls="measure", type="summary", unit="text", dp=0, pol="neither", freq="quarterly", agg="none", lag=45,
+         cls="measure", type="summary", unit="text", dp=0, pol="neither", freq="quarterly", agg="do_not_combine", lag=45,
          cat="economy", src="Internal assessment", org="TM-SDS",
          desc="Quarterly narrative judgement on progress across the good jobs measures.",
          defn="Owner's summary of measures 1.01 to 1.03, agreed at the quarterly board.",
@@ -539,6 +541,13 @@ def build():
     data.update(reference_values=refs, submissions=subs, submission_versions=versions,
                 review_comments=comments, audit_log=audit, rpt_values=rpt)
     data.update(_weekly_work(rng))
+    data["export_requests"] = [
+        dict(request_ref="REQ-20260929-0600-full", dataset="full_model", job_code="EXP-FULL-NIGHTLY", quarter_label=None,
+             odata_filter=None, filter_label="Everything", folder_path="full_model",
+             requested_by=None, requested_at=_dt(AS_OF - timedelta(days=1), 6), status="done",
+             output_url="https://example.sharepoint.com/sites/performance/snapshots/full_model/latest",
+             message="14 tables written.", completed_at=_dt(AS_OF - timedelta(days=1), 6, 9)),
+    ]
     data["export_jobs"] = [
         dict(job_code="EXP-FULL-NIGHTLY", job_name="Full data model, nightly", dataset="full_model", format="both",
              frequency="daily", run_day=None, folder_path="full_model", keep_history=True, active=True,
@@ -563,7 +572,7 @@ TASKS = [
     ("Agree charter targets for next year", "should", "TM-EMP", "measure", "PM-0004", "aisha.khan", date(2026, 8, 24), "open"),
     ("Chase providers for September job starts", "must", "ST-SDS-A", "measure", "PM-0002", "priya.shah", date(2026, 9, 1), "open"),
     ("Update the apprenticeship definition note", "should", "ST-SDS-A", "measure", "PM-0003", "chloe.bennett", date(2026, 9, 1), "complete"),
-    ("Book room for the quarterly board", "could", "ST-SDS-B", "none", None, "marcus.reid", date(2026, 9, 7), "cancelled"),
+    ("Book room for the quarterly board", "could", "ST-SDS-B", None, None, "marcus.reid", date(2026, 9, 7), "cancelled"),
     ("Prepare employer survey questions", "should", "ST-SDS-B", "measure", "PM-0004", "marcus.reid", date(2026, 9, 7), "open"),
     ("Reconcile temporary accommodation returns", "must", "TM-HSG", "measure", "PM-0007", "ellie.brooks", date(2026, 9, 14), "open"),
     ("Map bus data feeds by depot", "should", "TM-BUS", "measure", "PM-0010", "rhys.evans", date(2026, 9, 14), "complete"),

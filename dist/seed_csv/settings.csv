@@ -8,4 +8,6 @@ reminder_days_before_expected,5,Days before expected_by that updaters get a remi
 snapshot_library,snapshots,Document library that scheduled exports write to.
 reopen_allowed_role,admin,App role allowed to reopen an approved value.
 measures_app_url,https://apps.powerapps.com/play/REPLACE-WITH-APP-ID,"Link to the measures app, used in notification emails. Replace after publishing the app."
+export_definitions_path,/snapshots/_config/export_definitions.json,Export definitions the export flow reads. Upload dist/exports/export_definitions.json here.
+export_template_path,/snapshots/_config/export_template.xlsx,Blank workbook the export flow copies for each Excel export.
 weekly_app_url,https://apps.powerapps.com/play/REPLACE-WITH-APP-ID,Link to the weekly updates app.

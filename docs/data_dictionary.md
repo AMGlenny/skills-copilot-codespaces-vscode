@@ -23,7 +23,7 @@ One row per measure. Retired measures stay, with their history.
 | `decimal_places` | whole number |  | Decimal places to show. Does not change the stored value. |
 | `polarity` | choice | yes | Which direction is good. Used for RAG. Values: `higher_is_better`, `lower_is_better`, `neither`. |
 | `frequency` | choice | yes | How often a value is recorded. Values: `daily`, `weekly`, `fortnightly`, `monthly`, `quarterly`, `annual`, `calendar_year`, `academic_year`, `term`. |
-| `aggregation_method` | choice | yes | How to roll values up to a longer period, e.g. monthly to quarterly. Values: `sum`, `average`, `latest`, `max`, `min`, `none`. |
+| `aggregation_method` | choice | yes | How to roll values up to a longer period, e.g. monthly to quarterly. do_not_combine for values that must not be added or averaged. Values: `sum`, `average`, `latest`, `max`, `min`, `do_not_combine`. |
 | `expected_lag_days` | whole number |  | Usual days after period end before data is available. Blank means no expectation, so it is never flagged as late. |
 | `category` | text |  | Category code from the lookups list. Links to `lookups.code`. |
 | `data_source` | text |  | Where the data comes from. |
@@ -210,7 +210,7 @@ One row per task for its whole life. Open tasks carry over each week; nobody re-
 | `task_name` | text | yes | What needs doing. |
 | `priority` | choice | yes | must, should or could. Values: `must`, `should`, `could`. |
 | `org_unit_key` | text | yes | Team. Links to `org_units.org_unit_key`. |
-| `contributes_to_type` | choice | yes | group, measure or none. Values: `group`, `measure`, `none`. |
+| `contributes_to_type` | choice |  | group or measure. Blank if it doesn't contribute to anything specific. Values: `group`, `measure`. |
 | `contributes_to_key` | text |  | group_key or measure_code this work supports. |
 | `contributes_to_note` | long text |  | Optional extra detail on the aim. |
 | `raised_by` | text | yes | Who added it. Links to `people.email`. |
@@ -240,7 +240,7 @@ One row per problem for its whole life. Open problems carry over each week.
 | `status` | choice | yes | open or closed. Values: `open`, `closed`. |
 | `closed_date` | date (YYYY-MM-DD) |  | When it was closed. |
 | `resolution` | long text |  | How it was resolved. |
-| `contributes_to_type` | choice | yes | group, measure or none. Values: `group`, `measure`, `none`. |
+| `contributes_to_type` | choice |  | group or measure. Blank if it doesn't contribute to anything specific. Values: `group`, `measure`. |
 | `contributes_to_key` | text |  | group_key or measure_code affected. |
 | `notes` | long text |  | Context. |
 
@@ -311,10 +311,30 @@ Scheduled snapshot exports. Admins edit these; a flow runs them.
 | `frequency` | choice | yes | daily, weekly, monthly or quarterly. Values: `daily`, `weekly`, `monthly`, `quarterly`. |
 | `run_day` | whole number |  | Weekly: 1 (Mon) to 7. Monthly or quarterly: day of month. Ignored for daily. |
 | `folder_path` | text | yes | Folder in the snapshots library. |
-| `keep_history` | true/false |  | Also keep a dated copy as well as /latest. |
+| `keep_history` | true/false |  | Keep dated copies as well as /latest. Dated copies are always kept for now; automatic clean-up is a later feature. |
 | `active` | true/false |  | Only active jobs run. |
 | `last_run_at` | date-time (UTC, ISO 8601) |  | Written by the flow. |
 | `last_run_status` | text |  | Written by the flow. |
+
+### export_requests
+
+Queue of exports. The apps and the scheduler add a row; the PMSExportRun flow picks it up, writes the files and fills in the link. (excluded from standard exports and AI snapshots)
+
+| column | type | required | notes |
+|---|---|---|---|
+| `request_ref` | text | yes | **Key** (SharePoint Title column). Reference, e.g. REQ-20261001-0930-ab12. Unique. |
+| `dataset` | choice | yes | full_model, measures, weekly_work or quarter_pack. Values: `full_model`, `measures`, `weekly_work`, `quarter_pack`. |
+| `job_code` | text |  | The export_jobs row that asked for it. Blank for on-demand exports. Links to `export_jobs.job_code`. |
+| `quarter_label` | text |  | For quarter packs: the financial quarter, e.g. 2026-27 Q2. |
+| `odata_filter` | long text |  | Optional filter applied to the dataset's main tables, e.g. financial_year eq '2026-27'. |
+| `filter_label` | text |  | The filter in plain English, shown in the email and README. |
+| `folder_path` | text | yes | Folder in the snapshots library. |
+| `requested_by` | text |  | Who asked for it. Blank for scheduled jobs. |
+| `requested_at` | date-time (UTC, ISO 8601) | yes | When it was asked for. |
+| `status` | choice | yes | queued, running, done or failed. Values: `queued`, `running`, `done`, `failed`. |
+| `output_url` | long text |  | Link to the folder holding the files. |
+| `message` | long text |  | What happened, including any error. |
+| `completed_at` | date-time (UTC, ISO 8601) |  | When it finished. |
 
 ## Reporting
 

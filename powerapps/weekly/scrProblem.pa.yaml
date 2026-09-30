@@ -267,7 +267,7 @@
                                 impact: {Value: ddProblemImpact.Selected.code},
                                 urgency: {Value: ddProblemUrgency.Selected.code},
                                 target_resolution_date: dpProblemTarget.SelectedDate,
-                                contributes_to_type: {Value: Coalesce(cmbProblemContrib.Selected.type, "none")},
+                                contributes_to_type: If(IsBlank(cmbProblemContrib.Selected), Blank(), {Value: cmbProblemContrib.Selected.type}),
                                 contributes_to_key: cmbProblemContrib.Selected.key,
                                 resolution: Trim(txtProblemResolution.Text),
                                 notes: Trim(txtProblemNotes.Text)

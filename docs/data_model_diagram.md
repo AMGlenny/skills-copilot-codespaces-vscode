@@ -96,6 +96,10 @@ erDiagram
     export_jobs {
         string job_code PK
     }
+    export_requests {
+        string request_ref PK
+        string job_code FK
+    }
     rpt_values {
         string submission_key PK
         string measure_code FK
@@ -136,6 +140,7 @@ erDiagram
     people ||--o{ problems : "raised_by"
     people ||--o{ problems : "problem_owner"
     people ||--o{ audit_log : "changed_by"
+    export_jobs ||--o{ export_requests : "job_code"
     measures ||--o{ rpt_values : "measure_code"
     periods ||--o{ rpt_values : "period_key"
 ```

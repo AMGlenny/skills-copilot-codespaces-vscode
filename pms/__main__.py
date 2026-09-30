@@ -8,7 +8,7 @@ import json
 import sys
 from pathlib import Path
 
-from . import docs, periods, seed, sharepoint
+from . import docs, exports, periods, seed, sharepoint
 from .schema import LISTS, LISTS_BY_NAME
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -55,6 +55,13 @@ def build():
         "# Data model diagram (all keys)\n\n"
         "_Generated from `pms/schema.py`. Shows each table's key (PK) and the columns that link to other tables (FK)._\n\n"
         "```mermaid\n" + docs.mermaid() + "\n```\n", encoding="utf-8")
+
+    _write_json(DIST / "exports" / "export_definitions.json", exports.definitions_json())
+    for dataset, files in exports.build_samples(data, seed.AS_OF).items():
+        for fname, text in files.items():
+            path = DIST / "sample_exports" / dataset / fname
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text, encoding="utf-8", newline="")
 
     for name, count in written:
         print(f"dist/setup/{name}: {count} requests")

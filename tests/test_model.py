@@ -170,7 +170,7 @@ class SeedTests(unittest.TestCase):
         for name in ("tasks", "problems"):
             for r in DATA[name]:
                 t, k = r["contributes_to_type"], r["contributes_to_key"]
-                if t == "none":
+                if t is None:
                     self.assertIsNone(k)
                 else:
                     self.assertIn(k, groups if t == "group" else measures)

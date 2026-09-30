@@ -1,0 +1,38 @@
+﻿table_name,column_name,data_type,description
+values_flat,submission_key,text,measure_code|period_key. Unique.
+values_flat,measure_code,text,Measure.
+values_flat,measure_name,text,Measure name.
+values_flat,source_ref,text,Source document reference.
+values_flat,parent_measure_code,text,Parent measure.
+values_flat,measure_class,text,"measure, kpi or okr."
+values_flat,measure_type,text,"summary, output or outcome."
+values_flat,category,text,Category code.
+values_flat,unit,text,Unit.
+values_flat,polarity,text,Polarity.
+values_flat,frequency,text,Frequency.
+values_flat,aggregation_method,text,How to roll up.
+values_flat,owner_name,text,Measure owner.
+values_flat,owner_email,text,Measure owner email.
+values_flat,org_unit_key,text,Owning team.
+values_flat,period_key,text,Period.
+values_flat,period_type,text,Period type.
+values_flat,period_label,text,Period label.
+values_flat,period_start,date,Period start date.
+values_flat,period_end,date,Period end date.
+values_flat,financial_year,text,Financial year.
+values_flat,financial_quarter,text,Financial quarter.
+values_flat,value_number,number,Approved value (not text measures).
+values_flat,value_text,text,Approved value (text measures).
+values_flat,value_missing,bool,Yes if no value was provided.
+values_flat,narrative,text,Approved narrative.
+values_flat,data_quality,text,Data quality flag.
+values_flat,version_no,number,Approved version number.
+values_flat,approved_by,text,Approver email.
+values_flat,approved_date,datetime,Approval time.
+values_flat,target_value,number,Target for the period.
+values_flat,tolerance_value,number,Tolerance for the period (kpi and okr only).
+values_flat,baseline_value,number,Baseline for the period.
+values_flat,capacity_value,number,Capacity or throughput for the period.
+values_flat,rag_status,text,"green, amber, red, no_target, no_data or not_applicable."
+values_flat,is_latest,bool,Yes on the most recent approved period for the measure.
+values_flat,refreshed_at,datetime,When this row was last rebuilt.

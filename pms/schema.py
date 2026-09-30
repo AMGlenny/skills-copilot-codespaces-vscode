@@ -26,7 +26,7 @@ UNITS = ["number", "percent", "gbp", "count", "yes_no", "text"]
 POLARITIES = ["higher_is_better", "lower_is_better", "neither"]
 MEASURE_CLASSES = ["measure", "kpi", "okr"]
 MEASURE_TYPES = ["summary", "output", "outcome"]
-AGGREGATION_METHODS = ["sum", "average", "latest", "max", "min", "none"]
+AGGREGATION_METHODS = ["sum", "average", "latest", "max", "min", "do_not_combine"]
 MEASURE_STATUSES = ["active", "retired"]
 ROLES = ["owner", "updater", "approver"]
 APP_ROLES = ["admin", "standard", "viewer"]
@@ -46,11 +46,12 @@ PRIORITIES = ["must", "should", "could"]
 TASK_STATUSES = ["open", "complete", "cancelled"]
 PROBLEM_STATUSES = ["open", "closed"]
 LEVELS = ["low", "medium", "high"]
-CONTRIBUTES_TO_TYPES = ["group", "measure", "none"]
+CONTRIBUTES_TO_TYPES = ["group", "measure"]
 LOOKUP_TYPES = ["category", "data_source"]
 EXPORT_DATASETS = ["full_model", "measures", "weekly_work", "quarter_pack"]
 EXPORT_FORMATS = ["csv", "xlsx", "both"]
 EXPORT_FREQUENCIES = ["daily", "weekly", "monthly", "quarterly"]
+EXPORT_STATUSES = ["queued", "running", "done", "failed"]
 
 
 @dataclass
@@ -125,7 +126,7 @@ LISTS = [
             Col("decimal_places", "integer", "Decimal places to show. Does not change the stored value.", default=0),
             Col("polarity", "choice", "Which direction is good. Used for RAG.", required=True, choices=POLARITIES),
             Col("frequency", "choice", "How often a value is recorded.", required=True, choices=FREQUENCIES, indexed=True),
-            Col("aggregation_method", "choice", "How to roll values up to a longer period, e.g. monthly to quarterly.", required=True, choices=AGGREGATION_METHODS, default="none"),
+            Col("aggregation_method", "choice", "How to roll values up to a longer period, e.g. monthly to quarterly. do_not_combine for values that must not be added or averaged.", required=True, choices=AGGREGATION_METHODS, default="do_not_combine"),
             Col("expected_lag_days", "integer", "Usual days after period end before data is available. Blank means no expectation, so it is never flagged as late."),
             Col("category", "text", "Category code from the lookups list.", indexed=True, ref="lookups.code"),
             Col("data_source", "text", "Where the data comes from."),
@@ -335,7 +336,7 @@ LISTS = [
             Col("task_name", "text", "What needs doing.", required=True),
             Col("priority", "choice", "must, should or could.", required=True, choices=PRIORITIES),
             Col("org_unit_key", "text", "Team.", required=True, indexed=True, ref="org_units.org_unit_key"),
-            Col("contributes_to_type", "choice", "group, measure or none.", required=True, choices=CONTRIBUTES_TO_TYPES, default="none"),
+            Col("contributes_to_type", "choice", "group or measure. Blank if it doesn't contribute to anything specific.", choices=CONTRIBUTES_TO_TYPES),
             Col("contributes_to_key", "text", "group_key or measure_code this work supports.", indexed=True),
             Col("contributes_to_note", "note", "Optional extra detail on the aim."),
             Col("raised_by", "text", "Who added it.", required=True, indexed=True, ref="people.email"),
@@ -367,7 +368,7 @@ LISTS = [
             Col("status", "choice", "open or closed.", required=True, choices=PROBLEM_STATUSES, default="open", indexed=True),
             Col("closed_date", "date", "When it was closed.", indexed=True),
             Col("resolution", "note", "How it was resolved."),
-            Col("contributes_to_type", "choice", "group, measure or none.", required=True, choices=CONTRIBUTES_TO_TYPES, default="none"),
+            Col("contributes_to_type", "choice", "group or measure. Blank if it doesn't contribute to anything specific.", choices=CONTRIBUTES_TO_TYPES),
             Col("contributes_to_key", "text", "group_key or measure_code affected.", indexed=True),
             Col("notes", "note", "Context."),
         ],
@@ -426,11 +427,31 @@ LISTS = [
             Col("frequency", "choice", "daily, weekly, monthly or quarterly.", required=True, choices=EXPORT_FREQUENCIES),
             Col("run_day", "integer", "Weekly: 1 (Mon) to 7. Monthly or quarterly: day of month. Ignored for daily."),
             Col("folder_path", "text", "Folder in the snapshots library.", required=True),
-            Col("keep_history", "bool", "Also keep a dated copy as well as /latest.", default=True),
+            Col("keep_history", "bool", "Keep dated copies as well as /latest. Dated copies are always kept for now; automatic clean-up is a later feature.", default=True),
             Col("active", "bool", "Only active jobs run.", default=True),
             Col("last_run_at", "datetime", "Written by the flow."),
             Col("last_run_status", "text", "Written by the flow."),
         ],
+    ),
+    ListDef(
+        "export_requests", "shared",
+        "Queue of exports. The apps and the scheduler add a row; the PMSExportRun flow picks it up, writes the files and fills in the link.",
+        "request_ref", "Reference, e.g. REQ-20261001-0930-ab12. Unique.",
+        [
+            Col("dataset", "choice", "full_model, measures, weekly_work or quarter_pack.", required=True, choices=EXPORT_DATASETS),
+            Col("job_code", "text", "The export_jobs row that asked for it. Blank for on-demand exports.", ref="export_jobs.job_code"),
+            Col("quarter_label", "text", "For quarter packs: the financial quarter, e.g. 2026-27 Q2."),
+            Col("odata_filter", "note", "Optional filter applied to the dataset's main tables, e.g. financial_year eq '2026-27'."),
+            Col("filter_label", "text", "The filter in plain English, shown in the email and README."),
+            Col("folder_path", "text", "Folder in the snapshots library.", required=True),
+            Col("requested_by", "text", "Who asked for it. Blank for scheduled jobs.", indexed=True),
+            Col("requested_at", "datetime", "When it was asked for.", required=True),
+            Col("status", "choice", "queued, running, done or failed.", required=True, choices=EXPORT_STATUSES, default="queued", indexed=True),
+            Col("output_url", "note", "Link to the folder holding the files."),
+            Col("message", "note", "What happened, including any error."),
+            Col("completed_at", "datetime", "When it finished."),
+        ],
+        exported=False, read_own_only=True, edit_own_only=True,
     ),
     # ------------------------------------------------------------------
     # Reporting (generated)
