@@ -430,7 +430,7 @@ def build():
             if code == "PM-0019" and pkey == latest_key:
                 special = "awaiting"
 
-            sub = dict(submission_key=skey, measure_code=code, period_key=pkey, status="approved",
+            sub = dict(submission_key=skey, measure_code=code, period_key=pkey, period_end=p["end_date"], status="approved",
                        expected_by=exp, current_version=0, approved_version=None, submitted_date=None,
                        approved_by=None, approved_date=None)
             subs.append(sub)

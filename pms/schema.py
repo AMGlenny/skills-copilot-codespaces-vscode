@@ -179,7 +179,7 @@ LISTS = [
             Col("group_name", "text", "Name of the theme, programme or objective.", required=True),
             Col("group_type", "choice", "theme, programme or objective.", required=True, choices=GROUP_TYPES, indexed=True),
             Col("description", "note", "What it covers."),
-            Col("active", "bool", "Inactive groups are hidden from new entries.", default=True),
+            Col("active", "bool", "Inactive groups are hidden from new entries.", default=True, indexed=True),
         ],
     ),
     ListDef(
@@ -203,7 +203,7 @@ LISTS = [
             Col("ref_type", "choice", "target, tolerance, baseline or capacity. tolerance only for kpi and okr measures.", required=True, choices=REF_TYPES),
             Col("ref_value", "number", "The reference value, in the measure's unit.", required=True),
             Col("notes", "note", "Where the value came from."),
-            Col("active", "bool", "Inactive values are ignored.", default=True),
+            Col("active", "bool", "Inactive values are ignored.", default=True, indexed=True),
         ],
     ),
     ListDef(
@@ -213,6 +213,7 @@ LISTS = [
         [
             Col("measure_code", "text", "Measure.", required=True, indexed=True, ref="measures.measure_code"),
             Col("period_key", "text", "Period the data relates to.", required=True, indexed=True, ref="periods.period_key"),
+            Col("period_end", "date", "Last day of the period (copied from periods when the row is created) so the app can load recent work only.", required=True, indexed=True),
             Col("status", "choice", "not_started, draft, submitted, returned or approved.", required=True, choices=SUBMISSION_STATUSES, default="not_started", indexed=True),
             Col("expected_by", "date", "Period end plus the measure's expected lag. Blank if no lag is set.", indexed=True),
             Col("current_version", "integer", "Latest version number. 0 before anything is entered.", default=0),
@@ -283,7 +284,7 @@ LISTS = [
             Col("unit_name", "text", "Name as people know it.", required=True),
             Col("unit_level", "choice", "workstream, team or sub_team.", required=True, choices=UNIT_LEVELS, indexed=True),
             Col("parent_key", "text", "Parent unit. Blank for workstreams.", indexed=True, ref="org_units.org_unit_key"),
-            Col("active", "bool", "Inactive units are hidden from new entries.", default=True),
+            Col("active", "bool", "Inactive units are hidden from new entries.", default=True, indexed=True),
         ],
     ),
     ListDef(
@@ -428,7 +429,7 @@ LISTS = [
             Col("run_day", "integer", "Weekly: 1 (Mon) to 7. Monthly or quarterly: day of month. Ignored for daily."),
             Col("folder_path", "text", "Folder in the snapshots library.", required=True),
             Col("keep_history", "bool", "Keep dated copies as well as /latest. Dated copies are always kept for now; automatic clean-up is a later feature.", default=True),
-            Col("active", "bool", "Only active jobs run.", default=True),
+            Col("active", "bool", "Only active jobs run.", default=True, indexed=True),
             Col("last_run_at", "datetime", "Written by the flow."),
             Col("last_run_status", "text", "Written by the flow."),
         ],
@@ -481,7 +482,7 @@ LISTS = [
             Col("period_start", "date", "Period start date."),
             Col("period_end", "date", "Period end date.", indexed=True),
             Col("financial_year", "text", "Financial year.", indexed=True),
-            Col("financial_quarter", "text", "Financial quarter."),
+            Col("financial_quarter", "text", "Financial quarter.", indexed=True),
             Col("value_number", "number", "Approved value (not text measures)."),
             Col("value_text", "note", "Approved value (text measures)."),
             Col("value_missing", "bool", "Yes if no value was provided."),

@@ -109,6 +109,7 @@ One row per measure per period. Created as not_started when the period ends.
 | `submission_key` | text | yes | **Key** (SharePoint Title column). measure_code\|period_key. Unique. |
 | `measure_code` | text | yes | Measure. Links to `measures.measure_code`. |
 | `period_key` | text | yes | Period the data relates to. Links to `periods.period_key`. |
+| `period_end` | date (YYYY-MM-DD) | yes | Last day of the period (copied from periods when the row is created) so the app can load recent work only. |
 | `status` | choice | yes | not_started, draft, submitted, returned or approved. Values: `not_started`, `draft`, `submitted`, `returned`, `approved`. |
 | `expected_by` | date (YYYY-MM-DD) |  | Period end plus the measure's expected lag. Blank if no lag is set. |
 | `current_version` | whole number |  | Latest version number. 0 before anything is entered. |

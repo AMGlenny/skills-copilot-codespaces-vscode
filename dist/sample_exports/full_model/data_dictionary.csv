@@ -66,6 +66,7 @@ reference_values,active,bool,Inactive values are ignored.
 submissions,submission_key,text,measure_code|period_key. Unique.
 submissions,measure_code,text,Measure.
 submissions,period_key,text,Period the data relates to.
+submissions,period_end,date,Last day of the period (copied from periods when the row is created) so the app can load recent work only.
 submissions,status,text,"not_started, draft, submitted, returned or approved."
 submissions,expected_by,date,Period end plus the measure's expected lag. Blank if no lag is set.
 submissions,current_version,number,Latest version number. 0 before anything is entered.

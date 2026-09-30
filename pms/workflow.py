@@ -263,7 +263,7 @@ def expected_submissions(state, today, lookback_days=7):
             if key in existing:
                 continue
             new.append(dict(submission_key=key, measure_code=m["measure_code"], period_key=p["period_key"],
-                            status="not_started", expected_by=rules.expected_by(p["end_date"], m["expected_lag_days"]),
+                            period_end=p["end_date"], status="not_started", expected_by=rules.expected_by(p["end_date"], m["expected_lag_days"]),
                             current_version=0, approved_version=None, submitted_date=None,
                             approved_by=None, approved_date=None))
     return new

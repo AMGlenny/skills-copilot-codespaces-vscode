@@ -1062,7 +1062,7 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive groups are hidden from new entries.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive groups are hidden from new entries.\" Required=\"FALSE\" Indexed=\"TRUE\"><Default>1</Default></Field>",
     "Options": 24
    }
   }
@@ -1370,7 +1370,7 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive values are ignored.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive values are ignored.\" Required=\"FALSE\" Indexed=\"TRUE\"><Default>1</Default></Field>",
     "Options": 24
    }
   }
@@ -1474,6 +1474,25 @@
  },
  {
   "step": 75,
+  "description": "submissions: add column period_end",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"period_end\" StaticName=\"period_end\" DisplayName=\"period_end\" Description=\"Last day of the period (copied from periods when the row is created) so the app can load recent work only.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 76,
   "description": "submissions: add column status",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
@@ -1492,7 +1511,7 @@
   }
  },
  {
-  "step": 76,
+  "step": 77,
   "description": "submissions: add column expected_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
@@ -1511,7 +1530,7 @@
   }
  },
  {
-  "step": 77,
+  "step": 78,
   "description": "submissions: add column current_version",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
@@ -1530,7 +1549,7 @@
   }
  },
  {
-  "step": 78,
+  "step": 79,
   "description": "submissions: add column approved_version",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
@@ -1549,7 +1568,7 @@
   }
  },
  {
-  "step": 79,
+  "step": 80,
   "description": "submissions: add column submitted_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
@@ -1568,7 +1587,7 @@
   }
  },
  {
-  "step": 80,
+  "step": 81,
   "description": "submissions: add column approved_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
@@ -1587,7 +1606,7 @@
   }
  },
  {
-  "step": 81,
+  "step": 82,
   "description": "submissions: add column approved_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
@@ -1606,7 +1625,7 @@
   }
  },
  {
-  "step": 82,
+  "step": 83,
   "description": "submissions: add view awaiting_review",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/views/add",
@@ -1642,7 +1661,7 @@
   }
  },
  {
-  "step": 83,
+  "step": 84,
   "description": "submissions: add view returned",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/views/add",
@@ -1677,7 +1696,7 @@
   }
  },
  {
-  "step": 84,
+  "step": 85,
   "description": "submissions: add view expected_not_received",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submissions')/views/add",
@@ -1713,7 +1732,7 @@
   }
  },
  {
-  "step": 85,
+  "step": 86,
   "description": "Create list submission_versions",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -1733,7 +1752,7 @@
   }
  },
  {
-  "step": 86,
+  "step": 87,
   "description": "submission_versions: rename Title to version_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/getbyinternalnameortitle('Title')",
@@ -1754,7 +1773,7 @@
   }
  },
  {
-  "step": 87,
+  "step": 88,
   "description": "submission_versions: make version_key unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/getbyinternalnameortitle('Title')",
@@ -1772,7 +1791,7 @@
   }
  },
  {
-  "step": 88,
+  "step": 89,
   "description": "submission_versions: add column submission_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1791,7 +1810,7 @@
   }
  },
  {
-  "step": 89,
+  "step": 90,
   "description": "submission_versions: add column measure_code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1810,7 +1829,7 @@
   }
  },
  {
-  "step": 90,
+  "step": 91,
   "description": "submission_versions: add column period_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1829,7 +1848,7 @@
   }
  },
  {
-  "step": 91,
+  "step": 92,
   "description": "submission_versions: add column version_no",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1848,7 +1867,7 @@
   }
  },
  {
-  "step": 92,
+  "step": 93,
   "description": "submission_versions: add column value_number",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1867,7 +1886,7 @@
   }
  },
  {
-  "step": 93,
+  "step": 94,
   "description": "submission_versions: add column value_text",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1886,7 +1905,7 @@
   }
  },
  {
-  "step": 94,
+  "step": 95,
   "description": "submission_versions: add column value_missing",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1905,7 +1924,7 @@
   }
  },
  {
-  "step": 95,
+  "step": 96,
   "description": "submission_versions: add column narrative",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1924,7 +1943,7 @@
   }
  },
  {
-  "step": 96,
+  "step": 97,
   "description": "submission_versions: add column data_quality",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1943,7 +1962,7 @@
   }
  },
  {
-  "step": 97,
+  "step": 98,
   "description": "submission_versions: add column entered_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1962,7 +1981,7 @@
   }
  },
  {
-  "step": 98,
+  "step": 99,
   "description": "submission_versions: add column entered_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -1981,7 +2000,7 @@
   }
  },
  {
-  "step": 99,
+  "step": 100,
   "description": "submission_versions: add column submitted_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -2000,7 +2019,7 @@
   }
  },
  {
-  "step": 100,
+  "step": 101,
   "description": "submission_versions: add column version_status",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -2019,7 +2038,7 @@
   }
  },
  {
-  "step": 101,
+  "step": 102,
   "description": "submission_versions: add column rag_status",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
@@ -2038,7 +2057,7 @@
   }
  },
  {
-  "step": 102,
+  "step": 103,
   "description": "submission_versions: add view approved_versions",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('submission_versions')/views/add",
@@ -2076,7 +2095,7 @@
   }
  },
  {
-  "step": 103,
+  "step": 104,
   "description": "Create list review_comments",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -2096,7 +2115,7 @@
   }
  },
  {
-  "step": 104,
+  "step": 105,
   "description": "review_comments: rename Title to comment_ref",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/getbyinternalnameortitle('Title')",
@@ -2117,7 +2136,7 @@
   }
  },
  {
-  "step": 105,
+  "step": 106,
   "description": "review_comments: make comment_ref unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/getbyinternalnameortitle('Title')",
@@ -2135,7 +2154,7 @@
   }
  },
  {
-  "step": 106,
+  "step": 107,
   "description": "review_comments: add column submission_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
@@ -2154,7 +2173,7 @@
   }
  },
  {
-  "step": 107,
+  "step": 108,
   "description": "review_comments: add column version_no",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
@@ -2173,7 +2192,7 @@
   }
  },
  {
-  "step": 108,
+  "step": 109,
   "description": "review_comments: add column reviewer_email",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
@@ -2192,7 +2211,7 @@
   }
  },
  {
-  "step": 109,
+  "step": 110,
   "description": "review_comments: add column action",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
@@ -2211,7 +2230,7 @@
   }
  },
  {
-  "step": 110,
+  "step": 111,
   "description": "review_comments: add column comment",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
@@ -2230,7 +2249,7 @@
   }
  },
  {
-  "step": 111,
+  "step": 112,
   "description": "review_comments: add column comment_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
@@ -2249,7 +2268,7 @@
   }
  },
  {
-  "step": 112,
+  "step": 113,
   "description": "review_comments: add column resolved",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
@@ -2268,7 +2287,7 @@
   }
  },
  {
-  "step": 113,
+  "step": 114,
   "description": "review_comments: add column resolved_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
@@ -2287,7 +2306,7 @@
   }
  },
  {
-  "step": 114,
+  "step": 115,
   "description": "review_comments: add column resolved_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
@@ -2306,7 +2325,7 @@
   }
  },
  {
-  "step": 115,
+  "step": 116,
   "description": "Create list org_units",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -2326,7 +2345,7 @@
   }
  },
  {
-  "step": 116,
+  "step": 117,
   "description": "org_units: rename Title to org_unit_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('org_units')/fields/getbyinternalnameortitle('Title')",
@@ -2347,7 +2366,7 @@
   }
  },
  {
-  "step": 117,
+  "step": 118,
   "description": "org_units: make org_unit_key unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('org_units')/fields/getbyinternalnameortitle('Title')",
@@ -2365,7 +2384,7 @@
   }
  },
  {
-  "step": 118,
+  "step": 119,
   "description": "org_units: add column unit_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('org_units')/fields/createfieldasxml",
@@ -2384,7 +2403,7 @@
   }
  },
  {
-  "step": 119,
+  "step": 120,
   "description": "org_units: add column unit_level",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('org_units')/fields/createfieldasxml",
@@ -2403,7 +2422,7 @@
   }
  },
  {
-  "step": 120,
+  "step": 121,
   "description": "org_units: add column parent_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('org_units')/fields/createfieldasxml",
@@ -2422,7 +2441,7 @@
   }
  },
  {
-  "step": 121,
+  "step": 122,
   "description": "org_units: add column active",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('org_units')/fields/createfieldasxml",
@@ -2435,13 +2454,13 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive units are hidden from new entries.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive units are hidden from new entries.\" Required=\"FALSE\" Indexed=\"TRUE\"><Default>1</Default></Field>",
     "Options": 24
    }
   }
  },
  {
-  "step": 122,
+  "step": 123,
   "description": "Create list people",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -2461,7 +2480,7 @@
   }
  },
  {
-  "step": 123,
+  "step": 124,
   "description": "people: rename Title to email",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('people')/fields/getbyinternalnameortitle('Title')",
@@ -2482,7 +2501,7 @@
   }
  },
  {
-  "step": 124,
+  "step": 125,
   "description": "people: make email unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('people')/fields/getbyinternalnameortitle('Title')",
@@ -2500,7 +2519,7 @@
   }
  },
  {
-  "step": 125,
+  "step": 126,
   "description": "people: add column display_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
@@ -2519,7 +2538,7 @@
   }
  },
  {
-  "step": 126,
+  "step": 127,
   "description": "people: add column org_unit_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
@@ -2538,7 +2557,7 @@
   }
  },
  {
-  "step": 127,
+  "step": 128,
   "description": "people: add column line_manager_email",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
@@ -2557,7 +2576,7 @@
   }
  },
  {
-  "step": 128,
+  "step": 129,
   "description": "people: add column app_role",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
@@ -2576,7 +2595,7 @@
   }
  },
  {
-  "step": 129,
+  "step": 130,
   "description": "people: add column active",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
@@ -2595,7 +2614,7 @@
   }
  },
  {
-  "step": 130,
+  "step": 131,
   "description": "Create list weekly_updates",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -2615,7 +2634,7 @@
   }
  },
  {
-  "step": 131,
+  "step": 132,
   "description": "weekly_updates: rename Title to update_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/getbyinternalnameortitle('Title')",
@@ -2636,7 +2655,7 @@
   }
  },
  {
-  "step": 132,
+  "step": 133,
   "description": "weekly_updates: make update_key unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/getbyinternalnameortitle('Title')",
@@ -2654,7 +2673,7 @@
   }
  },
  {
-  "step": 133,
+  "step": 134,
   "description": "weekly_updates: add column email",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
@@ -2673,7 +2692,7 @@
   }
  },
  {
-  "step": 134,
+  "step": 135,
   "description": "weekly_updates: add column week_start",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
@@ -2692,7 +2711,7 @@
   }
  },
  {
-  "step": 135,
+  "step": 136,
   "description": "weekly_updates: add column org_unit_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
@@ -2711,7 +2730,7 @@
   }
  },
  {
-  "step": 136,
+  "step": 137,
   "description": "weekly_updates: add column successes",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
@@ -2730,7 +2749,7 @@
   }
  },
  {
-  "step": 137,
+  "step": 138,
   "description": "weekly_updates: add column communication",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
@@ -2749,7 +2768,7 @@
   }
  },
  {
-  "step": 138,
+  "step": 139,
   "description": "weekly_updates: add column workload",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
@@ -2768,7 +2787,7 @@
   }
  },
  {
-  "step": 139,
+  "step": 140,
   "description": "weekly_updates: add column submitted_at",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
@@ -2787,7 +2806,7 @@
   }
  },
  {
-  "step": 140,
+  "step": 141,
   "description": "weekly_updates: item-level permissions",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('weekly_updates')",
@@ -2806,7 +2825,7 @@
   }
  },
  {
-  "step": 141,
+  "step": 142,
   "description": "Create list wellbeing_checkins",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -2826,7 +2845,7 @@
   }
  },
  {
-  "step": 142,
+  "step": 143,
   "description": "wellbeing_checkins: rename Title to checkin_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/getbyinternalnameortitle('Title')",
@@ -2847,7 +2866,7 @@
   }
  },
  {
-  "step": 143,
+  "step": 144,
   "description": "wellbeing_checkins: make checkin_key unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/getbyinternalnameortitle('Title')",
@@ -2865,7 +2884,7 @@
   }
  },
  {
-  "step": 144,
+  "step": 145,
   "description": "wellbeing_checkins: add column email",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
@@ -2884,7 +2903,7 @@
   }
  },
  {
-  "step": 145,
+  "step": 146,
   "description": "wellbeing_checkins: add column line_manager_email",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
@@ -2903,7 +2922,7 @@
   }
  },
  {
-  "step": 146,
+  "step": 147,
   "description": "wellbeing_checkins: add column org_unit_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
@@ -2922,7 +2941,7 @@
   }
  },
  {
-  "step": 147,
+  "step": 148,
   "description": "wellbeing_checkins: add column week_start",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
@@ -2941,7 +2960,7 @@
   }
  },
  {
-  "step": 148,
+  "step": 149,
   "description": "wellbeing_checkins: add column wellbeing",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
@@ -2960,7 +2979,7 @@
   }
  },
  {
-  "step": 149,
+  "step": 150,
   "description": "wellbeing_checkins: add column comments",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
@@ -2979,7 +2998,7 @@
   }
  },
  {
-  "step": 150,
+  "step": 151,
   "description": "wellbeing_checkins: add column submitted_at",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
@@ -2998,7 +3017,7 @@
   }
  },
  {
-  "step": 151,
+  "step": 152,
   "description": "wellbeing_checkins: item-level permissions",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('wellbeing_checkins')",
@@ -3017,7 +3036,7 @@
   }
  },
  {
-  "step": 152,
+  "step": 153,
   "description": "Create list tasks",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -3037,7 +3056,7 @@
   }
  },
  {
-  "step": 153,
+  "step": 154,
   "description": "tasks: rename Title to task_code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/getbyinternalnameortitle('Title')",
@@ -3058,7 +3077,7 @@
   }
  },
  {
-  "step": 154,
+  "step": 155,
   "description": "tasks: make task_code unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/getbyinternalnameortitle('Title')",
@@ -3076,7 +3095,7 @@
   }
  },
  {
-  "step": 155,
+  "step": 156,
   "description": "tasks: add column task_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3095,7 +3114,7 @@
   }
  },
  {
-  "step": 156,
+  "step": 157,
   "description": "tasks: add column priority",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3114,7 +3133,7 @@
   }
  },
  {
-  "step": 157,
+  "step": 158,
   "description": "tasks: add column org_unit_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3133,7 +3152,7 @@
   }
  },
  {
-  "step": 158,
+  "step": 159,
   "description": "tasks: add column contributes_to_type",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3152,7 +3171,7 @@
   }
  },
  {
-  "step": 159,
+  "step": 160,
   "description": "tasks: add column contributes_to_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3171,7 +3190,7 @@
   }
  },
  {
-  "step": 160,
+  "step": 161,
   "description": "tasks: add column contributes_to_note",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3190,7 +3209,7 @@
   }
  },
  {
-  "step": 161,
+  "step": 162,
   "description": "tasks: add column raised_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3209,7 +3228,7 @@
   }
  },
  {
-  "step": 162,
+  "step": 163,
   "description": "tasks: add column date_raised",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3228,7 +3247,7 @@
   }
  },
  {
-  "step": 163,
+  "step": 164,
   "description": "tasks: add column assigned_to",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3247,7 +3266,7 @@
   }
  },
  {
-  "step": 164,
+  "step": 165,
   "description": "tasks: add column status",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3266,7 +3285,7 @@
   }
  },
  {
-  "step": 165,
+  "step": 166,
   "description": "tasks: add column completed_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3285,7 +3304,7 @@
   }
  },
  {
-  "step": 166,
+  "step": 167,
   "description": "tasks: add column completed_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3304,7 +3323,7 @@
   }
  },
  {
-  "step": 167,
+  "step": 168,
   "description": "tasks: add column notes",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
@@ -3323,7 +3342,7 @@
   }
  },
  {
-  "step": 168,
+  "step": 169,
   "description": "tasks: add view open_tasks",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('tasks')/views/add",
@@ -3360,7 +3379,7 @@
   }
  },
  {
-  "step": 169,
+  "step": 170,
   "description": "Create list problems",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -3380,7 +3399,7 @@
   }
  },
  {
-  "step": 170,
+  "step": 171,
   "description": "problems: rename Title to problem_code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/getbyinternalnameortitle('Title')",
@@ -3401,7 +3420,7 @@
   }
  },
  {
-  "step": 171,
+  "step": 172,
   "description": "problems: make problem_code unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/getbyinternalnameortitle('Title')",
@@ -3419,7 +3438,7 @@
   }
  },
  {
-  "step": 172,
+  "step": 173,
   "description": "problems: add column problem_title",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3438,7 +3457,7 @@
   }
  },
  {
-  "step": 173,
+  "step": 174,
   "description": "problems: add column problem_statement",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3457,7 +3476,7 @@
   }
  },
  {
-  "step": 174,
+  "step": 175,
   "description": "problems: add column org_unit_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3476,7 +3495,7 @@
   }
  },
  {
-  "step": 175,
+  "step": 176,
   "description": "problems: add column raised_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3495,7 +3514,7 @@
   }
  },
  {
-  "step": 176,
+  "step": 177,
   "description": "problems: add column raised_on",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3514,7 +3533,7 @@
   }
  },
  {
-  "step": 177,
+  "step": 178,
   "description": "problems: add column problem_owner",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3533,7 +3552,7 @@
   }
  },
  {
-  "step": 178,
+  "step": 179,
   "description": "problems: add column impact",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3552,7 +3571,7 @@
   }
  },
  {
-  "step": 179,
+  "step": 180,
   "description": "problems: add column urgency",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3571,7 +3590,7 @@
   }
  },
  {
-  "step": 180,
+  "step": 181,
   "description": "problems: add column target_resolution_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3590,7 +3609,7 @@
   }
  },
  {
-  "step": 181,
+  "step": 182,
   "description": "problems: add column status",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3609,7 +3628,7 @@
   }
  },
  {
-  "step": 182,
+  "step": 183,
   "description": "problems: add column closed_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3628,7 +3647,7 @@
   }
  },
  {
-  "step": 183,
+  "step": 184,
   "description": "problems: add column resolution",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3647,7 +3666,7 @@
   }
  },
  {
-  "step": 184,
+  "step": 185,
   "description": "problems: add column contributes_to_type",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3666,7 +3685,7 @@
   }
  },
  {
-  "step": 185,
+  "step": 186,
   "description": "problems: add column contributes_to_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3685,7 +3704,7 @@
   }
  },
  {
-  "step": 186,
+  "step": 187,
   "description": "problems: add column notes",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
@@ -3704,7 +3723,7 @@
   }
  },
  {
-  "step": 187,
+  "step": 188,
   "description": "problems: add view open_problems",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('problems')/views/add",
@@ -3741,7 +3760,7 @@
   }
  },
  {
-  "step": 188,
+  "step": 189,
   "description": "Create list lookups",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -3761,7 +3780,7 @@
   }
  },
  {
-  "step": 189,
+  "step": 190,
   "description": "lookups: rename Title to lookup_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('lookups')/fields/getbyinternalnameortitle('Title')",
@@ -3782,7 +3801,7 @@
   }
  },
  {
-  "step": 190,
+  "step": 191,
   "description": "lookups: make lookup_key unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('lookups')/fields/getbyinternalnameortitle('Title')",
@@ -3800,7 +3819,7 @@
   }
  },
  {
-  "step": 191,
+  "step": 192,
   "description": "lookups: add column lookup_type",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
@@ -3819,7 +3838,7 @@
   }
  },
  {
-  "step": 192,
+  "step": 193,
   "description": "lookups: add column code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
@@ -3838,7 +3857,7 @@
   }
  },
  {
-  "step": 193,
+  "step": 194,
   "description": "lookups: add column label",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
@@ -3857,7 +3876,7 @@
   }
  },
  {
-  "step": 194,
+  "step": 195,
   "description": "lookups: add column sort_order",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
@@ -3876,7 +3895,7 @@
   }
  },
  {
-  "step": 195,
+  "step": 196,
   "description": "lookups: add column active",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
@@ -3895,7 +3914,7 @@
   }
  },
  {
-  "step": 196,
+  "step": 197,
   "description": "Create list settings",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -3915,7 +3934,7 @@
   }
  },
  {
-  "step": 197,
+  "step": 198,
   "description": "settings: rename Title to setting_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('settings')/fields/getbyinternalnameortitle('Title')",
@@ -3936,7 +3955,7 @@
   }
  },
  {
-  "step": 198,
+  "step": 199,
   "description": "settings: make setting_key unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('settings')/fields/getbyinternalnameortitle('Title')",
@@ -3954,7 +3973,7 @@
   }
  },
  {
-  "step": 199,
+  "step": 200,
   "description": "settings: add column setting_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('settings')/fields/createfieldasxml",
@@ -3973,7 +3992,7 @@
   }
  },
  {
-  "step": 200,
+  "step": 201,
   "description": "settings: add column description",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('settings')/fields/createfieldasxml",
@@ -3992,7 +4011,7 @@
   }
  },
  {
-  "step": 201,
+  "step": 202,
   "description": "Create list audit_log",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -4012,7 +4031,7 @@
   }
  },
  {
-  "step": 202,
+  "step": 203,
   "description": "audit_log: rename Title to audit_ref",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/getbyinternalnameortitle('Title')",
@@ -4033,7 +4052,7 @@
   }
  },
  {
-  "step": 203,
+  "step": 204,
   "description": "audit_log: make audit_ref unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/getbyinternalnameortitle('Title')",
@@ -4051,7 +4070,7 @@
   }
  },
  {
-  "step": 204,
+  "step": 205,
   "description": "audit_log: add column list_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
@@ -4070,7 +4089,7 @@
   }
  },
  {
-  "step": 205,
+  "step": 206,
   "description": "audit_log: add column item_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
@@ -4089,7 +4108,7 @@
   }
  },
  {
-  "step": 206,
+  "step": 207,
   "description": "audit_log: add column action",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
@@ -4108,7 +4127,7 @@
   }
  },
  {
-  "step": 207,
+  "step": 208,
   "description": "audit_log: add column field_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
@@ -4127,7 +4146,7 @@
   }
  },
  {
-  "step": 208,
+  "step": 209,
   "description": "audit_log: add column old_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
@@ -4146,7 +4165,7 @@
   }
  },
  {
-  "step": 209,
+  "step": 210,
   "description": "audit_log: add column new_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
@@ -4165,7 +4184,7 @@
   }
  },
  {
-  "step": 210,
+  "step": 211,
   "description": "audit_log: add column changed_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
@@ -4184,7 +4203,7 @@
   }
  },
  {
-  "step": 211,
+  "step": 212,
   "description": "audit_log: add column changed_at",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
@@ -4203,7 +4222,7 @@
   }
  },
  {
-  "step": 212,
+  "step": 213,
   "description": "Create list export_jobs",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -4223,7 +4242,7 @@
   }
  },
  {
-  "step": 213,
+  "step": 214,
   "description": "export_jobs: rename Title to job_code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/getbyinternalnameortitle('Title')",
@@ -4244,7 +4263,7 @@
   }
  },
  {
-  "step": 214,
+  "step": 215,
   "description": "export_jobs: make job_code unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/getbyinternalnameortitle('Title')",
@@ -4262,7 +4281,7 @@
   }
  },
  {
-  "step": 215,
+  "step": 216,
   "description": "export_jobs: add column job_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4281,7 +4300,7 @@
   }
  },
  {
-  "step": 216,
+  "step": 217,
   "description": "export_jobs: add column dataset",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4300,7 +4319,7 @@
   }
  },
  {
-  "step": 217,
+  "step": 218,
   "description": "export_jobs: add column format",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4319,7 +4338,7 @@
   }
  },
  {
-  "step": 218,
+  "step": 219,
   "description": "export_jobs: add column frequency",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4338,7 +4357,7 @@
   }
  },
  {
-  "step": 219,
+  "step": 220,
   "description": "export_jobs: add column run_day",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4357,7 +4376,7 @@
   }
  },
  {
-  "step": 220,
+  "step": 221,
   "description": "export_jobs: add column folder_path",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4376,7 +4395,7 @@
   }
  },
  {
-  "step": 221,
+  "step": 222,
   "description": "export_jobs: add column keep_history",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4395,7 +4414,7 @@
   }
  },
  {
-  "step": 222,
+  "step": 223,
   "description": "export_jobs: add column active",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4408,13 +4427,13 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Only active jobs run.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Only active jobs run.\" Required=\"FALSE\" Indexed=\"TRUE\"><Default>1</Default></Field>",
     "Options": 24
    }
   }
  },
  {
-  "step": 223,
+  "step": 224,
   "description": "export_jobs: add column last_run_at",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4433,7 +4452,7 @@
   }
  },
  {
-  "step": 224,
+  "step": 225,
   "description": "export_jobs: add column last_run_status",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
@@ -4452,7 +4471,7 @@
   }
  },
  {
-  "step": 225,
+  "step": 226,
   "description": "Create list export_requests",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -4472,7 +4491,7 @@
   }
  },
  {
-  "step": 226,
+  "step": 227,
   "description": "export_requests: rename Title to request_ref",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/getbyinternalnameortitle('Title')",
@@ -4493,7 +4512,7 @@
   }
  },
  {
-  "step": 227,
+  "step": 228,
   "description": "export_requests: make request_ref unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/getbyinternalnameortitle('Title')",
@@ -4511,7 +4530,7 @@
   }
  },
  {
-  "step": 228,
+  "step": 229,
   "description": "export_requests: add column dataset",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4530,7 +4549,7 @@
   }
  },
  {
-  "step": 229,
+  "step": 230,
   "description": "export_requests: add column job_code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4549,7 +4568,7 @@
   }
  },
  {
-  "step": 230,
+  "step": 231,
   "description": "export_requests: add column quarter_label",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4568,7 +4587,7 @@
   }
  },
  {
-  "step": 231,
+  "step": 232,
   "description": "export_requests: add column odata_filter",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4587,7 +4606,7 @@
   }
  },
  {
-  "step": 232,
+  "step": 233,
   "description": "export_requests: add column filter_label",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4606,7 +4625,7 @@
   }
  },
  {
-  "step": 233,
+  "step": 234,
   "description": "export_requests: add column folder_path",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4625,7 +4644,7 @@
   }
  },
  {
-  "step": 234,
+  "step": 235,
   "description": "export_requests: add column requested_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4644,7 +4663,7 @@
   }
  },
  {
-  "step": 235,
+  "step": 236,
   "description": "export_requests: add column requested_at",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4663,7 +4682,7 @@
   }
  },
  {
-  "step": 236,
+  "step": 237,
   "description": "export_requests: add column status",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4682,7 +4701,7 @@
   }
  },
  {
-  "step": 237,
+  "step": 238,
   "description": "export_requests: add column output_url",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4701,7 +4720,7 @@
   }
  },
  {
-  "step": 238,
+  "step": 239,
   "description": "export_requests: add column message",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4720,7 +4739,7 @@
   }
  },
  {
-  "step": 239,
+  "step": 240,
   "description": "export_requests: add column completed_at",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')/fields/createfieldasxml",
@@ -4739,7 +4758,7 @@
   }
  },
  {
-  "step": 240,
+  "step": 241,
   "description": "export_requests: item-level permissions",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('export_requests')",
@@ -4758,7 +4777,7 @@
   }
  },
  {
-  "step": 241,
+  "step": 242,
   "description": "Create list rpt_values",
   "method": "POST",
   "uri": "_api/web/lists",
@@ -4778,7 +4797,7 @@
   }
  },
  {
-  "step": 242,
+  "step": 243,
   "description": "rpt_values: rename Title to submission_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/getbyinternalnameortitle('Title')",
@@ -4799,7 +4818,7 @@
   }
  },
  {
-  "step": 243,
+  "step": 244,
   "description": "rpt_values: make submission_key unique",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/getbyinternalnameortitle('Title')",
@@ -4817,7 +4836,7 @@
   }
  },
  {
-  "step": 244,
+  "step": 245,
   "description": "rpt_values: add column measure_code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4836,7 +4855,7 @@
   }
  },
  {
-  "step": 245,
+  "step": 246,
   "description": "rpt_values: add column measure_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4855,7 +4874,7 @@
   }
  },
  {
-  "step": 246,
+  "step": 247,
   "description": "rpt_values: add column source_ref",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4874,7 +4893,7 @@
   }
  },
  {
-  "step": 247,
+  "step": 248,
   "description": "rpt_values: add column parent_measure_code",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4893,7 +4912,7 @@
   }
  },
  {
-  "step": 248,
+  "step": 249,
   "description": "rpt_values: add column measure_class",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4912,7 +4931,7 @@
   }
  },
  {
-  "step": 249,
+  "step": 250,
   "description": "rpt_values: add column measure_type",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4931,7 +4950,7 @@
   }
  },
  {
-  "step": 250,
+  "step": 251,
   "description": "rpt_values: add column category",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4950,7 +4969,7 @@
   }
  },
  {
-  "step": 251,
+  "step": 252,
   "description": "rpt_values: add column unit",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4969,7 +4988,7 @@
   }
  },
  {
-  "step": 252,
+  "step": 253,
   "description": "rpt_values: add column polarity",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -4988,7 +5007,7 @@
   }
  },
  {
-  "step": 253,
+  "step": 254,
   "description": "rpt_values: add column frequency",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5007,7 +5026,7 @@
   }
  },
  {
-  "step": 254,
+  "step": 255,
   "description": "rpt_values: add column aggregation_method",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5026,7 +5045,7 @@
   }
  },
  {
-  "step": 255,
+  "step": 256,
   "description": "rpt_values: add column owner_name",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5045,7 +5064,7 @@
   }
  },
  {
-  "step": 256,
+  "step": 257,
   "description": "rpt_values: add column owner_email",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5064,7 +5083,7 @@
   }
  },
  {
-  "step": 257,
+  "step": 258,
   "description": "rpt_values: add column org_unit_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5083,7 +5102,7 @@
   }
  },
  {
-  "step": 258,
+  "step": 259,
   "description": "rpt_values: add column period_key",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5102,7 +5121,7 @@
   }
  },
  {
-  "step": 259,
+  "step": 260,
   "description": "rpt_values: add column period_type",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5121,7 +5140,7 @@
   }
  },
  {
-  "step": 260,
+  "step": 261,
   "description": "rpt_values: add column period_label",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5140,7 +5159,7 @@
   }
  },
  {
-  "step": 261,
+  "step": 262,
   "description": "rpt_values: add column period_start",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5159,7 +5178,7 @@
   }
  },
  {
-  "step": 262,
+  "step": 263,
   "description": "rpt_values: add column period_end",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5178,7 +5197,7 @@
   }
  },
  {
-  "step": 263,
+  "step": 264,
   "description": "rpt_values: add column financial_year",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5197,7 +5216,7 @@
   }
  },
  {
-  "step": 264,
+  "step": 265,
   "description": "rpt_values: add column financial_quarter",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5210,13 +5229,13 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Text\" Name=\"financial_quarter\" StaticName=\"financial_quarter\" DisplayName=\"financial_quarter\" Description=\"Financial quarter.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "SchemaXml": "<Field Type=\"Text\" Name=\"financial_quarter\" StaticName=\"financial_quarter\" DisplayName=\"financial_quarter\" Description=\"Financial quarter.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
     "Options": 24
    }
   }
  },
  {
-  "step": 265,
+  "step": 266,
   "description": "rpt_values: add column value_number",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5235,7 +5254,7 @@
   }
  },
  {
-  "step": 266,
+  "step": 267,
   "description": "rpt_values: add column value_text",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5254,7 +5273,7 @@
   }
  },
  {
-  "step": 267,
+  "step": 268,
   "description": "rpt_values: add column value_missing",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5273,7 +5292,7 @@
   }
  },
  {
-  "step": 268,
+  "step": 269,
   "description": "rpt_values: add column narrative",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5292,7 +5311,7 @@
   }
  },
  {
-  "step": 269,
+  "step": 270,
   "description": "rpt_values: add column data_quality",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5311,7 +5330,7 @@
   }
  },
  {
-  "step": 270,
+  "step": 271,
   "description": "rpt_values: add column version_no",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5330,7 +5349,7 @@
   }
  },
  {
-  "step": 271,
+  "step": 272,
   "description": "rpt_values: add column approved_by",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5349,7 +5368,7 @@
   }
  },
  {
-  "step": 272,
+  "step": 273,
   "description": "rpt_values: add column approved_date",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5368,7 +5387,7 @@
   }
  },
  {
-  "step": 273,
+  "step": 274,
   "description": "rpt_values: add column target_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5387,7 +5406,7 @@
   }
  },
  {
-  "step": 274,
+  "step": 275,
   "description": "rpt_values: add column tolerance_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5406,7 +5425,7 @@
   }
  },
  {
-  "step": 275,
+  "step": 276,
   "description": "rpt_values: add column baseline_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5425,7 +5444,7 @@
   }
  },
  {
-  "step": 276,
+  "step": 277,
   "description": "rpt_values: add column capacity_value",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5444,7 +5463,7 @@
   }
  },
  {
-  "step": 277,
+  "step": 278,
   "description": "rpt_values: add column rag_status",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5463,7 +5482,7 @@
   }
  },
  {
-  "step": 278,
+  "step": 279,
   "description": "rpt_values: add column is_latest",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5482,7 +5501,7 @@
   }
  },
  {
-  "step": 279,
+  "step": 280,
   "description": "rpt_values: add column refreshed_at",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
@@ -5501,7 +5520,7 @@
   }
  },
  {
-  "step": 280,
+  "step": 281,
   "description": "rpt_values: add view latest_values",
   "method": "POST",
   "uri": "_api/web/lists/getbytitle('rpt_values')/views/add",
@@ -5537,7 +5556,7 @@
   }
  },
  {
-  "step": 281,
+  "step": 282,
   "description": "Create document library snapshots",
   "method": "POST",
   "uri": "_api/web/lists",

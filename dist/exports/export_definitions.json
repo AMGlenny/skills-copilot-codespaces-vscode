@@ -480,7 +480,7 @@
     {
      "name": "submissions",
      "list": "submissions",
-     "select": "Title,measure_code,period_key,status,expected_by,current_version,approved_version,submitted_date,approved_by,approved_date",
+     "select": "Title,measure_code,period_key,period_end,status,expected_by,current_version,approved_version,submitted_date,approved_by,approved_date",
      "filter": "",
      "main": false,
      "columns": [
@@ -501,6 +501,12 @@
        "source": "period_key",
        "type": "text",
        "description": "Period the data relates to."
+      },
+      {
+       "name": "period_end",
+       "source": "period_end",
+       "type": "date",
+       "description": "Last day of the period (copied from periods when the row is created) so the app can load recent work only."
       },
       {
        "name": "status",
@@ -1656,6 +1662,12 @@
      "period_key",
      "text",
      "Period the data relates to."
+    ],
+    [
+     "submissions",
+     "period_end",
+     "date",
+     "Last day of the period (copied from periods when the row is created) so the app can load recent work only."
     ],
     [
      "submissions",

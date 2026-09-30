@@ -40,7 +40,7 @@ groups,group_key,text,true,true,true,,,"Group key, e.g. TH-JOBS. Unique."
 groups,group_name,text,true,false,false,,,"Name of the theme, programme or objective."
 groups,group_type,choice,true,true,false,theme|programme|objective,,"theme, programme or objective."
 groups,description,long text,false,false,false,,,What it covers.
-groups,active,true/false,false,false,false,,,Inactive groups are hidden from new entries.
+groups,active,true/false,false,true,false,,,Inactive groups are hidden from new entries.
 measure_links,link_key,text,true,true,true,,,measure_code|group_key. Unique.
 measure_links,measure_code,text,true,true,false,,measures.measure_code,Measure.
 measure_links,group_key,text,true,true,false,,groups.group_key,Group.
@@ -52,10 +52,11 @@ reference_values,period_key,text,true,true,false,,periods.period_key,Period.
 reference_values,ref_type,choice,true,false,false,target|tolerance|baseline|capacity,,"target, tolerance, baseline or capacity. tolerance only for kpi and okr measures."
 reference_values,ref_value,number,true,false,false,,,"The reference value, in the measure's unit."
 reference_values,notes,long text,false,false,false,,,Where the value came from.
-reference_values,active,true/false,false,false,false,,,Inactive values are ignored.
+reference_values,active,true/false,false,true,false,,,Inactive values are ignored.
 submissions,submission_key,text,true,true,true,,,measure_code|period_key. Unique.
 submissions,measure_code,text,true,true,false,,measures.measure_code,Measure.
 submissions,period_key,text,true,true,false,,periods.period_key,Period the data relates to.
+submissions,period_end,date (YYYY-MM-DD),true,true,false,,,Last day of the period (copied from periods when the row is created) so the app can load recent work only.
 submissions,status,choice,true,true,false,not_started|draft|submitted|returned|approved,,"not_started, draft, submitted, returned or approved."
 submissions,expected_by,date (YYYY-MM-DD),false,true,false,,,Period end plus the measure's expected lag. Blank if no lag is set.
 submissions,current_version,whole number,false,false,false,,,Latest version number. 0 before anything is entered.
@@ -92,7 +93,7 @@ org_units,org_unit_key,text,true,true,true,,,"Key, e.g. WS-JOBS, TM-SDS, ST-SDS-
 org_units,unit_name,text,true,false,false,,,Name as people know it.
 org_units,unit_level,choice,true,true,false,workstream|team|sub_team,,"workstream, team or sub_team."
 org_units,parent_key,text,false,true,false,,org_units.org_unit_key,Parent unit. Blank for workstreams.
-org_units,active,true/false,false,false,false,,,Inactive units are hidden from new entries.
+org_units,active,true/false,false,true,false,,,Inactive units are hidden from new entries.
 people,email,text,true,true,true,,,"Work email, lower case. Unique."
 people,display_name,text,true,false,false,,,Name shown in the app.
 people,org_unit_key,text,false,true,false,,org_units.org_unit_key,Default team. Pre-fills the weekly update.
@@ -171,7 +172,7 @@ export_jobs,frequency,choice,true,false,false,daily|weekly|monthly|quarterly,,"d
 export_jobs,run_day,whole number,false,false,false,,,Weekly: 1 (Mon) to 7. Monthly or quarterly: day of month. Ignored for daily.
 export_jobs,folder_path,text,true,false,false,,,Folder in the snapshots library.
 export_jobs,keep_history,true/false,false,false,false,,,Keep dated copies as well as /latest. Dated copies are always kept for now; automatic clean-up is a later feature.
-export_jobs,active,true/false,false,false,false,,,Only active jobs run.
+export_jobs,active,true/false,false,true,false,,,Only active jobs run.
 export_jobs,last_run_at,"date-time (UTC, ISO 8601)",false,false,false,,,Written by the flow.
 export_jobs,last_run_status,text,false,false,false,,,Written by the flow.
 export_requests,request_ref,text,true,true,true,,,"Reference, e.g. REQ-20261001-0930-ab12. Unique."
@@ -208,7 +209,7 @@ rpt_values,period_label,text,false,false,false,,,Period label.
 rpt_values,period_start,date (YYYY-MM-DD),false,false,false,,,Period start date.
 rpt_values,period_end,date (YYYY-MM-DD),false,true,false,,,Period end date.
 rpt_values,financial_year,text,false,true,false,,,Financial year.
-rpt_values,financial_quarter,text,false,false,false,,,Financial quarter.
+rpt_values,financial_quarter,text,false,true,false,,,Financial quarter.
 rpt_values,value_number,number,false,false,false,,,Approved value (not text measures).
 rpt_values,value_text,long text,false,false,false,,,Approved value (text measures).
 rpt_values,value_missing,true/false,false,false,false,,,Yes if no value was provided.

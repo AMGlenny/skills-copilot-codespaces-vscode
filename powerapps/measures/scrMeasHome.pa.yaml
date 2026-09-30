@@ -68,9 +68,16 @@
                   Width: =1
                   Height: =1
                   OnSelect: |-
-                    =ClearCollect(
+                    =// Open work for periods that ended in the last 13 months. Older abandoned values
+                    // are in the expected_not_received view in SharePoint, so they can't push this
+                    // past the 2,000 row limit.
+                    ClearCollect(
                         colOpenSubs,
-                        Filter(submissions, status.Value = "not_started" || status.Value = "draft" || status.Value = "returned" || status.Value = "submitted")
+                        Filter(
+                            submissions,
+                            period_end >= DateAdd(Today(), -400, TimeUnit.Days) &&
+                            (status.Value = "not_started" || status.Value = "draft" || status.Value = "returned" || status.Value = "submitted")
+                        )
                     );
                     ClearCollect(colPeriods, ForAll(Distinct(colOpenSubs, period_key) As d, LookUp(periods, period_key = d.Value)));
                     // Updater's list, most urgent first.

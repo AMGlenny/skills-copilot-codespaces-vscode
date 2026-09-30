@@ -7,7 +7,7 @@ A performance management system built on Microsoft 365. It has two parts:
 
 Because the work is logged as it happens, quarterly reports can be put together, or drafted by AI, from data that already exists. There's no quarterly scramble to collect it.
 
-It runs on SharePoint Online lists for the data, a Power Apps canvas app for entry and review, and Power Automate for notifications, reminders and scheduled exports.
+It runs on SharePoint Online lists for the data, two Power Apps canvas apps (weekly updates, and measures), Power Automate for the rules, notifications, reminders and scheduled exports, and an Office Script that writes the Excel exports.
 
 ## Principles
 
@@ -23,7 +23,9 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 | 2. Weekly updates app | Daily and weekly tool for tasks, problems, successes, workload and wellbeing | **Done**: [build guide](docs/weekly_app_guide.md) |
 | 3. Measures app | Entry, review, versions, audit, notifications, reminders, RAG, target setting | **Done**: [build guide](docs/measures_app_guide.md) |
 | 4. Exports | On-demand CSV and xlsx with a data dictionary, scheduled snapshots, quarterly report pack, AI prompt template | **Done**: [exports guide](docs/exports_guide.md) |
-| 5. Hardening | WCAG 2.2 AA checks, mobile, volume testing | Next |
+| 5. Hardening | Query and index checks, capacity estimates, WCAG 2.2 AA checks, go-live checklist, runbook, automated checks on every push | **Done**: [capacity](docs/capacity_and_limits.md), [accessibility](docs/accessibility.md), [go-live](docs/go_live_checklist.md), [operations](docs/operations.md) |
+
+Next: build it in your tenant, using the [go-live checklist](docs/go_live_checklist.md).
 
 ## Getting started
 
@@ -33,6 +35,7 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 4. Build the measures app and its flows with [docs/measures_app_guide.md](docs/measures_app_guide.md).
 5. Set up exports and snapshots with [docs/exports_guide.md](docs/exports_guide.md) and [flows/export_run.md](flows/export_run.md).
 6. To add a measure, see [docs/adding_a_measure.md](docs/adding_a_measure.md).
+7. Before going live, work through [docs/go_live_checklist.md](docs/go_live_checklist.md). After that, [docs/operations.md](docs/operations.md) covers the routine jobs and what to do when something goes wrong.
 
 ## What's in the repository
 
@@ -55,7 +58,8 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 | `powerapps/weekly/`, `powerapps/measures/` | The two apps: app formulas and screens as YAML to paste into Power Apps Studio |
 | `flows/` | Step-by-step builds for Power Automate flows |
 | `scripts/Invoke-PmsSetup.ps1` | PnP PowerShell alternative to the setup flow |
-| `tests/` | Checks that the schema, rules, data and app source are consistent |
+| `pms/capacity.py` | Every query the apps and flows make, checked against the indexes, plus growth and flow-usage estimates |
+| `tests/` | Checks on the schema, rules, workflow, data, app source, accessibility, exports and capacity. They run on every push (`.github/workflows/pms-checks.yml`). |
 
 ## Changing the data model
 

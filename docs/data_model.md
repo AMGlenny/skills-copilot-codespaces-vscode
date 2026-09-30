@@ -76,7 +76,7 @@ Tasks and problems also point at a group or a measure through `contributes_to_ty
 
 ## Values, versions and approval
 
-- `submissions` has one row per measure per period. It's created as `not_started` once the period ends.
+- `submissions` has one row per measure per period. It's created as `not_started` once the period ends. It carries a copy of `period_end` so the app can load recent work only.
 - `expected_by` is the period end plus the measure's `expected_lag_days`. Data is often lagged, so there are no due dates:
   - Past `expected_by` with nothing submitted shows as **expected, not received**.
   - No lag set means it is never flagged as late.
