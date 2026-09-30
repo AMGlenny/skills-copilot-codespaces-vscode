@@ -1,98 +1,107 @@
-<header>
+# Performance Management System
 
-![Deprecation Badge](https://img.shields.io/badge/Skills-Deprecated-333?logo=github&labelColor=454c54&color=bf8700)
+A performance management system built on Microsoft 365. It has two parts:
 
-This course has been deprecated. Please visit the [Getting Started with GitHub Copilot](https://github.com/skills/getting-started-with-github-copilot) exercise for the newest learning content.
+- **Measures:** formal measures, targets and approved values, with a full audit trail.
+- **Weekly work:** a light daily or weekly log of tasks, problems, successes and workload.
 
-<!--
-  <<< Author notes: Course header >>>
-  Read <https://skills.github.com/quickstart> for more information about how to build courses using this template.
-  Include a 1280×640 image, course name in sentence case, and a concise description in emphasis.
-  In your repository settings: enable template repository, add your 1280×640 social image, auto delete head branches.
-  Next to "About", add description & tags; disable releases, packages, & environments.
-  Add your open source license, GitHub uses the MIT license.
--->
+Because the work is logged as it happens, quarterly reports can be put together, or drafted by AI, from data that already exists. There's no quarterly scramble to collect it.
 
-# Code with GitHub Copilot
+It runs on SharePoint Online lists for the data, a Power Apps canvas app for entry and review, and Power Automate for notifications, reminders and scheduled exports.
 
-_GitHub Copilot can help you code by offering autocomplete-style suggestions right in VS Code and Codespaces._
+## Principles
 
-</header>
+- **Submit once, use many times.** Every value is entered in one place and reused everywhere.
+- **Keep it simple.** Only essential features are built. Everything else is on the "later" list.
+- **Data first.** The data model is clean, consistent and exportable, and the interface sits on top.
 
-<!--
-  <<< Author notes: Step 1 >>>
-  Choose 3-5 steps for your course.
-  The first step is always the hardest, so pick something easy!
-  Link to docs.github.com for further explanations.
-  Encourage users to open new tabs for steps!
--->
+## Status
 
-## Step 1: Leverage Codespaces with VS Code for Copilot
+| Phase | Scope | Status |
+|---|---|---|
+| 1. Data foundation | Lists, columns, indexes, views, periods, sample data, data dictionary, setup | **Done** (this repository) |
+| 2. Weekly updates app | Daily and weekly tool for tasks, problems, successes, workload and wellbeing | Next |
+| 3. Measures app | Entry, review, versions, audit, notifications, RAG, admin screens | |
+| 4. Exports | On-demand CSV and xlsx with a data dictionary, scheduled snapshots, quarterly report pack, AI prompt template | |
+| 5. Hardening | WCAG 2.2 AA checks, mobile, volume testing | |
 
-_Welcome to "Develop With AI Powered Code Suggestions Using GitHub Copilot and VS Code"! :wave:_
+## Getting started
 
-GitHub Copilot is an AI pair programmer that helps you write code faster and with less work. It draws context from comments and code to suggest individual lines and whole functions instantly. GitHub Copilot is powered by OpenAI Codex, a generative pretrained language model created by OpenAI.
+1. Follow [docs/setup_guide.md](docs/setup_guide.md). One Power Automate flow creates everything on your SharePoint site and loads the sample data. No IT request or premium licence is needed.
+2. Read [docs/data_model.md](docs/data_model.md) for how the data fits together.
+3. To add a measure, see [docs/adding_a_measure.md](docs/adding_a_measure.md).
 
-**Copilot works with many code editors including VS Code, Visual Studio, JetBrains IDE, and Neovim.**
+## What's in the repository
 
-Additionally, GitHub Copilot is trained on all languages that appear in public repositories. For each language, the quality of suggestions you receive may depend on the volume and diversity of training data for that language.
+| Path | What it is |
+|---|---|
+| `pms/schema.py` | **Single source of truth** for every list, column, choice and view |
+| `pms/periods.py` | Period calendar: financial year (Apr to Mar), calendar year, academic year, terms, weeks, fortnights |
+| `pms/rules.py` | Business rules (RAG, validation, expected-by dates). The apps and flows must match these. |
+| `pms/seed.py` | Fictional sample data covering every frequency and workflow state |
+| `pms/sharepoint.py`, `pms/docs.py` | Generators for the setup requests, data dictionary and diagram |
+| `dist/setup/*.json` | Setup requests, run by the setup flow or the PnP script |
+| `dist/seed_csv/*.csv` | Sample data as tidy CSV, one file per table. Handy for testing Power BI. |
+| `dist/data_dictionary.csv` | Every column, with its type, allowed values and links |
+| `docs/` | Guides, data model, generated data dictionary and diagram |
+| `scripts/Invoke-PmsSetup.ps1` | PnP PowerShell alternative to the setup flow |
+| `tests/` | Checks that the schema, rules and data are consistent |
 
-Using Copilot inside a Codespace shows just how easy it is to get up and running with GitHub's suite of [Collaborative Coding](https://github.com/features#features-collaboration) tools.
+## Changing the data model
 
-> **Note**
-> This skills exercise will focus on leveraging GitHub Codespace. It is recommended that you complete the GitHub skill, [Codespaces](https://github.com/skills/code-with-codespaces), before moving forward with this exercise.
+Edit `pms/schema.py` (and `pms/seed.py` if the sample data needs to change). Then rebuild and test:
 
-### :keyboard: Activity: Enable Copilot inside a Codespace
+```bash
+python -m pms build
+python -m unittest discover -s tests
+```
 
-**We recommend opening another browser tab to work through the following activities so you can keep these instructions open for reference.**
+The build regenerates everything in `dist/`, `docs/data_dictionary.md` and `docs/data_model_diagram.md`. It needs Python 3.9 or later and nothing else.
 
-Before you open up a codespace on a repository, you can create a development container and define specific extensions or configurations that will be used or installed in your codespace. Let's create this development container and add copilot to the list of extensions.
+The tests check, among other things:
+- every link points at a real row
+- periods don't overlap
+- every measure has exactly one owner
+- tolerances only exist on KPIs and OKRs
+- off-track or missing values have a narrative
+- no "N/A" placeholders appear anywhere
+- the sample data covers every frequency, status and RAG value
 
-1. Navigating back to your **Code** tab of your repository, click the **Add file** drop-down button, and then click `Create new file`.
-1. Type or paste the following in the empty text field prompt to name your file.
-   ```
-   .devcontainer/devcontainer.json
-   ```
-1. In the body of the new **.devcontainer/devcontainer.json** file, add the following content:
-   ```
-   {
-       // Name this configuration
-       "name": "Codespace for Skills!",
-       "customizations": {
-           "vscode": {
-               "extensions": [
-                   "GitHub.copilot"
-               ]
-           }
-       }
-   }
-   ```
-1. Select the option to **Commit directly to the `main` branch**, and then click the **Commit new file** button.
-1. Navigate back to the home page of your repository by clicking the **Code** tab located at the top left of the screen.
-1. Click the **Code** button located in the middle of the page.
-1. Click the **Codespaces** tab on the box that pops up.
-1. Click the **Create codespace on main** button.
+## Key decisions
 
-   **Wait about 2 minutes for the codespace to spin itself up.**
+- **Linking and access**
+  - Tables link through readable text keys, not lookup columns.
+  - Each list's Title column is renamed to its key.
+  - People have read-only access. Writes go through flows, so the "only the updater edits the value" rule and the audit trail can't be bypassed.
+- **Measures**
+  - `measure_code` (e.g. PM-0007) is the system key.
+  - `source_ref` keeps the document's own reference, which can repeat (parent and child can both be "1.01").
+  - Tolerance only applies to KPIs and OKRs.
+- **Values**
+  - No due dates, because data is lagged. Each measure has an optional expected lag, and anything past it shows as "expected, not received".
+  - Percent is stored as 0 to 100: 58 means 58%.
+  - Data quality flags are verified, provisional, estimated and unverified.
+- **Wellbeing** is kept in its own restricted list:
+  - Only the line manager sees individual responses.
+  - Everyone else sees team counts, and only for teams where at least 5 people responded.
+  - It's never exported or sent to AI.
+- **AI and exports**
+  - AI and Power BI read tidy snapshot files: CSV plus xlsx, a data dictionary and a plain-English README.
+  - Nothing depends on a particular Copilot feature, so another AI tool can use the files if Microsoft changes Copilot.
 
-1. Verify your codespace is running. The browser should contain a VS Code web-based editor and a terminal should be present such as the below:
-   ![Screen Shot 2023-03-09 at 9 09 07 AM](https://user-images.githubusercontent.com/26442605/224102962-d0222578-3f10-4566-856d-8d59f28fcf2e.png)
-1. The `copilot` extension should show up in the VS Code extension list. Click the extensions sidebar tab. You should see the following:
-   ![Screen Shot 2023-03-09 at 9 04 13 AM](https://user-images.githubusercontent.com/26442605/224102514-7d6d2f51-f435-401d-a529-7bae3ae3e511.png)
+## Later (deliberately not built)
 
-**Wait about 60 seconds then refresh your repository landing page for the next step.**
-
-<footer>
-
-<!--
-  <<< Author notes: Footer >>>
-  Add a link to get support, GitHub status page, code of conduct, license link.
--->
-
----
-
-Get help: [Post in our discussion board](https://github.com/orgs/skills/discussions/categories/code-with-copilot) &bull; [Review the GitHub status page](https://www.githubstatus.com/)
-
-&copy; 2023 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
-
-</footer>
+- Automatic roll-up of child values into parent measures
+- Formatted report packs (PDF or Word)
+- Power BI template with ready-made visuals
+- Trend charts inside the app
+- Targets set as a percentage change on baseline
+- Bulk CSV import for updaters
+- Delegation cover during leave
+- Teams adaptive-card approvals
+- Multi-level approvals
+- Change requests for measure definitions
+- Automatic priority score from impact and urgency
+- Weekly progress notes on tasks
+- Copilot Studio agent
+- Migration from the old Meeting Submission Tool

@@ -1,0 +1,9 @@
+setting_key,setting_value,description
+fortnight_anchor_date,2025-04-07,Monday that fortnightly periods count from.
+week_start_day,monday,Weeks run Monday to Sunday.
+percent_storage,0_to_100,"Percentages are stored as 0 to 100, so 58 means 58%."
+wellbeing_min_group_size,5,Team wellbeing counts are only shown when at least this many people responded.
+archive_closed_after_days,730,Closed tasks and problems older than this move to the archive lists.
+reminder_days_before_expected,5,Days before expected_by that updaters get a reminder.
+snapshot_library,snapshots,Document library that scheduled exports write to.
+reopen_allowed_role,admin,App role allowed to reopen an approved value.

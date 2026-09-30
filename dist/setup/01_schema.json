@@ -1,0 +1,5214 @@
+[
+ {
+  "step": 1,
+  "description": "Create list measures",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "measures",
+   "Description": "One row per measure. Retired measures stay, with their history.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 2,
+  "description": "measures: rename Title to measure_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "measure_code",
+   "Description": "System key, e.g. PM-0001. Unique. Every other table links on this.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 3,
+  "description": "measures: make measure_code unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 4,
+  "description": "measures: add column measure_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_name\" StaticName=\"measure_name\" DisplayName=\"measure_name\" Description=\"Short name of the measure.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 5,
+  "description": "measures: add column source_ref",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"source_ref\" StaticName=\"source_ref\" DisplayName=\"source_ref\" Description=\"Reference used in the source document, e.g. 1.01. Not unique: parent and child can share it.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 6,
+  "description": "measures: add column source_document",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"source_document\" StaticName=\"source_document\" DisplayName=\"source_document\" Description=\"Document or framework the measure comes from.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 7,
+  "description": "measures: add column parent_measure_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"parent_measure_code\" StaticName=\"parent_measure_code\" DisplayName=\"parent_measure_code\" Description=\"measure_code of the parent summary measure. Blank for top-level measures.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 8,
+  "description": "measures: add column description",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"description\" StaticName=\"description\" DisplayName=\"description\" Description=\"What the measure tells you, in plain English.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 9,
+  "description": "measures: add column definition",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"definition\" StaticName=\"definition\" DisplayName=\"definition\" Description=\"Definition and calculation method.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 10,
+  "description": "measures: add column measure_class",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"measure_class\" StaticName=\"measure_class\" DisplayName=\"measure_class\" Description=\"measure, kpi or okr. Tolerance only applies to kpi and okr.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>measure</Default><CHOICES><CHOICE>measure</CHOICE><CHOICE>kpi</CHOICE><CHOICE>okr</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 11,
+  "description": "measures: add column measure_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"measure_type\" StaticName=\"measure_type\" DisplayName=\"measure_type\" Description=\"summary, output or outcome.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>output</Default><CHOICES><CHOICE>summary</CHOICE><CHOICE>output</CHOICE><CHOICE>outcome</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 12,
+  "description": "measures: add column unit",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"unit\" StaticName=\"unit\" DisplayName=\"unit\" Description=\"Unit of the value. percent is stored as 0 to 100 (58 means 58%). gbp is pounds. yes_no is stored as 1 or 0.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>number</CHOICE><CHOICE>percent</CHOICE><CHOICE>gbp</CHOICE><CHOICE>count</CHOICE><CHOICE>yes_no</CHOICE><CHOICE>text</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 13,
+  "description": "measures: add column decimal_places",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"decimal_places\" StaticName=\"decimal_places\" DisplayName=\"decimal_places\" Description=\"Decimal places to show. Does not change the stored value.\" Required=\"FALSE\" Decimals=\"0\"><Default>0</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 14,
+  "description": "measures: add column polarity",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"polarity\" StaticName=\"polarity\" DisplayName=\"polarity\" Description=\"Which direction is good. Used for RAG.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>higher_is_better</CHOICE><CHOICE>lower_is_better</CHOICE><CHOICE>neither</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 15,
+  "description": "measures: add column frequency",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"frequency\" StaticName=\"frequency\" DisplayName=\"frequency\" Description=\"How often a value is recorded.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>daily</CHOICE><CHOICE>weekly</CHOICE><CHOICE>fortnightly</CHOICE><CHOICE>monthly</CHOICE><CHOICE>quarterly</CHOICE><CHOICE>annual</CHOICE><CHOICE>calendar_year</CHOICE><CHOICE>academic_year</CHOICE><CHOICE>term</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 16,
+  "description": "measures: add column aggregation_method",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"aggregation_method\" StaticName=\"aggregation_method\" DisplayName=\"aggregation_method\" Description=\"How to roll values up to a longer period, e.g. monthly to quarterly.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>none</Default><CHOICES><CHOICE>sum</CHOICE><CHOICE>average</CHOICE><CHOICE>latest</CHOICE><CHOICE>max</CHOICE><CHOICE>min</CHOICE><CHOICE>none</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 17,
+  "description": "measures: add column expected_lag_days",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"expected_lag_days\" StaticName=\"expected_lag_days\" DisplayName=\"expected_lag_days\" Description=\"Usual days after period end before data is available. Blank means no expectation, so it is never flagged as late.\" Required=\"FALSE\" Decimals=\"0\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 18,
+  "description": "measures: add column category",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"category\" StaticName=\"category\" DisplayName=\"category\" Description=\"Category code from the lookups list.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 19,
+  "description": "measures: add column data_source",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"data_source\" StaticName=\"data_source\" DisplayName=\"data_source\" Description=\"Where the data comes from.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 20,
+  "description": "measures: add column org_unit_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"org_unit_key\" StaticName=\"org_unit_key\" DisplayName=\"org_unit_key\" Description=\"Team that owns the measure.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 21,
+  "description": "measures: add column status",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"status\" StaticName=\"status\" DisplayName=\"status\" Description=\"active or retired. Measures are never deleted.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>active</Default><CHOICES><CHOICE>active</CHOICE><CHOICE>retired</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 22,
+  "description": "measures: add column retired_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"retired_date\" StaticName=\"retired_date\" DisplayName=\"retired_date\" Description=\"Date the measure was retired.\" Required=\"FALSE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 23,
+  "description": "measures: add column retired_reason",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"retired_reason\" StaticName=\"retired_reason\" DisplayName=\"retired_reason\" Description=\"Why the measure was retired.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 24,
+  "description": "measures: add view active_measures",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "active_measures",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "measure_name",
+      "source_ref",
+      "measure_class",
+      "unit",
+      "frequency",
+      "category",
+      "org_unit_key"
+     ]
+    },
+    "Query": "<Where><Eq><FieldRef Name='status'/><Value Type='Choice'>active</Value></Eq></Where><OrderBy><FieldRef Name='Title' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 25,
+  "description": "measures: add view retired_measures",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measures')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "retired_measures",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "measure_name",
+      "retired_date",
+      "retired_reason"
+     ]
+    },
+    "Query": "<Where><Eq><FieldRef Name='status'/><Value Type='Choice'>retired</Value></Eq></Where><OrderBy><FieldRef Name='Title' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 26,
+  "description": "Create list periods",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "periods",
+   "Description": "Central calendar. Every value joins to one period. Term rows are edited here by admins.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 27,
+  "description": "periods: rename Title to period_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "period_key",
+   "Description": "Period key, e.g. M-2026-09, Q-2026-27-Q2, T-2026-27-AUT.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 28,
+  "description": "periods: make period_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 29,
+  "description": "periods: add column period_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"period_type\" StaticName=\"period_type\" DisplayName=\"period_type\" Description=\"Matches a measure frequency.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>daily</CHOICE><CHOICE>weekly</CHOICE><CHOICE>fortnightly</CHOICE><CHOICE>monthly</CHOICE><CHOICE>quarterly</CHOICE><CHOICE>annual</CHOICE><CHOICE>calendar_year</CHOICE><CHOICE>academic_year</CHOICE><CHOICE>term</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 30,
+  "description": "periods: add column period_label",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"period_label\" StaticName=\"period_label\" DisplayName=\"period_label\" Description=\"Display label, e.g. Q2 2026-27 or Autumn Term 2026.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 31,
+  "description": "periods: add column start_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"start_date\" StaticName=\"start_date\" DisplayName=\"start_date\" Description=\"First day of the period.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 32,
+  "description": "periods: add column end_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"end_date\" StaticName=\"end_date\" DisplayName=\"end_date\" Description=\"Last day of the period.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 33,
+  "description": "periods: add column financial_year",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"financial_year\" StaticName=\"financial_year\" DisplayName=\"financial_year\" Description=\"UK financial year (April to March) containing the start date, e.g. 2026-27.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 34,
+  "description": "periods: add column financial_quarter",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"financial_quarter\" StaticName=\"financial_quarter\" DisplayName=\"financial_quarter\" Description=\"Financial quarter containing the start date, e.g. 2026-27 Q2. Blank for periods longer than a quarter.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 35,
+  "description": "periods: add column academic_year",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"academic_year\" StaticName=\"academic_year\" DisplayName=\"academic_year\" Description=\"Academic year (September to August) containing the start date.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 36,
+  "description": "periods: add column calendar_year",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"calendar_year\" StaticName=\"calendar_year\" DisplayName=\"calendar_year\" Description=\"Calendar year containing the start date.\" Required=\"FALSE\" Decimals=\"0\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 37,
+  "description": "periods: add view term_dates",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('periods')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "term_dates",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "period_label",
+      "start_date",
+      "end_date",
+      "academic_year"
+     ]
+    },
+    "Query": "<Where><Eq><FieldRef Name='period_type'/><Value Type='Choice'>term</Value></Eq></Where><OrderBy><FieldRef Name='start_date' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 38,
+  "description": "Create list measure_roles",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "measure_roles",
+   "Description": "Who owns, updates and approves each measure. A measure can have several updaters.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 39,
+  "description": "measure_roles: rename Title to role_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_roles')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "role_key",
+   "Description": "measure_code|email|role. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 40,
+  "description": "measure_roles: make role_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_roles')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 41,
+  "description": "measure_roles: add column measure_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_roles')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_code\" StaticName=\"measure_code\" DisplayName=\"measure_code\" Description=\"Measure.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 42,
+  "description": "measure_roles: add column email",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_roles')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"email\" StaticName=\"email\" DisplayName=\"email\" Description=\"Person.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 43,
+  "description": "measure_roles: add column role",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_roles')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"role\" StaticName=\"role\" DisplayName=\"role\" Description=\"owner, updater or approver.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>owner</CHOICE><CHOICE>updater</CHOICE><CHOICE>approver</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 44,
+  "description": "measure_roles: add column active",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_roles')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Only active roles give access.\" Required=\"FALSE\" Indexed=\"TRUE\"><Default>1</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 45,
+  "description": "measure_roles: add column start_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_roles')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"start_date\" StaticName=\"start_date\" DisplayName=\"start_date\" Description=\"Role start.\" Required=\"FALSE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 46,
+  "description": "measure_roles: add column end_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_roles')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"end_date\" StaticName=\"end_date\" DisplayName=\"end_date\" Description=\"Role end.\" Required=\"FALSE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 47,
+  "description": "Create list groups",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "groups",
+   "Description": "Themes, programmes and objectives that measures and work contribute to.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 48,
+  "description": "groups: rename Title to group_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('groups')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "group_key",
+   "Description": "Group key, e.g. TH-JOBS. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 49,
+  "description": "groups: make group_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('groups')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 50,
+  "description": "groups: add column group_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('groups')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"group_name\" StaticName=\"group_name\" DisplayName=\"group_name\" Description=\"Name of the theme, programme or objective.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 51,
+  "description": "groups: add column group_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('groups')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"group_type\" StaticName=\"group_type\" DisplayName=\"group_type\" Description=\"theme, programme or objective.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>theme</CHOICE><CHOICE>programme</CHOICE><CHOICE>objective</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 52,
+  "description": "groups: add column description",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('groups')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"description\" StaticName=\"description\" DisplayName=\"description\" Description=\"What it covers.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 53,
+  "description": "groups: add column active",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('groups')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive groups are hidden from new entries.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 54,
+  "description": "Create list measure_links",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "measure_links",
+   "Description": "Many-to-many links between measures and groups.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 55,
+  "description": "measure_links: rename Title to link_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_links')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "link_key",
+   "Description": "measure_code|group_key. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 56,
+  "description": "measure_links: make link_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_links')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 57,
+  "description": "measure_links: add column measure_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_links')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_code\" StaticName=\"measure_code\" DisplayName=\"measure_code\" Description=\"Measure.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 58,
+  "description": "measure_links: add column group_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_links')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"group_key\" StaticName=\"group_key\" DisplayName=\"group_key\" Description=\"Group.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 59,
+  "description": "measure_links: add column relationship_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_links')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"relationship_type\" StaticName=\"relationship_type\" DisplayName=\"relationship_type\" Description=\"primary, contributes_to or related.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>primary</CHOICE><CHOICE>contributes_to</CHOICE><CHOICE>related</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 60,
+  "description": "measure_links: add column active",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('measure_links')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive links are kept for history.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 61,
+  "description": "Create list reference_values",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "reference_values",
+   "Description": "Optional targets, tolerances, baselines and capacities. Zero or more per measure per period.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 62,
+  "description": "reference_values: rename Title to ref_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('reference_values')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "ref_key",
+   "Description": "measure_code|period_key|ref_type. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 63,
+  "description": "reference_values: make ref_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('reference_values')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 64,
+  "description": "reference_values: add column measure_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('reference_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_code\" StaticName=\"measure_code\" DisplayName=\"measure_code\" Description=\"Measure.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 65,
+  "description": "reference_values: add column period_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('reference_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"period_key\" StaticName=\"period_key\" DisplayName=\"period_key\" Description=\"Period.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 66,
+  "description": "reference_values: add column ref_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('reference_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"ref_type\" StaticName=\"ref_type\" DisplayName=\"ref_type\" Description=\"target, tolerance, baseline or capacity. tolerance only for kpi and okr measures.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>target</CHOICE><CHOICE>tolerance</CHOICE><CHOICE>baseline</CHOICE><CHOICE>capacity</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 67,
+  "description": "reference_values: add column ref_value",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('reference_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"ref_value\" StaticName=\"ref_value\" DisplayName=\"ref_value\" Description=\"The reference value, in the measure's unit.\" Required=\"TRUE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 68,
+  "description": "reference_values: add column notes",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('reference_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"notes\" StaticName=\"notes\" DisplayName=\"notes\" Description=\"Where the value came from.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 69,
+  "description": "reference_values: add column active",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('reference_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive values are ignored.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 70,
+  "description": "Create list submissions",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "submissions",
+   "Description": "One row per measure per period. Created as not_started when the period ends.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 71,
+  "description": "submissions: rename Title to submission_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "submission_key",
+   "Description": "measure_code|period_key. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 72,
+  "description": "submissions: make submission_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 73,
+  "description": "submissions: add column measure_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_code\" StaticName=\"measure_code\" DisplayName=\"measure_code\" Description=\"Measure.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 74,
+  "description": "submissions: add column period_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"period_key\" StaticName=\"period_key\" DisplayName=\"period_key\" Description=\"Period the data relates to.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 75,
+  "description": "submissions: add column status",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"status\" StaticName=\"status\" DisplayName=\"status\" Description=\"not_started, draft, submitted, returned or approved.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>not_started</Default><CHOICES><CHOICE>not_started</CHOICE><CHOICE>draft</CHOICE><CHOICE>submitted</CHOICE><CHOICE>returned</CHOICE><CHOICE>approved</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 76,
+  "description": "submissions: add column expected_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"expected_by\" StaticName=\"expected_by\" DisplayName=\"expected_by\" Description=\"Period end plus the measure's expected lag. Blank if no lag is set.\" Required=\"FALSE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 77,
+  "description": "submissions: add column current_version",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"current_version\" StaticName=\"current_version\" DisplayName=\"current_version\" Description=\"Latest version number. 0 before anything is entered.\" Required=\"FALSE\" Decimals=\"0\"><Default>0</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 78,
+  "description": "submissions: add column approved_version",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"approved_version\" StaticName=\"approved_version\" DisplayName=\"approved_version\" Description=\"Version used in reports. Blank until first approval.\" Required=\"FALSE\" Decimals=\"0\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 79,
+  "description": "submissions: add column submitted_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"submitted_date\" StaticName=\"submitted_date\" DisplayName=\"submitted_date\" Description=\"When the latest version was submitted.\" Required=\"FALSE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 80,
+  "description": "submissions: add column approved_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"approved_by\" StaticName=\"approved_by\" DisplayName=\"approved_by\" Description=\"Email of the approver.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 81,
+  "description": "submissions: add column approved_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"approved_date\" StaticName=\"approved_date\" DisplayName=\"approved_date\" Description=\"When it was approved.\" Required=\"FALSE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 82,
+  "description": "submissions: add view awaiting_review",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "awaiting_review",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "measure_code",
+      "period_key",
+      "current_version",
+      "submitted_date"
+     ]
+    },
+    "Query": "<Where><Eq><FieldRef Name='status'/><Value Type='Choice'>submitted</Value></Eq></Where><OrderBy><FieldRef Name='submitted_date' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 83,
+  "description": "submissions: add view returned",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "returned",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "measure_code",
+      "period_key",
+      "current_version"
+     ]
+    },
+    "Query": "<Where><Eq><FieldRef Name='status'/><Value Type='Choice'>returned</Value></Eq></Where><OrderBy><FieldRef Name='Title' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 84,
+  "description": "submissions: add view expected_not_received",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submissions')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "expected_not_received",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "measure_code",
+      "period_key",
+      "status",
+      "expected_by"
+     ]
+    },
+    "Query": "<Where><And><Or><Eq><FieldRef Name='status'/><Value Type='Choice'>not_started</Value></Eq><Eq><FieldRef Name='status'/><Value Type='Choice'>draft</Value></Eq></Or><Lt><FieldRef Name='expected_by'/><Value Type='DateTime'><Today/></Value></Lt></And></Where><OrderBy><FieldRef Name='expected_by' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 85,
+  "description": "Create list submission_versions",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "submission_versions",
+   "Description": "Every version of every value. Drafts are edited in place; each resubmission after a return is a new version.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 86,
+  "description": "submission_versions: rename Title to version_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "version_key",
+   "Description": "submission_key|v<version_no>. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 87,
+  "description": "submission_versions: make version_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 88,
+  "description": "submission_versions: add column submission_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"submission_key\" StaticName=\"submission_key\" DisplayName=\"submission_key\" Description=\"Submission.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 89,
+  "description": "submission_versions: add column measure_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_code\" StaticName=\"measure_code\" DisplayName=\"measure_code\" Description=\"Measure (copied from the submission for filtering).\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 90,
+  "description": "submission_versions: add column period_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"period_key\" StaticName=\"period_key\" DisplayName=\"period_key\" Description=\"Period (copied from the submission for filtering).\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 91,
+  "description": "submission_versions: add column version_no",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"version_no\" StaticName=\"version_no\" DisplayName=\"version_no\" Description=\"1, 2, 3 and so on.\" Required=\"TRUE\" Decimals=\"0\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 92,
+  "description": "submission_versions: add column value_number",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"value_number\" StaticName=\"value_number\" DisplayName=\"value_number\" Description=\"The value for all units except text. percent 0 to 100, yes_no 1 or 0.\" Required=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 93,
+  "description": "submission_versions: add column value_text",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"value_text\" StaticName=\"value_text\" DisplayName=\"value_text\" Description=\"The value for text measures only.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 94,
+  "description": "submission_versions: add column value_missing",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"value_missing\" StaticName=\"value_missing\" DisplayName=\"value_missing\" Description=\"Yes if no value could be provided. Narrative then required.\" Required=\"FALSE\"><Default>0</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 95,
+  "description": "submission_versions: add column narrative",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"narrative\" StaticName=\"narrative\" DisplayName=\"narrative\" Description=\"Updater's commentary. Required if the value is missing or off track.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 96,
+  "description": "submission_versions: add column data_quality",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"data_quality\" StaticName=\"data_quality\" DisplayName=\"data_quality\" Description=\"verified, provisional, estimated or unverified.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>unverified</Default><CHOICES><CHOICE>verified</CHOICE><CHOICE>provisional</CHOICE><CHOICE>estimated</CHOICE><CHOICE>unverified</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 97,
+  "description": "submission_versions: add column entered_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"entered_by\" StaticName=\"entered_by\" DisplayName=\"entered_by\" Description=\"Email of the updater.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 98,
+  "description": "submission_versions: add column entered_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"entered_date\" StaticName=\"entered_date\" DisplayName=\"entered_date\" Description=\"When the value was first entered.\" Required=\"TRUE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 99,
+  "description": "submission_versions: add column submitted_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"submitted_date\" StaticName=\"submitted_date\" DisplayName=\"submitted_date\" Description=\"When this version was submitted.\" Required=\"FALSE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 100,
+  "description": "submission_versions: add column version_status",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"version_status\" StaticName=\"version_status\" DisplayName=\"version_status\" Description=\"draft, submitted, returned, approved or superseded. Only approved versions flow into reports.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>draft</Default><CHOICES><CHOICE>draft</CHOICE><CHOICE>submitted</CHOICE><CHOICE>returned</CHOICE><CHOICE>approved</CHOICE><CHOICE>superseded</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 101,
+  "description": "submission_versions: add column rag_status",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"rag_status\" StaticName=\"rag_status\" DisplayName=\"rag_status\" Description=\"RAG worked out at approval using polarity and the period's target and tolerance.\" Required=\"FALSE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>green</CHOICE><CHOICE>amber</CHOICE><CHOICE>red</CHOICE><CHOICE>no_target</CHOICE><CHOICE>no_data</CHOICE><CHOICE>not_applicable</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 102,
+  "description": "submission_versions: add view approved_versions",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('submission_versions')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "approved_versions",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "measure_code",
+      "period_key",
+      "version_no",
+      "value_number",
+      "value_text",
+      "rag_status"
+     ]
+    },
+    "Query": "<Where><Eq><FieldRef Name='version_status'/><Value Type='Choice'>approved</Value></Eq></Where><OrderBy><FieldRef Name='Title' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 103,
+  "description": "Create list review_comments",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "review_comments",
+   "Description": "Reviewer feedback, kept apart from the narrative. Internal only: excluded from standard exports.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 104,
+  "description": "review_comments: rename Title to comment_ref",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "comment_ref",
+   "Description": "Reference, e.g. RC-00001.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 105,
+  "description": "review_comments: make comment_ref unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 106,
+  "description": "review_comments: add column submission_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"submission_key\" StaticName=\"submission_key\" DisplayName=\"submission_key\" Description=\"Submission.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 107,
+  "description": "review_comments: add column version_no",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"version_no\" StaticName=\"version_no\" DisplayName=\"version_no\" Description=\"Version the comment was made on.\" Required=\"TRUE\" Decimals=\"0\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 108,
+  "description": "review_comments: add column reviewer_email",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"reviewer_email\" StaticName=\"reviewer_email\" DisplayName=\"reviewer_email\" Description=\"Reviewer.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 109,
+  "description": "review_comments: add column action",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"action\" StaticName=\"action\" DisplayName=\"action\" Description=\"returned, approved or comment.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>returned</CHOICE><CHOICE>approved</CHOICE><CHOICE>comment</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 110,
+  "description": "review_comments: add column comment",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"comment\" StaticName=\"comment\" DisplayName=\"comment\" Description=\"The comment. Required when returning.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 111,
+  "description": "review_comments: add column comment_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"comment_date\" StaticName=\"comment_date\" DisplayName=\"comment_date\" Description=\"When the comment was made.\" Required=\"TRUE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 112,
+  "description": "review_comments: add column resolved",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"resolved\" StaticName=\"resolved\" DisplayName=\"resolved\" Description=\"Yes once the updater has dealt with it.\" Required=\"FALSE\" Indexed=\"TRUE\"><Default>0</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 113,
+  "description": "review_comments: add column resolved_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"resolved_by\" StaticName=\"resolved_by\" DisplayName=\"resolved_by\" Description=\"Who marked it resolved.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 114,
+  "description": "review_comments: add column resolved_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('review_comments')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"resolved_date\" StaticName=\"resolved_date\" DisplayName=\"resolved_date\" Description=\"When it was resolved.\" Required=\"FALSE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 115,
+  "description": "Create list org_units",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "org_units",
+   "Description": "Workstream, team and sub-team hierarchy. Feeds every team dropdown.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 116,
+  "description": "org_units: rename Title to org_unit_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('org_units')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "org_unit_key",
+   "Description": "Key, e.g. WS-JOBS, TM-SDS, ST-SDS-A. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 117,
+  "description": "org_units: make org_unit_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('org_units')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 118,
+  "description": "org_units: add column unit_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('org_units')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"unit_name\" StaticName=\"unit_name\" DisplayName=\"unit_name\" Description=\"Name as people know it.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 119,
+  "description": "org_units: add column unit_level",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('org_units')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"unit_level\" StaticName=\"unit_level\" DisplayName=\"unit_level\" Description=\"workstream, team or sub_team.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>workstream</CHOICE><CHOICE>team</CHOICE><CHOICE>sub_team</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 120,
+  "description": "org_units: add column parent_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('org_units')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"parent_key\" StaticName=\"parent_key\" DisplayName=\"parent_key\" Description=\"Parent unit. Blank for workstreams.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 121,
+  "description": "org_units: add column active",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('org_units')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive units are hidden from new entries.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 122,
+  "description": "Create list people",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "people",
+   "Description": "Everyone who uses the system.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 123,
+  "description": "people: rename Title to email",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('people')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "email",
+   "Description": "Work email, lower case. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 124,
+  "description": "people: make email unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('people')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 125,
+  "description": "people: add column display_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"display_name\" StaticName=\"display_name\" DisplayName=\"display_name\" Description=\"Name shown in the app.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 126,
+  "description": "people: add column org_unit_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"org_unit_key\" StaticName=\"org_unit_key\" DisplayName=\"org_unit_key\" Description=\"Default team. Pre-fills the weekly update.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 127,
+  "description": "people: add column line_manager_email",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"line_manager_email\" StaticName=\"line_manager_email\" DisplayName=\"line_manager_email\" Description=\"Line manager. Only they can see this person's individual wellbeing responses.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 128,
+  "description": "people: add column app_role",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"app_role\" StaticName=\"app_role\" DisplayName=\"app_role\" Description=\"admin, standard or viewer. Measure rights come from measure_roles.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>standard</Default><CHOICES><CHOICE>admin</CHOICE><CHOICE>standard</CHOICE><CHOICE>viewer</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 129,
+  "description": "people: add column active",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('people')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Leavers are made inactive, never deleted.\" Required=\"FALSE\" Indexed=\"TRUE\"><Default>1</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 130,
+  "description": "Create list weekly_updates",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "weekly_updates",
+   "Description": "One row per person per week: successes, communication and workload.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 131,
+  "description": "weekly_updates: rename Title to update_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "update_key",
+   "Description": "email|week_start. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 132,
+  "description": "weekly_updates: make update_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 133,
+  "description": "weekly_updates: add column email",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"email\" StaticName=\"email\" DisplayName=\"email\" Description=\"Person.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 134,
+  "description": "weekly_updates: add column week_start",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"week_start\" StaticName=\"week_start\" DisplayName=\"week_start\" Description=\"Monday of the week.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 135,
+  "description": "weekly_updates: add column org_unit_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"org_unit_key\" StaticName=\"org_unit_key\" DisplayName=\"org_unit_key\" Description=\"Team at the time of the update.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 136,
+  "description": "weekly_updates: add column successes",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"successes\" StaticName=\"successes\" DisplayName=\"successes\" Description=\"Successes had or heard about.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 137,
+  "description": "weekly_updates: add column communication",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"communication\" StaticName=\"communication\" DisplayName=\"communication\" Description=\"Anything that would help if more widely known.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 138,
+  "description": "weekly_updates: add column workload",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"workload\" StaticName=\"workload\" DisplayName=\"workload\" Description=\"light, manageable, heavy or overloaded.\" Required=\"FALSE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>light</CHOICE><CHOICE>manageable</CHOICE><CHOICE>heavy</CHOICE><CHOICE>overloaded</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 139,
+  "description": "weekly_updates: add column submitted_at",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('weekly_updates')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"submitted_at\" StaticName=\"submitted_at\" DisplayName=\"submitted_at\" Description=\"When it was saved.\" Required=\"TRUE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 140,
+  "description": "Create list wellbeing_checkins",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "wellbeing_checkins",
+   "Description": "RESTRICTED. Individual wellbeing, visible only to the person's line manager. People see team counts only. Never exported or sent to AI.",
+   "EnableVersioning": true,
+   "NoCrawl": true
+  }
+ },
+ {
+  "step": 141,
+  "description": "wellbeing_checkins: rename Title to checkin_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "checkin_key",
+   "Description": "email|week_start. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 142,
+  "description": "wellbeing_checkins: make checkin_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 143,
+  "description": "wellbeing_checkins: add column email",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"email\" StaticName=\"email\" DisplayName=\"email\" Description=\"Person.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 144,
+  "description": "wellbeing_checkins: add column line_manager_email",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"line_manager_email\" StaticName=\"line_manager_email\" DisplayName=\"line_manager_email\" Description=\"Line manager at the time of the check-in. Controls who can see it.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 145,
+  "description": "wellbeing_checkins: add column org_unit_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"org_unit_key\" StaticName=\"org_unit_key\" DisplayName=\"org_unit_key\" Description=\"Team at the time, for team counts.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 146,
+  "description": "wellbeing_checkins: add column week_start",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"week_start\" StaticName=\"week_start\" DisplayName=\"week_start\" Description=\"Monday of the week.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 147,
+  "description": "wellbeing_checkins: add column wellbeing",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"wellbeing\" StaticName=\"wellbeing\" DisplayName=\"wellbeing\" Description=\"thriving, ok or struggling.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>thriving</CHOICE><CHOICE>ok</CHOICE><CHOICE>struggling</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 148,
+  "description": "wellbeing_checkins: add column comments",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"comments\" StaticName=\"comments\" DisplayName=\"comments\" Description=\"Optional comments.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 149,
+  "description": "wellbeing_checkins: add column submitted_at",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('wellbeing_checkins')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"submitted_at\" StaticName=\"submitted_at\" DisplayName=\"submitted_at\" Description=\"When it was saved.\" Required=\"TRUE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 150,
+  "description": "Create list tasks",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "tasks",
+   "Description": "One row per task for its whole life. Open tasks carry over each week; nobody re-enters them.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 151,
+  "description": "tasks: rename Title to task_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "task_code",
+   "Description": "Key, e.g. TSK-00001. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 152,
+  "description": "tasks: make task_code unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 153,
+  "description": "tasks: add column task_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"task_name\" StaticName=\"task_name\" DisplayName=\"task_name\" Description=\"What needs doing.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 154,
+  "description": "tasks: add column priority",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"priority\" StaticName=\"priority\" DisplayName=\"priority\" Description=\"must, should or could.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>must</CHOICE><CHOICE>should</CHOICE><CHOICE>could</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 155,
+  "description": "tasks: add column org_unit_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"org_unit_key\" StaticName=\"org_unit_key\" DisplayName=\"org_unit_key\" Description=\"Team.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 156,
+  "description": "tasks: add column contributes_to_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"contributes_to_type\" StaticName=\"contributes_to_type\" DisplayName=\"contributes_to_type\" Description=\"group, measure or none.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>none</Default><CHOICES><CHOICE>group</CHOICE><CHOICE>measure</CHOICE><CHOICE>none</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 157,
+  "description": "tasks: add column contributes_to_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"contributes_to_key\" StaticName=\"contributes_to_key\" DisplayName=\"contributes_to_key\" Description=\"group_key or measure_code this work supports.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 158,
+  "description": "tasks: add column contributes_to_note",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"contributes_to_note\" StaticName=\"contributes_to_note\" DisplayName=\"contributes_to_note\" Description=\"Optional extra detail on the aim.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 159,
+  "description": "tasks: add column raised_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"raised_by\" StaticName=\"raised_by\" DisplayName=\"raised_by\" Description=\"Who added it.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 160,
+  "description": "tasks: add column date_raised",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"date_raised\" StaticName=\"date_raised\" DisplayName=\"date_raised\" Description=\"When it was added.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 161,
+  "description": "tasks: add column assigned_to",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"assigned_to\" StaticName=\"assigned_to\" DisplayName=\"assigned_to\" Description=\"Who is doing it.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 162,
+  "description": "tasks: add column status",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"status\" StaticName=\"status\" DisplayName=\"status\" Description=\"open, complete or cancelled.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>open</Default><CHOICES><CHOICE>open</CHOICE><CHOICE>complete</CHOICE><CHOICE>cancelled</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 163,
+  "description": "tasks: add column completed_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"completed_by\" StaticName=\"completed_by\" DisplayName=\"completed_by\" Description=\"Who completed it.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 164,
+  "description": "tasks: add column completed_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"completed_date\" StaticName=\"completed_date\" DisplayName=\"completed_date\" Description=\"When it was completed or cancelled.\" Required=\"FALSE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 165,
+  "description": "tasks: add column notes",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"notes\" StaticName=\"notes\" DisplayName=\"notes\" Description=\"Notes.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 166,
+  "description": "tasks: add view open_tasks",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('tasks')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "open_tasks",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "task_name",
+      "priority",
+      "org_unit_key",
+      "assigned_to",
+      "date_raised"
+     ]
+    },
+    "Query": "<Where><Eq><FieldRef Name='status'/><Value Type='Choice'>open</Value></Eq></Where><OrderBy><FieldRef Name='date_raised' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 167,
+  "description": "Create list problems",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "problems",
+   "Description": "One row per problem for its whole life. Open problems carry over each week.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 168,
+  "description": "problems: rename Title to problem_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "problem_code",
+   "Description": "Key, e.g. PRB-00001. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 169,
+  "description": "problems: make problem_code unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 170,
+  "description": "problems: add column problem_title",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"problem_title\" StaticName=\"problem_title\" DisplayName=\"problem_title\" Description=\"Short title.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 171,
+  "description": "problems: add column problem_statement",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"problem_statement\" StaticName=\"problem_statement\" DisplayName=\"problem_statement\" Description=\"What the problem is.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 172,
+  "description": "problems: add column org_unit_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"org_unit_key\" StaticName=\"org_unit_key\" DisplayName=\"org_unit_key\" Description=\"Team.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 173,
+  "description": "problems: add column raised_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"raised_by\" StaticName=\"raised_by\" DisplayName=\"raised_by\" Description=\"Who raised it.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 174,
+  "description": "problems: add column raised_on",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"raised_on\" StaticName=\"raised_on\" DisplayName=\"raised_on\" Description=\"When it was raised.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 175,
+  "description": "problems: add column problem_owner",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"problem_owner\" StaticName=\"problem_owner\" DisplayName=\"problem_owner\" Description=\"Who owns resolving it.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 176,
+  "description": "problems: add column impact",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"impact\" StaticName=\"impact\" DisplayName=\"impact\" Description=\"low, medium or high.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>low</CHOICE><CHOICE>medium</CHOICE><CHOICE>high</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 177,
+  "description": "problems: add column urgency",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"urgency\" StaticName=\"urgency\" DisplayName=\"urgency\" Description=\"low, medium or high.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>low</CHOICE><CHOICE>medium</CHOICE><CHOICE>high</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 178,
+  "description": "problems: add column target_resolution_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"target_resolution_date\" StaticName=\"target_resolution_date\" DisplayName=\"target_resolution_date\" Description=\"When it should be resolved by.\" Required=\"FALSE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 179,
+  "description": "problems: add column status",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"status\" StaticName=\"status\" DisplayName=\"status\" Description=\"open or closed.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>open</Default><CHOICES><CHOICE>open</CHOICE><CHOICE>closed</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 180,
+  "description": "problems: add column closed_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"closed_date\" StaticName=\"closed_date\" DisplayName=\"closed_date\" Description=\"When it was closed.\" Required=\"FALSE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 181,
+  "description": "problems: add column resolution",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"resolution\" StaticName=\"resolution\" DisplayName=\"resolution\" Description=\"How it was resolved.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 182,
+  "description": "problems: add column contributes_to_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"contributes_to_type\" StaticName=\"contributes_to_type\" DisplayName=\"contributes_to_type\" Description=\"group, measure or none.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>none</Default><CHOICES><CHOICE>group</CHOICE><CHOICE>measure</CHOICE><CHOICE>none</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 183,
+  "description": "problems: add column contributes_to_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"contributes_to_key\" StaticName=\"contributes_to_key\" DisplayName=\"contributes_to_key\" Description=\"group_key or measure_code affected.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 184,
+  "description": "problems: add column notes",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"notes\" StaticName=\"notes\" DisplayName=\"notes\" Description=\"Context.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 185,
+  "description": "problems: add view open_problems",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('problems')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "open_problems",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "problem_title",
+      "impact",
+      "urgency",
+      "problem_owner",
+      "raised_on"
+     ]
+    },
+    "Query": "<Where><Eq><FieldRef Name='status'/><Value Type='Choice'>open</Value></Eq></Where><OrderBy><FieldRef Name='raised_on' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 186,
+  "description": "Create list lookups",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "lookups",
+   "Description": "Editable pick lists that change over time, such as categories.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 187,
+  "description": "lookups: rename Title to lookup_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('lookups')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "lookup_key",
+   "Description": "lookup_type|code. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 188,
+  "description": "lookups: make lookup_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('lookups')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 189,
+  "description": "lookups: add column lookup_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"lookup_type\" StaticName=\"lookup_type\" DisplayName=\"lookup_type\" Description=\"Which pick list.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>category</CHOICE><CHOICE>data_source</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 190,
+  "description": "lookups: add column code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"code\" StaticName=\"code\" DisplayName=\"code\" Description=\"Stored code.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 191,
+  "description": "lookups: add column label",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"label\" StaticName=\"label\" DisplayName=\"label\" Description=\"Label shown to people.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 192,
+  "description": "lookups: add column sort_order",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"sort_order\" StaticName=\"sort_order\" DisplayName=\"sort_order\" Description=\"Order in dropdowns.\" Required=\"FALSE\" Decimals=\"0\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 193,
+  "description": "lookups: add column active",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('lookups')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Inactive values are hidden from new entries.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 194,
+  "description": "Create list settings",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "settings",
+   "Description": "System settings that admins can change without editing flows.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 195,
+  "description": "settings: rename Title to setting_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('settings')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "setting_key",
+   "Description": "Setting name. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 196,
+  "description": "settings: make setting_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('settings')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 197,
+  "description": "settings: add column setting_value",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('settings')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"setting_value\" StaticName=\"setting_value\" DisplayName=\"setting_value\" Description=\"Value.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 198,
+  "description": "settings: add column description",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('settings')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"description\" StaticName=\"description\" DisplayName=\"description\" Description=\"What the setting does.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 199,
+  "description": "Create list audit_log",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "audit_log",
+   "Description": "Every create, edit and status change: who, when, old and new value. Written only by flows.",
+   "EnableVersioning": false,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 200,
+  "description": "audit_log: rename Title to audit_ref",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "audit_ref",
+   "Description": "Reference, e.g. AUD-0000001.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 201,
+  "description": "audit_log: make audit_ref unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 202,
+  "description": "audit_log: add column list_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"list_name\" StaticName=\"list_name\" DisplayName=\"list_name\" Description=\"List that changed.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 203,
+  "description": "audit_log: add column item_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"item_key\" StaticName=\"item_key\" DisplayName=\"item_key\" Description=\"Key of the item that changed.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 204,
+  "description": "audit_log: add column action",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"action\" StaticName=\"action\" DisplayName=\"action\" Description=\"create, edit, status_change, reopen or retire.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>create</CHOICE><CHOICE>edit</CHOICE><CHOICE>status_change</CHOICE><CHOICE>reopen</CHOICE><CHOICE>retire</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 205,
+  "description": "audit_log: add column field_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"field_name\" StaticName=\"field_name\" DisplayName=\"field_name\" Description=\"Column that changed. Blank for create.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 206,
+  "description": "audit_log: add column old_value",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"old_value\" StaticName=\"old_value\" DisplayName=\"old_value\" Description=\"Value before.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 207,
+  "description": "audit_log: add column new_value",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"new_value\" StaticName=\"new_value\" DisplayName=\"new_value\" Description=\"Value after.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 208,
+  "description": "audit_log: add column changed_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"changed_by\" StaticName=\"changed_by\" DisplayName=\"changed_by\" Description=\"Who made the change.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 209,
+  "description": "audit_log: add column changed_at",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('audit_log')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"changed_at\" StaticName=\"changed_at\" DisplayName=\"changed_at\" Description=\"When.\" Required=\"TRUE\" Indexed=\"TRUE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 210,
+  "description": "Create list export_jobs",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "export_jobs",
+   "Description": "Scheduled snapshot exports. Admins edit these; a flow runs them.",
+   "EnableVersioning": true,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 211,
+  "description": "export_jobs: rename Title to job_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "job_code",
+   "Description": "Key, e.g. EXP-FULL-NIGHTLY. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 212,
+  "description": "export_jobs: make job_code unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 213,
+  "description": "export_jobs: add column job_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"job_name\" StaticName=\"job_name\" DisplayName=\"job_name\" Description=\"Name.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 214,
+  "description": "export_jobs: add column dataset",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"dataset\" StaticName=\"dataset\" DisplayName=\"dataset\" Description=\"full_model, measures, weekly_work or quarter_pack.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>full_model</CHOICE><CHOICE>measures</CHOICE><CHOICE>weekly_work</CHOICE><CHOICE>quarter_pack</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 215,
+  "description": "export_jobs: add column format",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"format\" StaticName=\"format\" DisplayName=\"format\" Description=\"csv, xlsx or both.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><Default>both</Default><CHOICES><CHOICE>csv</CHOICE><CHOICE>xlsx</CHOICE><CHOICE>both</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 216,
+  "description": "export_jobs: add column frequency",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"frequency\" StaticName=\"frequency\" DisplayName=\"frequency\" Description=\"daily, weekly, monthly or quarterly.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>daily</CHOICE><CHOICE>weekly</CHOICE><CHOICE>monthly</CHOICE><CHOICE>quarterly</CHOICE></CHOICES></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 217,
+  "description": "export_jobs: add column run_day",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"run_day\" StaticName=\"run_day\" DisplayName=\"run_day\" Description=\"Weekly: 1 (Mon) to 7. Monthly or quarterly: day of month. Ignored for daily.\" Required=\"FALSE\" Decimals=\"0\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 218,
+  "description": "export_jobs: add column folder_path",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"folder_path\" StaticName=\"folder_path\" DisplayName=\"folder_path\" Description=\"Folder in the snapshots library.\" Required=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 219,
+  "description": "export_jobs: add column keep_history",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"keep_history\" StaticName=\"keep_history\" DisplayName=\"keep_history\" Description=\"Also keep a dated copy as well as /latest.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 220,
+  "description": "export_jobs: add column active",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"active\" StaticName=\"active\" DisplayName=\"active\" Description=\"Only active jobs run.\" Required=\"FALSE\"><Default>1</Default></Field>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 221,
+  "description": "export_jobs: add column last_run_at",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"last_run_at\" StaticName=\"last_run_at\" DisplayName=\"last_run_at\" Description=\"Written by the flow.\" Required=\"FALSE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 222,
+  "description": "export_jobs: add column last_run_status",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('export_jobs')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"last_run_status\" StaticName=\"last_run_status\" DisplayName=\"last_run_status\" Description=\"Written by the flow.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 223,
+  "description": "Create list rpt_values",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 100,
+   "Title": "rpt_values",
+   "Description": "Flat, read-only reporting table: one row per approved measure per period with every lookup filled in. Rebuilt by flows; export straight from here.",
+   "EnableVersioning": false,
+   "NoCrawl": false
+  }
+ },
+ {
+  "step": 224,
+  "description": "rpt_values: rename Title to submission_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "Title": "submission_key",
+   "Description": "measure_code|period_key. Unique.",
+   "Indexed": true,
+   "Required": true
+  }
+ },
+ {
+  "step": 225,
+  "description": "rpt_values: make submission_key unique",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/getbyinternalnameortitle('Title')",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose",
+   "X-HTTP-Method": "MERGE",
+   "IF-MATCH": "*"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.Field"
+   },
+   "EnforceUniqueValues": true
+  }
+ },
+ {
+  "step": 226,
+  "description": "rpt_values: add column measure_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_code\" StaticName=\"measure_code\" DisplayName=\"measure_code\" Description=\"Measure.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 227,
+  "description": "rpt_values: add column measure_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_name\" StaticName=\"measure_name\" DisplayName=\"measure_name\" Description=\"Measure name.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 228,
+  "description": "rpt_values: add column source_ref",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"source_ref\" StaticName=\"source_ref\" DisplayName=\"source_ref\" Description=\"Source document reference.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 229,
+  "description": "rpt_values: add column parent_measure_code",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"parent_measure_code\" StaticName=\"parent_measure_code\" DisplayName=\"parent_measure_code\" Description=\"Parent measure.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 230,
+  "description": "rpt_values: add column measure_class",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_class\" StaticName=\"measure_class\" DisplayName=\"measure_class\" Description=\"measure, kpi or okr.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 231,
+  "description": "rpt_values: add column measure_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"measure_type\" StaticName=\"measure_type\" DisplayName=\"measure_type\" Description=\"summary, output or outcome.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 232,
+  "description": "rpt_values: add column category",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"category\" StaticName=\"category\" DisplayName=\"category\" Description=\"Category code.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 233,
+  "description": "rpt_values: add column unit",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"unit\" StaticName=\"unit\" DisplayName=\"unit\" Description=\"Unit.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 234,
+  "description": "rpt_values: add column polarity",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"polarity\" StaticName=\"polarity\" DisplayName=\"polarity\" Description=\"Polarity.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 235,
+  "description": "rpt_values: add column frequency",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"frequency\" StaticName=\"frequency\" DisplayName=\"frequency\" Description=\"Frequency.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 236,
+  "description": "rpt_values: add column aggregation_method",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"aggregation_method\" StaticName=\"aggregation_method\" DisplayName=\"aggregation_method\" Description=\"How to roll up.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 237,
+  "description": "rpt_values: add column owner_name",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"owner_name\" StaticName=\"owner_name\" DisplayName=\"owner_name\" Description=\"Measure owner.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 238,
+  "description": "rpt_values: add column owner_email",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"owner_email\" StaticName=\"owner_email\" DisplayName=\"owner_email\" Description=\"Measure owner email.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 239,
+  "description": "rpt_values: add column org_unit_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"org_unit_key\" StaticName=\"org_unit_key\" DisplayName=\"org_unit_key\" Description=\"Owning team.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 240,
+  "description": "rpt_values: add column period_key",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"period_key\" StaticName=\"period_key\" DisplayName=\"period_key\" Description=\"Period.\" Required=\"TRUE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 241,
+  "description": "rpt_values: add column period_type",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"period_type\" StaticName=\"period_type\" DisplayName=\"period_type\" Description=\"Period type.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 242,
+  "description": "rpt_values: add column period_label",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"period_label\" StaticName=\"period_label\" DisplayName=\"period_label\" Description=\"Period label.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 243,
+  "description": "rpt_values: add column period_start",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"period_start\" StaticName=\"period_start\" DisplayName=\"period_start\" Description=\"Period start date.\" Required=\"FALSE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 244,
+  "description": "rpt_values: add column period_end",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"period_end\" StaticName=\"period_end\" DisplayName=\"period_end\" Description=\"Period end date.\" Required=\"FALSE\" Indexed=\"TRUE\" Format=\"DateOnly\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 245,
+  "description": "rpt_values: add column financial_year",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"financial_year\" StaticName=\"financial_year\" DisplayName=\"financial_year\" Description=\"Financial year.\" Required=\"FALSE\" Indexed=\"TRUE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 246,
+  "description": "rpt_values: add column financial_quarter",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"financial_quarter\" StaticName=\"financial_quarter\" DisplayName=\"financial_quarter\" Description=\"Financial quarter.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 247,
+  "description": "rpt_values: add column value_number",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"value_number\" StaticName=\"value_number\" DisplayName=\"value_number\" Description=\"Approved value (not text measures).\" Required=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 248,
+  "description": "rpt_values: add column value_text",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"value_text\" StaticName=\"value_text\" DisplayName=\"value_text\" Description=\"Approved value (text measures).\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 249,
+  "description": "rpt_values: add column value_missing",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"value_missing\" StaticName=\"value_missing\" DisplayName=\"value_missing\" Description=\"Yes if no value was provided.\" Required=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 250,
+  "description": "rpt_values: add column narrative",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Note\" Name=\"narrative\" StaticName=\"narrative\" DisplayName=\"narrative\" Description=\"Approved narrative.\" Required=\"FALSE\" NumLines=\"6\" RichText=\"FALSE\" AppendOnly=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 251,
+  "description": "rpt_values: add column data_quality",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"data_quality\" StaticName=\"data_quality\" DisplayName=\"data_quality\" Description=\"Data quality flag.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 252,
+  "description": "rpt_values: add column version_no",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"version_no\" StaticName=\"version_no\" DisplayName=\"version_no\" Description=\"Approved version number.\" Required=\"FALSE\" Decimals=\"0\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 253,
+  "description": "rpt_values: add column approved_by",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"approved_by\" StaticName=\"approved_by\" DisplayName=\"approved_by\" Description=\"Approver email.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 254,
+  "description": "rpt_values: add column approved_date",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"approved_date\" StaticName=\"approved_date\" DisplayName=\"approved_date\" Description=\"Approval time.\" Required=\"FALSE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 255,
+  "description": "rpt_values: add column target_value",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"target_value\" StaticName=\"target_value\" DisplayName=\"target_value\" Description=\"Target for the period.\" Required=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 256,
+  "description": "rpt_values: add column tolerance_value",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"tolerance_value\" StaticName=\"tolerance_value\" DisplayName=\"tolerance_value\" Description=\"Tolerance for the period (kpi and okr only).\" Required=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 257,
+  "description": "rpt_values: add column baseline_value",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"baseline_value\" StaticName=\"baseline_value\" DisplayName=\"baseline_value\" Description=\"Baseline for the period.\" Required=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 258,
+  "description": "rpt_values: add column capacity_value",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Number\" Name=\"capacity_value\" StaticName=\"capacity_value\" DisplayName=\"capacity_value\" Description=\"Capacity or throughput for the period.\" Required=\"FALSE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 259,
+  "description": "rpt_values: add column rag_status",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Text\" Name=\"rag_status\" StaticName=\"rag_status\" DisplayName=\"rag_status\" Description=\"green, amber, red, no_target, no_data or not_applicable.\" Required=\"FALSE\" MaxLength=\"255\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 260,
+  "description": "rpt_values: add column is_latest",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"Boolean\" Name=\"is_latest\" StaticName=\"is_latest\" DisplayName=\"is_latest\" Description=\"Yes on the most recent approved period for the measure.\" Required=\"FALSE\" Indexed=\"TRUE\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 261,
+  "description": "rpt_values: add column refreshed_at",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/fields/createfieldasxml",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.XmlSchemaFieldCreationInformation"
+    },
+    "SchemaXml": "<Field Type=\"DateTime\" Name=\"refreshed_at\" StaticName=\"refreshed_at\" DisplayName=\"refreshed_at\" Description=\"When this row was last rebuilt.\" Required=\"FALSE\" Format=\"DateTime\"/>",
+    "Options": 24
+   }
+  }
+ },
+ {
+  "step": 262,
+  "description": "rpt_values: add view latest_values",
+  "method": "POST",
+  "uri": "_api/web/lists/getbytitle('rpt_values')/views/add",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "parameters": {
+    "__metadata": {
+     "type": "SP.ViewCreationInformation"
+    },
+    "Title": "latest_values",
+    "ViewFields": {
+     "__metadata": {
+      "type": "Collection(Edm.String)"
+     },
+     "results": [
+      "LinkTitle",
+      "measure_name",
+      "period_label",
+      "value_number",
+      "rag_status"
+     ]
+    },
+    "Query": "<Where><Eq><FieldRef Name='is_latest'/><Value Type='Boolean'>1</Value></Eq></Where><OrderBy><FieldRef Name='Title' Ascending='TRUE'/></OrderBy>",
+    "RowLimit": 100,
+    "Paged": true,
+    "PersonalView": false,
+    "SetAsDefaultView": false,
+    "ViewTypeKind": 1
+   }
+  }
+ },
+ {
+  "step": 263,
+  "description": "Create document library snapshots",
+  "method": "POST",
+  "uri": "_api/web/lists",
+  "headers": {
+   "Accept": "application/json;odata=verbose",
+   "Content-Type": "application/json;odata=verbose"
+  },
+  "body": {
+   "__metadata": {
+    "type": "SP.List"
+   },
+   "BaseTemplate": 101,
+   "Title": "snapshots",
+   "Description": "Scheduled export files. /latest is overwritten each run; dated folders keep history.",
+   "EnableVersioning": true
+  }
+ }
+]
