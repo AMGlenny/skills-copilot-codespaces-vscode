@@ -96,6 +96,13 @@ def schema_requests():
                     "Options": FIELD_OPTIONS,
                 }
             })
+        if lst.read_own_only or lst.edit_own_only:
+            # ReadSecurity 1 = all items, 2 = own items. WriteSecurity 1 = all, 2 = own.
+            add(f"{lst.name}: item-level permissions", _list_uri(lst.name), {
+                "__metadata": {"type": "SP.List"},
+                "ReadSecurity": 2 if lst.read_own_only else 1,
+                "WriteSecurity": 2 if lst.edit_own_only else 1,
+            }, MERGE)
         for view in lst.views:
             fields = ["LinkTitle" if f == "Title" else f for f in view.columns]
             order = f"<OrderBy><FieldRef Name='{view.order_by}' Ascending='{'TRUE' if view.ascending else 'FALSE'}'/></OrderBy>"

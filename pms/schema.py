@@ -88,6 +88,9 @@ class ListDef:
     restricted: bool = False  # extra permissions step, excluded from search/AI
     generated: bool = False  # written only by flows, never by people
     exported: bool = True  # included in standard exports and AI snapshots
+    # SharePoint item-level permissions (List settings > Advanced settings).
+    read_own_only: bool = False  # people can only read items they created
+    edit_own_only: bool = False  # people can only edit items they created
 
     @property
     def all_columns(self):
@@ -307,6 +310,7 @@ LISTS = [
             Col("workload", "choice", "light, manageable, heavy or overloaded.", choices=WORKLOAD),
             Col("submitted_at", "datetime", "When it was saved.", required=True),
         ],
+        edit_own_only=True,
     ),
     ListDef(
         "wellbeing_checkins", "weekly_work",
@@ -314,14 +318,14 @@ LISTS = [
         "checkin_key", "email|week_start. Unique.",
         [
             Col("email", "text", "Person.", required=True, indexed=True, ref="people.email"),
-            Col("line_manager_email", "text", "Line manager at the time of the check-in. Controls who can see it.", required=True, indexed=True, ref="people.email"),
+            Col("line_manager_email", "text", "Line manager at the time of the check-in. Only they can see it. Blank if the person has no line manager, so only they see it.", indexed=True, ref="people.email"),
             Col("org_unit_key", "text", "Team at the time, for team counts.", required=True, indexed=True, ref="org_units.org_unit_key"),
             Col("week_start", "date", "Monday of the week.", required=True, indexed=True),
             Col("wellbeing", "choice", "thriving, ok or struggling.", required=True, choices=WELLBEING),
             Col("comments", "note", "Optional comments."),
             Col("submitted_at", "datetime", "When it was saved.", required=True),
         ],
-        restricted=True, exported=False,
+        restricted=True, exported=False, read_own_only=True, edit_own_only=True,
     ),
     ListDef(
         "tasks", "weekly_work",

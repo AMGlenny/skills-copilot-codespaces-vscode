@@ -110,12 +110,20 @@ Narrative is required when a value is missing or amber or red.
 ## Wellbeing (restricted)
 
 - **Separate list.** `wellbeing_checkins` is split from `weekly_updates`.
-- **Access:**
-  - Staff and even site members have no direct access to the list.
-  - Flows running as the service account read it and return only what each person may see:
-    - individual responses go only to the `line_manager_email` recorded on the check-in
-    - everyone else sees team counts, only when at least `wellbeing_min_group_size` (5) people responded
+- **SharePoint item-level permissions:** people can add check-ins and read and edit only their own. Site owners and members are removed from the list, so admins can't browse it.
+- **Everyone else's data comes only through the `PMSWellbeingView` flow,** which runs as the service account:
+  - individual responses go only to the `line_manager_email` recorded on the check-in
+  - everyone else sees team counts, only when at least `wellbeing_min_group_size` (5) people responded
 - **Excluded everywhere else:** it's left out of search (NoCrawl), exports and AI snapshots.
+
+## Who writes what
+
+| Lists | Written by | Audit trail |
+|---|---|---|
+| Measures lists (submissions, versions, reviews, reference values) | Flows running as the service account (phase 3) | `audit_log`, written by the flows |
+| weekly_updates, wellbeing_checkins, tasks, problems | The weekly app, directly. Item-level permissions and a no-delete permission level control access. | SharePoint version history on each item |
+| rpt_values, audit_log | Flows only | Not needed |
+| Reference lists (people, org_units, groups, lookups, settings, periods) | Admins | SharePoint version history |
 
 ## Reporting table
 

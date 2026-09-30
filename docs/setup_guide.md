@@ -14,7 +14,7 @@ This creates every list, column, index and view on a SharePoint site and loads t
 
 1. In the site, open **Documents** and create a folder called `pms-setup`.
 2. Upload these files from the `dist/setup` folder in this repository:
-   - `01_schema.json`: creates the lists, columns, indexes and views (263 steps)
+   - `01_schema.json`: creates the lists, columns, indexes and views (265 steps)
    - `02_seed.json`: loads the sample data (1,627 steps)
 
 ## 3. Build the setup flow (one off, about 10 minutes)
@@ -71,22 +71,40 @@ Save the flow.
 
 ## 5. Set permissions
 
-Writes will go through flows running as a service account (phase 2 onwards), so people only need read access.
+There are two patterns:
+- **Measures lists are read-only for people.** From phase 3, changes to them go through flows running as a service account, so the approval rules can't be bypassed.
+- **The four weekly-work lists** (`weekly_updates`, `wellbeing_checkins`, `tasks`, `problems`) are written by the app directly. SharePoint's own item-level security enforces who can do what, and version history keeps the audit trail.
+
+**a. Site groups**
 
 | Who | Where | Permission |
 |---|---|---|
 | Service account (until you have one: you) | Site Owners | Full control |
 | System admins | Site Owners | Full control |
-| Everyone else | Site Visitors | Read |
+| Everyone else who uses the apps | Site Visitors | Read |
 
-Then lock down wellbeing:
+**b. A "no delete" permission level**
+1. Click the gear icon, then **Site permissions**, then **Advanced permissions settings**, then **Permission Levels**.
+2. Tick **Contribute** and click **Copy Permission Level**. Name the copy `Contribute without delete`.
+3. Untick **Delete Items** and **Delete Versions**, then save.
 
-1. Open the `wellbeing_checkins` list, then the gear icon, then **List settings**, then **Permissions for this list**.
-2. Click **Stop inheriting permissions**.
-3. Select every group and click **Remove user permissions**.
-4. Click **Grant permissions** and give only the service account **Edit**.
+**c. Weekly-work lists.** Repeat these steps for `weekly_updates`, `tasks` and `problems`:
+1. Open the list, then the gear icon, then **List settings**, then **Permissions for this list**, and click **Stop inheriting permissions**.
+2. Tick **Site Visitors**, click **Edit User Permissions** and choose **Contribute without delete**.
 
-Line managers see their own team's individual responses through the app, and everyone else sees team counts, all served by flows.
+The setup flow has already set `weekly_updates` so people can only edit their own update. You can check this under **List settings**, then **Advanced settings**, then **Item-level permissions**.
+
+**d. Lock down wellbeing**
+1. Open `wellbeing_checkins`, then **List settings**, then **Permissions for this list**, and click **Stop inheriting permissions**.
+2. Remove **Site Owners** and **Site Members**, so admins can't browse individual answers.
+3. Give **Site Visitors** the **Contribute without delete** level.
+4. Give the service account **Full Control** directly. Full Control is needed so its flow can read everyone's rows.
+5. Under **Advanced settings**, check that item-level permissions are set to **Read items that were created by the user** and **Create items and edit items that were created by the user**. The setup flow sets this, but check it anyway.
+
+Together, these mean:
+- People can add and see only their own check-ins.
+- Line managers see their direct reports' answers through the app, served by the `PMSWellbeingView` flow.
+- Everyone else only ever sees team totals.
 
 Two more things to know:
 - SharePoint administrators can always regain access to any list. Record that in your data protection impact assessment. A DPIA is recommended anyway, because wellbeing can be health data.

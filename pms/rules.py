@@ -78,3 +78,76 @@ def expected_by(period_end, lag_days):
     if lag_days is None:
         return None
     return period_end + timedelta(days=lag_days)
+
+
+# ---------------------------------------------------------------------------
+# Weekly work
+# ---------------------------------------------------------------------------
+PRIORITY_LABELS = {"must": "Must do", "should": "Should do", "could": "Could do"}
+
+
+def week_start(d):
+    """Monday of the week containing d."""
+    return d - timedelta(days=d.weekday())
+
+
+def tasks_for_week(tasks, org_unit_key, week):
+    """Tasks shown on a team's week: every open task (they carry over until
+    closed) plus anything completed or cancelled during that week."""
+    week_end = week + timedelta(days=6)
+    shown = [t for t in tasks if t["org_unit_key"] == org_unit_key and (
+        t["status"] == "open"
+        or (t["completed_date"] is not None and week <= t["completed_date"] <= week_end))]
+    return sorted(shown, key=lambda t: (t["status"] != "open", t["date_raised"], t["task_code"]))
+
+
+def problems_for_week(problems, org_unit_key, week):
+    week_end = week + timedelta(days=6)
+    shown = [p for p in problems if p["org_unit_key"] == org_unit_key and (
+        p["status"] == "open"
+        or (p["closed_date"] is not None and week <= p["closed_date"] <= week_end))]
+    return sorted(shown, key=lambda p: (p["status"] != "open", p["raised_on"], p["problem_code"]))
+
+
+def wellbeing_view(checkins, caller_email, org_unit_key, week, min_group_size):
+    """What one person may see about wellbeing for a week.
+
+    - individual responses only where the caller is the recorded line manager
+    - team counts only when at least min_group_size people in the team responded
+    """
+    in_week = [c for c in checkins if c["week_start"] == week]
+    team = [c for c in in_week if c["org_unit_key"] == org_unit_key]
+    show = len(team) >= min_group_size
+    counts = {w: sum(1 for c in team if c["wellbeing"] == w) for w in ("thriving", "ok", "struggling")}
+    return {
+        "responses": len(team),
+        "show_counts": show,
+        "counts": counts if show else None,
+        "direct_reports": sorted(
+            ({"email": c["email"], "wellbeing": c["wellbeing"], "comments": c["comments"]}
+             for c in in_week if c["line_manager_email"] == caller_email),
+            key=lambda r: r["email"]),
+    }
+
+
+def validate_task(task):
+    errors = []
+    name = (task.get("task_name") or "").strip()
+    if not name:
+        errors.append("Enter a task name.")
+    elif len(name) > 255:
+        errors.append("Task name must be 255 characters or fewer.")
+    if (task.get("contributes_to_type") or "none") != "none" and not task.get("contributes_to_key"):
+        errors.append("Choose what the task contributes to, or choose none.")
+    return errors
+
+
+def validate_problem(problem):
+    errors = []
+    if not (problem.get("problem_title") or "").strip():
+        errors.append("Enter a short title.")
+    if not (problem.get("problem_statement") or "").strip():
+        errors.append("Describe the problem.")
+    if problem.get("status") == "closed" and not (problem.get("resolution") or "").strip():
+        errors.append("Say how the problem was resolved before closing it.")
+    return errors

@@ -19,9 +19,9 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 
 | Phase | Scope | Status |
 |---|---|---|
-| 1. Data foundation | Lists, columns, indexes, views, periods, sample data, data dictionary, setup | **Done** (this repository) |
-| 2. Weekly updates app | Daily and weekly tool for tasks, problems, successes, workload and wellbeing | Next |
-| 3. Measures app | Entry, review, versions, audit, notifications, RAG, admin screens | |
+| 1. Data foundation | Lists, columns, indexes, views, periods, sample data, data dictionary, setup | **Done** |
+| 2. Weekly updates app | Daily and weekly tool for tasks, problems, successes, workload and wellbeing | **Done**: [build guide](docs/weekly_app_guide.md) |
+| 3. Measures app | Entry, review, versions, audit, notifications, RAG, admin screens | Next |
 | 4. Exports | On-demand CSV and xlsx with a data dictionary, scheduled snapshots, quarterly report pack, AI prompt template | |
 | 5. Hardening | WCAG 2.2 AA checks, mobile, volume testing | |
 
@@ -29,7 +29,8 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 
 1. Follow [docs/setup_guide.md](docs/setup_guide.md). One Power Automate flow creates everything on your SharePoint site and loads the sample data. No IT request or premium licence is needed.
 2. Read [docs/data_model.md](docs/data_model.md) for how the data fits together.
-3. To add a measure, see [docs/adding_a_measure.md](docs/adding_a_measure.md).
+3. Build the weekly updates app with [docs/weekly_app_guide.md](docs/weekly_app_guide.md).
+4. To add a measure, see [docs/adding_a_measure.md](docs/adding_a_measure.md).
 
 ## What's in the repository
 
@@ -44,8 +45,10 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 | `dist/seed_csv/*.csv` | Sample data as tidy CSV, one file per table. Handy for testing Power BI. |
 | `dist/data_dictionary.csv` | Every column, with its type, allowed values and links |
 | `docs/` | Guides, data model, generated data dictionary and diagram |
+| `powerapps/weekly/` | Weekly updates app: app formulas and four screens as YAML to paste into Power Apps Studio |
+| `flows/` | Step-by-step builds for Power Automate flows |
 | `scripts/Invoke-PmsSetup.ps1` | PnP PowerShell alternative to the setup flow |
-| `tests/` | Checks that the schema, rules and data are consistent |
+| `tests/` | Checks that the schema, rules, data and app source are consistent |
 
 ## Changing the data model
 
@@ -56,7 +59,7 @@ python -m pms build
 python -m unittest discover -s tests
 ```
 
-The build regenerates everything in `dist/`, `docs/data_dictionary.md` and `docs/data_model_diagram.md`. It needs Python 3.9 or later and nothing else.
+The build regenerates everything in `dist/`, `docs/data_dictionary.md` and `docs/data_model_diagram.md`. It needs Python 3.9 or later. The app source checks also need PyYAML (`pip install pyyaml`); without it they are skipped.
 
 The tests check, among other things:
 - every link points at a real row
@@ -72,7 +75,8 @@ The tests check, among other things:
 - **Linking and access**
   - Tables link through readable text keys, not lookup columns.
   - Each list's Title column is renamed to its key.
-  - People have read-only access. Writes go through flows, so the "only the updater edits the value" rule and the audit trail can't be bypassed.
+  - Measures data is read-only for people. Writes go through flows (phase 3), so the "only the updater edits the value" rule and the audit trail can't be bypassed.
+  - Weekly work is written by the app directly. SharePoint item-level permissions stop people editing someone else's update, a "no delete" permission level stops deletions, and version history is the audit trail. This keeps the daily tool quick.
 - **Measures**
   - `measure_code` (e.g. PM-0007) is the system key.
   - `source_ref` keeps the document's own reference, which can repeat (parent and child can both be "1.01").

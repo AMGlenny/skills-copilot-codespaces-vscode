@@ -193,7 +193,7 @@ RESTRICTED. Individual wellbeing, visible only to the person's line manager. Peo
 |---|---|---|---|
 | `checkin_key` | text | yes | **Key** (SharePoint Title column). email\|week_start. Unique. |
 | `email` | text | yes | Person. Links to `people.email`. |
-| `line_manager_email` | text | yes | Line manager at the time of the check-in. Controls who can see it. Links to `people.email`. |
+| `line_manager_email` | text |  | Line manager at the time of the check-in. Only they can see it. Blank if the person has no line manager, so only they see it. Links to `people.email`. |
 | `org_unit_key` | text | yes | Team at the time, for team counts. Links to `org_units.org_unit_key`. |
 | `week_start` | date (YYYY-MM-DD) | yes | Monday of the week. |
 | `wellbeing` | choice | yes | thriving, ok or struggling. Values: `thriving`, `ok`, `struggling`. |

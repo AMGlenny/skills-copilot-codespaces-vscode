@@ -1,0 +1,297 @@
+# =====================================================================
+# Screen: scrProblem (raise or update a problem)
+#
+# 1. Add a blank screen and rename it scrProblem.
+# 2. Screen properties:
+#      Fill:      =clrPage
+#      OnVisible: =Reset(txtProblemTitle); Reset(txtProblemStatement); Reset(ddProblemImpact); Reset(ddProblemUrgency); Reset(cmbProblemOwner); Reset(dpProblemTarget); Reset(cmbProblemContrib); Reset(ddProblemStatus); Reset(txtProblemResolution); Reset(txtProblemNotes)
+# 3. Copy everything below, right-click scrProblem, "Paste code".
+# =====================================================================
+- conProblem:
+    Control: GroupContainer@1.3.0
+    Variant: AutoLayout
+    Properties:
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+      LayoutDirection: =LayoutDirection.Vertical
+      LayoutAlignItems: =LayoutAlignItems.Center
+      LayoutOverflowY: =LayoutOverflow.Scroll
+      Fill: =clrPage
+    Children:
+      - conProblemHeader:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =64
+            Fill: =clrHeader
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutGap: =8
+            PaddingLeft: =8
+            PaddingRight: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - icnProblemBack:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  Icon: =Icon.ArrowLeft
+                  Color: =Color.White
+                  Width: =44
+                  Height: =44
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =10
+                  PaddingBottom: =10
+                  AccessibleLabel: ="Back to my week without saving"
+                  TabIndex: =0
+                  OnSelect: =Back()
+            - lblProblemScreenTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Text: =If(varProblemNew, "Raise a problem", "Problem " & varProblem.problem_code)
+                  Role: =TextRole.Heading1
+                  Color: =Color.White
+                  FontWeight: =FontWeight.Semibold
+                  Size: =18
+                  Height: =40
+                  FillPortions: =1
+      - conProblemForm:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Width: =Min(App.Width - 32, 760)
+            Height: =1180
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =6
+            Fill: =clrPanel
+            BorderColor: =clrBorder
+            BorderThickness: =1
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =16
+            PaddingBottom: =16
+          Children:
+            - lblProblemTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Short title (required)"
+                  Color: =clrText
+                  Height: =24
+            - txtProblemTitle:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Default: =varProblem.problem_title
+                  MaxLength: =255
+                  AccessibleLabel: ="Short title, required"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblProblemStatement:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Problem statement (required)"
+                  Color: =clrText
+                  Height: =24
+            - txtProblemStatement:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Default: =varProblem.problem_statement
+                  Mode: =TextMode.MultiLine
+                  HintText: ="What is the problem and what is it affecting?"
+                  AccessibleLabel: ="Problem statement, required"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =100
+            - lblProblemImpact:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Impact"
+                  Color: =clrText
+                  Height: =24
+            - ddProblemImpact:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  Items: =fxLevelLabels
+                  Value: =label
+                  Default: =Coalesce(LookUp(fxLevelLabels, code = varProblem.impact.Value).label, "Medium")
+                  AccessibleLabel: ="Impact"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblProblemUrgency:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Urgency"
+                  Color: =clrText
+                  Height: =24
+            - ddProblemUrgency:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  Items: =fxLevelLabels
+                  Value: =label
+                  Default: =Coalesce(LookUp(fxLevelLabels, code = varProblem.urgency.Value).label, "Medium")
+                  AccessibleLabel: ="Urgency"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblProblemOwner:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Problem owner"
+                  Color: =clrText
+                  Height: =24
+            - cmbProblemOwner:
+                Control: Classic/ComboBox@2.4.0
+                Properties:
+                  Items: =SortByColumns(colPeople, "display_name", SortOrder.Ascending)
+                  DisplayFields: =["display_name"]
+                  SearchFields: =["display_name"]
+                  SelectMultiple: =false
+                  DefaultSelectedItems: =Filter(colPeople, email = varProblem.problem_owner)
+                  AccessibleLabel: ="Problem owner"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblProblemTarget:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Target resolution date"
+                  Color: =clrText
+                  Height: =24
+            - dpProblemTarget:
+                Control: Classic/DatePicker@2.6.0
+                Properties:
+                  DefaultDate: =varProblem.target_resolution_date
+                  StartOfWeek: =StartOfWeek.Monday
+                  AccessibleLabel: ="Target resolution date"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblProblemContrib:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Affects (theme, programme, objective or measure)"
+                  Color: =clrText
+                  Height: =24
+            - cmbProblemContrib:
+                Control: Classic/ComboBox@2.4.0
+                Properties:
+                  Items: =colContrib
+                  DisplayFields: =["label"]
+                  SearchFields: =["label"]
+                  SelectMultiple: =false
+                  DefaultSelectedItems: =Filter(colContrib, key = varProblem.contributes_to_key)
+                  AccessibleLabel: ="Affects"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblProblemStatus:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Status"
+                  Color: =clrText
+                  Height: =24
+            - ddProblemStatus:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  Items: |-
+                    =Table({code: "open", label: "Open"}, {code: "closed", label: "Closed"})
+                  Value: =label
+                  Default: =Coalesce(Proper(varProblem.status.Value), "Open")
+                  AccessibleLabel: ="Status"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblProblemResolution:
+                Control: Label@2.5.1
+                Properties:
+                  Text: =If(ddProblemStatus.Selected.code = "closed", "How was it resolved? (required to close)", "Resolution")
+                  Color: =clrText
+                  Height: =24
+            - txtProblemResolution:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Default: =varProblem.resolution
+                  Mode: =TextMode.MultiLine
+                  AccessibleLabel: ="Resolution, required to close the problem"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =80
+            - lblProblemNotes:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Notes"
+                  Color: =clrText
+                  Height: =24
+            - txtProblemNotes:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Default: =varProblem.notes
+                  Mode: =TextMode.MultiLine
+                  HintText: ="Context"
+                  AccessibleLabel: ="Notes"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =100
+            - lblProblemRaised:
+                Control: Label@2.5.1
+                Properties:
+                  Visible: =!varProblemNew
+                  Text: ="Raised by " & Coalesce(LookUp(colPeople, email = varProblem.raised_by).display_name, varProblem.raised_by) & " on " & Text(varProblem.raised_on, "dd mmm yyyy")
+                  Color: =clrMuted
+                  Size: =11
+                  AutoHeight: =true
+            - btnProblemSave:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="Save problem"
+                  DisplayMode: =If(fxCanEdit, DisplayMode.Edit, DisplayMode.Disabled)
+                  Fill: =clrAccent
+                  Color: =Color.White
+                  HoverFill: =clrAccentDark
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =160
+                  Height: =44
+                  OnSelect: |-
+                    =With(
+                        {
+                            status: ddProblemStatus.Selected.code,
+                            f: {
+                                problem_title: Trim(txtProblemTitle.Text),
+                                problem_statement: Trim(txtProblemStatement.Text),
+                                org_unit_key: Coalesce(varProblem.org_unit_key, varTeam),
+                                problem_owner: cmbProblemOwner.Selected.email,
+                                impact: {Value: ddProblemImpact.Selected.code},
+                                urgency: {Value: ddProblemUrgency.Selected.code},
+                                target_resolution_date: dpProblemTarget.SelectedDate,
+                                contributes_to_type: {Value: Coalesce(cmbProblemContrib.Selected.type, "none")},
+                                contributes_to_key: cmbProblemContrib.Selected.key,
+                                resolution: Trim(txtProblemResolution.Text),
+                                notes: Trim(txtProblemNotes.Text)
+                            }
+                        },
+                        If(
+                            IsBlank(f.problem_title), Notify("Enter a short title.", NotificationType.Error),
+                            IsBlank(f.problem_statement), Notify("Describe the problem.", NotificationType.Error),
+                            status = "closed" && IsBlank(f.resolution), Notify("Say how the problem was resolved before closing it.", NotificationType.Error),
+                            With(
+                                {g: {status: {Value: status}, closed_date: If(status = "closed", Coalesce(varProblem.closed_date, Today()), Blank())}},
+                                If(
+                                    varProblemNew,
+                                    With(
+                                        {r: Patch(problems, Defaults(problems), {problem_code: Text(GUID()), raised_by: fxMe, raised_on: Today()}, f, g)},
+                                        If(!IsBlank(r), Patch(problems, r, {problem_code: "PRB-" & Text(r.ID, "00000")}))
+                                    ),
+                                    Patch(problems, varProblem, f, g)
+                                );
+                                If(
+                                    IsEmpty(Errors(problems)),
+                                    Notify("Problem saved.", NotificationType.Success); Back(),
+                                    Notify("The problem did not save. Check your connection and try again.", NotificationType.Error)
+                                )
+                            )
+                        )
+                    )

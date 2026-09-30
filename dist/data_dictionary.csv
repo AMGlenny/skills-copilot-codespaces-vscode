@@ -109,7 +109,7 @@ weekly_updates,workload,choice,false,false,false,light|manageable|heavy|overload
 weekly_updates,submitted_at,"date-time (UTC, ISO 8601)",true,false,false,,,When it was saved.
 wellbeing_checkins,checkin_key,text,true,true,true,,,email|week_start. Unique.
 wellbeing_checkins,email,text,true,true,false,,people.email,Person.
-wellbeing_checkins,line_manager_email,text,true,true,false,,people.email,Line manager at the time of the check-in. Controls who can see it.
+wellbeing_checkins,line_manager_email,text,false,true,false,,people.email,"Line manager at the time of the check-in. Only they can see it. Blank if the person has no line manager, so only they see it."
 wellbeing_checkins,org_unit_key,text,true,true,false,,org_units.org_unit_key,"Team at the time, for team counts."
 wellbeing_checkins,week_start,date (YYYY-MM-DD),true,true,false,,,Monday of the week.
 wellbeing_checkins,wellbeing,choice,true,false,false,thriving|ok|struggling,,"thriving, ok or struggling."

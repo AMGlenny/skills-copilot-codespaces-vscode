@@ -1,0 +1,663 @@
+# =====================================================================
+# Screen: scrWeek ("My week")
+#
+# 1. Add a blank screen and rename it scrWeek.
+# 2. Set these screen properties:
+#      Fill:      =clrPage
+#      OnVisible: =If(!varLoaded, Select(btnLoadWeek); Set(varLoaded, true), Select(btnLoadLists))
+# 3. Copy everything below this comment, right-click scrWeek in the tree
+#    view and choose "Paste code".
+# =====================================================================
+- conWeek:
+    Control: GroupContainer@1.3.0
+    Variant: AutoLayout
+    Properties:
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+      LayoutDirection: =LayoutDirection.Vertical
+      Fill: =clrPage
+    Children:
+      # ---------------- Header ----------------
+      - conWeekHeader:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =64
+            Fill: =clrHeader
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutGap: =8
+            PaddingLeft: =16
+            PaddingRight: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - lblWeekAppTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Weekly update"
+                  Role: =TextRole.Heading1
+                  Color: =Color.White
+                  FontWeight: =FontWeight.Semibold
+                  Size: =18
+                  Height: =40
+                  FillPortions: =1
+            - btnWeekNavWeek:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="My week"
+                  OnSelect: =Navigate(scrWeek)
+                  Fill: =clrPanel
+                  Color: =clrHeader
+                  BorderColor: =clrPanel
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =ColorValue("#FFD166")
+                  Width: =110
+                  Height: =40
+            - btnWeekNavTeam:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="My team"
+                  OnSelect: =Navigate(scrTeam)
+                  Fill: =clrHeader
+                  Color: =Color.White
+                  BorderColor: =Color.White
+                  BorderThickness: =1
+                  HoverFill: =clrAccentDark
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =ColorValue("#FFD166")
+                  Width: =110
+                  Height: =40
+      # ---------------- Week, team and save ----------------
+      - conWeekToolbar:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =If(fxIsNarrow, 230, 84)
+            Fill: =clrPanel
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutWrap: =true
+            LayoutAlignItems: =LayoutAlignItems.End
+            LayoutGap: =12
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =8
+            PaddingBottom: =8
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - conWeekPickWeek:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  Width: =200
+                  Height: =66
+                Children:
+                  - lblWeekPickWeek:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Week commencing (Monday)"
+                        Color: =clrText
+                        Size: =11
+                        Height: =24
+                  - dpWeek:
+                      Control: Classic/DatePicker@2.6.0
+                      Properties:
+                        DefaultDate: =varWeek
+                        StartOfWeek: =StartOfWeek.Monday
+                        AccessibleLabel: ="Week commencing"
+                        BorderColor: =clrBorder
+                        Height: =40
+                        OnChange: |-
+                          =Set(varWeek, DateAdd(Self.SelectedDate, -(Weekday(Self.SelectedDate, StartOfWeek.Monday) - 1), TimeUnit.Days));
+                          Select(btnLoadWeek)
+            - conWeekPickTeam:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  Width: =If(fxIsNarrow, App.Width - 32, 380)
+                  Height: =66
+                Children:
+                  - lblWeekPickTeam:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Team"
+                        Color: =clrText
+                        Size: =11
+                        Height: =24
+                  - cmbWeekTeam:
+                      Control: Classic/ComboBox@2.4.0
+                      Properties:
+                        Items: =colTeams
+                        DisplayFields: =["path"]
+                        SearchFields: =["path"]
+                        SelectMultiple: =false
+                        DefaultSelectedItems: =Filter(colTeams, org_unit_key = varTeam)
+                        AccessibleLabel: ="Team"
+                        BorderColor: =clrBorder
+                        Height: =40
+                        OnChange: =Set(varTeam, Self.Selected.org_unit_key); Select(btnLoadLists)
+            - btnWeekSave:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: =If(varSaving, "Saving...", "Save my week")
+                  DisplayMode: =If(varSaving || !fxCanEdit, DisplayMode.Disabled, DisplayMode.Edit)
+                  Fill: =clrAccent
+                  Color: =Color.White
+                  HoverFill: =clrAccentDark
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =160
+                  Height: =40
+                  OnSelect: |-
+                    =If(
+                        IsBlank(varTeam),
+                        Notify("Choose your team first.", NotificationType.Error),
+                        Set(varSaving, true);
+                        // 1. Weekly update: one row per person per week.
+                        With(
+                            {
+                                f: {
+                                    week_start: varWeek,
+                                    org_unit_key: varTeam,
+                                    successes: Trim(txtWeekSuccesses.Text),
+                                    communication: Trim(txtWeekComms.Text),
+                                    workload: If(IsBlank(ddWeekWorkload.Selected.code), Blank(), {Value: ddWeekWorkload.Selected.code}),
+                                    submitted_at: Now()
+                                }
+                            },
+                            Set(
+                                varUpdate,
+                                If(
+                                    IsBlank(varUpdate),
+                                    Patch(weekly_updates, Defaults(weekly_updates), {update_key: varKey, email: fxMe}, f),
+                                    Patch(weekly_updates, varUpdate, f)
+                                )
+                            )
+                        );
+                        // 2. Wellbeing: only if answered. Private to the line manager.
+                        If(
+                            !IsBlank(ddWeekWellbeing.Selected.code),
+                            With(
+                                {
+                                    w: {
+                                        week_start: varWeek,
+                                        org_unit_key: varTeam,
+                                        line_manager_email: fxPerson.line_manager_email,
+                                        wellbeing: {Value: ddWeekWellbeing.Selected.code},
+                                        comments: Trim(txtWeekWellbeingComments.Text),
+                                        submitted_at: Now()
+                                    }
+                                },
+                                Set(
+                                    varCheckin,
+                                    If(
+                                        IsBlank(varCheckin),
+                                        Patch(wellbeing_checkins, Defaults(wellbeing_checkins), {checkin_key: varKey, email: fxMe}, w),
+                                        Patch(wellbeing_checkins, varCheckin, w)
+                                    )
+                                )
+                            )
+                        );
+                        // 3. Task ticks made this session.
+                        ForAll(
+                            colTaskTicks As t,
+                            Patch(
+                                tasks,
+                                LookUp(tasks, task_code = t.code),
+                                If(
+                                    t.done,
+                                    {status: {Value: "complete"}, completed_by: fxMe, completed_date: Today()},
+                                    {status: {Value: "open"}, completed_by: Blank(), completed_date: Blank()}
+                                )
+                            )
+                        );
+                        Set(varSaving, false);
+                        If(
+                            IsEmpty(Errors(weekly_updates)) && IsEmpty(Errors(wellbeing_checkins)) && IsEmpty(Errors(tasks)),
+                            Clear(colTaskTicks);
+                            Select(btnLoadLists);
+                            Notify("Saved. Thanks for your update.", NotificationType.Success),
+                            Notify("Something did not save. Check your connection and try again.", NotificationType.Error)
+                        )
+                    )
+            - lblWeekSaveStatus:
+                Control: Label@2.5.1
+                Properties:
+                  Live: =Live.Polite
+                  Color: =clrMuted
+                  Size: =11
+                  Height: =40
+                  Width: =280
+                  Text: |-
+                    =If(IsBlank(varUpdate), "Not saved yet for this week", "Last saved " & Text(varUpdate.submitted_at, "dd mmm yyyy, hh:mm")) &
+                    If(CountRows(colTaskTicks) > 0, ". " & CountRows(colTaskTicks) & " task change(s) not saved yet.", "")
+            # Hidden helpers: loading is done by selecting these.
+            - btnLoadWeek:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Visible: =false
+                  Width: =1
+                  Height: =1
+                  OnSelect: |-
+                    =Set(varKey, fxMe & "|" & Text(varWeek, "yyyy-mm-dd"));
+                    Set(varUpdate, LookUp(weekly_updates, update_key = varKey));
+                    Set(varCheckin, LookUp(wellbeing_checkins, checkin_key = varKey));
+                    Clear(colTaskTicks);
+                    Reset(txtWeekSuccesses); Reset(txtWeekComms); Reset(ddWeekWorkload);
+                    Reset(ddWeekWellbeing); Reset(txtWeekWellbeingComments);
+                    Select(btnLoadLists)
+            - btnLoadLists:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Visible: =false
+                  Width: =1
+                  Height: =1
+                  OnSelect: |-
+                    =// Open items carry over every week; closed ones show only in the week they closed.
+                    ClearCollect(
+                        colTasks,
+                        Filter(
+                            tasks,
+                            org_unit_key = varTeam &&
+                            (status.Value = "open" || (completed_date >= varWeek && completed_date <= DateAdd(varWeek, 6, TimeUnit.Days)))
+                        )
+                    );
+                    ClearCollect(
+                        colProblems,
+                        Filter(
+                            problems,
+                            org_unit_key = varTeam &&
+                            (status.Value = "open" || (closed_date >= varWeek && closed_date <= DateAdd(varWeek, 6, TimeUnit.Days)))
+                        )
+                    )
+      # ---------------- Three columns (stack on narrow screens) ----------------
+      - conWeekBody:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            FillPortions: =1
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutWrap: =true
+            LayoutGap: =16
+            LayoutOverflowY: =LayoutOverflow.Scroll
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =16
+            PaddingBottom: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            # ---------- Column 1: my update ----------
+            - conWeekUpdate:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =6
+                  FillPortions: =1
+                  LayoutMinWidth: =300
+                  Height: =If(fxIsNarrow, 720, Parent.Height - 32)
+                  Fill: =clrPanel
+                  BorderColor: =clrBorder
+                  BorderThickness: =1
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  PaddingBottom: =12
+                  LayoutOverflowY: =LayoutOverflow.Scroll
+                Children:
+                  - lblWeekUpdateHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="My update"
+                        Role: =TextRole.Heading2
+                        FontWeight: =FontWeight.Semibold
+                        Size: =15
+                        Color: =clrText
+                        Height: =32
+                  - lblWeekSuccesses:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Successes"
+                        Color: =clrText
+                        Height: =24
+                  - txtWeekSuccesses:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        Default: =varUpdate.successes
+                        Mode: =TextMode.MultiLine
+                        HintText: ="Any success you've had or heard about"
+                        AccessibleLabel: ="Successes"
+                        DisplayMode: =fxEditMode
+                        BorderColor: =clrBorder
+                        Height: =120
+                  - lblWeekComms:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Communication"
+                        Color: =clrText
+                        Height: =24
+                  - txtWeekComms:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        Default: =varUpdate.communication
+                        Mode: =TextMode.MultiLine
+                        HintText: ="Anything that would help if more widely known"
+                        AccessibleLabel: |-
+                          ="Communication: anything that would help if more widely known"
+                        DisplayMode: =fxEditMode
+                        BorderColor: =clrBorder
+                        Height: =90
+                  - lblWeekWorkload:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Workload"
+                        Color: =clrText
+                        Height: =24
+                  - ddWeekWorkload:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        Items: =fxWorkloadLabels
+                        Value: =label
+                        AllowEmptySelection: =true
+                        Default: =LookUp(fxWorkloadLabels, code = varUpdate.workload.Value).label
+                        AccessibleLabel: ="Workload"
+                        DisplayMode: =fxEditMode
+                        BorderColor: =clrBorder
+                        Height: =40
+                  - lblWeekWellbeingHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Wellbeing (private)"
+                        Role: =TextRole.Heading3
+                        FontWeight: =FontWeight.Semibold
+                        Color: =clrText
+                        Height: =32
+                  - lblWeekWellbeingNote:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: |-
+                          =If(
+                              IsBlank(fxPerson.line_manager_email),
+                              "No line manager is recorded for you, so only you can see your answer. Your team only ever sees totals.",
+                              "Only your line manager sees your answer. Your team only ever sees totals, and only when at least 5 people have answered."
+                          )
+                        Color: =clrMuted
+                        Size: =11
+                        AutoHeight: =true
+                  - ddWeekWellbeing:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        Items: =fxWellbeingLabels
+                        Value: =label
+                        AllowEmptySelection: =true
+                        Default: =LookUp(fxWellbeingLabels, code = varCheckin.wellbeing.Value).label
+                        AccessibleLabel: ="How are you doing this week? Private to your line manager."
+                        DisplayMode: =fxEditMode
+                        BorderColor: =clrBorder
+                        Height: =40
+                  - txtWeekWellbeingComments:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        Default: =varCheckin.comments
+                        Mode: =TextMode.MultiLine
+                        HintText: ="Anything you want your line manager to know (optional)"
+                        AccessibleLabel: ="Wellbeing comments, private to your line manager"
+                        DisplayMode: =fxEditMode
+                        BorderColor: =clrBorder
+                        Height: =80
+            # ---------- Column 2: tasks ----------
+            - conWeekTasks:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =6
+                  FillPortions: =1
+                  LayoutMinWidth: =300
+                  Height: =If(fxIsNarrow, 560, Parent.Height - 32)
+                  Fill: =clrPanel
+                  BorderColor: =clrBorder
+                  BorderThickness: =1
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  PaddingBottom: =12
+                Children:
+                  - conWeekTasksTop:
+                      Control: GroupContainer@1.3.0
+                      Variant: AutoLayout
+                      Properties:
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        Height: =44
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - lblWeekTasksHeading:
+                            Control: Label@2.5.1
+                            Properties:
+                              Text: ="Tasks (" & CountRows(Filter(colTasks, status.Value = "open")) & " open)"
+                              Role: =TextRole.Heading2
+                              FontWeight: =FontWeight.Semibold
+                              Size: =15
+                              Color: =clrText
+                              FillPortions: =1
+                              Height: =40
+                        - btnWeekAddTask:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              Text: ="+ Add task"
+                              DisplayMode: =If(fxCanEdit, DisplayMode.Edit, DisplayMode.Disabled)
+                              OnSelect: =Set(varTask, Blank()); Set(varTaskNew, true); Navigate(scrTask)
+                              Fill: =clrPanel
+                              Color: =clrAccent
+                              BorderColor: =clrAccent
+                              BorderThickness: =1
+                              FocusedBorderThickness: =3
+                              FocusedBorderColor: =clrText
+                              Width: =120
+                              Height: =40
+                  - lblWeekTasksHint:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Open tasks carry over each week. Tick what's done, then Save my week."
+                        Color: =clrMuted
+                        Size: =11
+                        AutoHeight: =true
+                  - galWeekTasks:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        Items: |-
+                          =SortByColumns(
+                              AddColumns(colTasks, sort_open, If(status.Value = "open", 0, 1)),
+                              "sort_open", SortOrder.Ascending,
+                              "date_raised", SortOrder.Ascending
+                          )
+                        AccessibleLabel: ="Tasks for this team"
+                        TemplateSize: =88
+                        TemplatePadding: =0
+                        FillPortions: =1
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - chkWeekTaskDone:
+                            Control: Classic/CheckBox@2.1.0
+                            Properties:
+                              X: =0
+                              Y: =8
+                              Width: =96
+                              Height: =40
+                              Text: ="Done"
+                              CheckboxSize: =24
+                              Color: =clrText
+                              Default: =Coalesce(LookUp(colTaskTicks, code = ThisItem.task_code).done, ThisItem.status.Value = "complete")
+                              DisplayMode: =If(fxCanEdit && ThisItem.status.Value <> "cancelled", DisplayMode.Edit, DisplayMode.Disabled)
+                              OnCheck: |-
+                                =RemoveIf(colTaskTicks, code = ThisItem.task_code);
+                                If(ThisItem.status.Value <> "complete", Collect(colTaskTicks, {code: ThisItem.task_code, done: true}))
+                              OnUncheck: |-
+                                =RemoveIf(colTaskTicks, code = ThisItem.task_code);
+                                If(ThisItem.status.Value = "complete", Collect(colTaskTicks, {code: ThisItem.task_code, done: false}))
+                        - lblWeekTaskName:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =100
+                              Y: =6
+                              Width: =Parent.TemplateWidth - 156
+                              Height: =44
+                              Text: =ThisItem.task_name & If(ThisItem.status.Value = "cancelled", " (cancelled)", "")
+                              FontWeight: =FontWeight.Semibold
+                              Color: =clrText
+                              VerticalAlign: =VerticalAlign.Top
+                              Wrap: =true
+                        - lblWeekTaskMeta:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =100
+                              Y: =50
+                              Width: =Parent.TemplateWidth - 156
+                              Height: =30
+                              Size: =11
+                              Color: =clrMuted
+                              Text: |-
+                                =LookUp(fxPriorityLabels, code = ThisItem.priority.Value).label &
+                                ". Raised " & Text(ThisItem.date_raised, "dd mmm") &
+                                If(IsBlank(ThisItem.assigned_to), "", ". " & Coalesce(LookUp(colPeople, email = ThisItem.assigned_to).display_name, ThisItem.assigned_to))
+                        - icnWeekTaskOpen:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              X: =Parent.TemplateWidth - 48
+                              Y: =20
+                              Width: =44
+                              Height: =44
+                              Icon: =Icon.ChevronRight
+                              Color: =clrAccent
+                              AccessibleLabel: |-
+                                ="Open task: " & ThisItem.task_name
+                              TabIndex: =0
+                              OnSelect: =Set(varTask, ThisItem); Set(varTaskNew, false); Navigate(scrTask)
+                        - rectWeekTaskLine:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              X: =0
+                              Y: =Parent.TemplateHeight - 1
+                              Width: =Parent.TemplateWidth
+                              Height: =1
+                              Fill: =ColorValue("#D0D0D0")
+            # ---------- Column 3: problems ----------
+            - conWeekProblems:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =6
+                  FillPortions: =1
+                  LayoutMinWidth: =300
+                  Height: =If(fxIsNarrow, 560, Parent.Height - 32)
+                  Fill: =clrPanel
+                  BorderColor: =clrBorder
+                  BorderThickness: =1
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  PaddingBottom: =12
+                Children:
+                  - conWeekProblemsTop:
+                      Control: GroupContainer@1.3.0
+                      Variant: AutoLayout
+                      Properties:
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        Height: =44
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - lblWeekProblemsHeading:
+                            Control: Label@2.5.1
+                            Properties:
+                              Text: ="Problems (" & CountRows(Filter(colProblems, status.Value = "open")) & " open)"
+                              Role: =TextRole.Heading2
+                              FontWeight: =FontWeight.Semibold
+                              Size: =15
+                              Color: =clrText
+                              FillPortions: =1
+                              Height: =40
+                        - btnWeekAddProblem:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              Text: ="+ Raise problem"
+                              DisplayMode: =If(fxCanEdit, DisplayMode.Edit, DisplayMode.Disabled)
+                              OnSelect: =Set(varProblem, Blank()); Set(varProblemNew, true); Navigate(scrProblem)
+                              Fill: =clrPanel
+                              Color: =clrAccent
+                              BorderColor: =clrAccent
+                              BorderThickness: =1
+                              FocusedBorderThickness: =3
+                              FocusedBorderColor: =clrText
+                              Width: =150
+                              Height: =40
+                  - galWeekProblems:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        Items: |-
+                          =SortByColumns(
+                              AddColumns(colProblems, sort_open, If(status.Value = "open", 0, 1)),
+                              "sort_open", SortOrder.Ascending,
+                              "raised_on", SortOrder.Ascending
+                          )
+                        AccessibleLabel: ="Problems for this team"
+                        TemplateSize: =96
+                        TemplatePadding: =0
+                        FillPortions: =1
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - lblWeekProblemTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =6
+                              Width: =Parent.TemplateWidth - 52
+                              Height: =40
+                              Text: =ThisItem.problem_title & If(ThisItem.status.Value = "closed", " (closed)", "")
+                              FontWeight: =FontWeight.Semibold
+                              Color: =clrText
+                              VerticalAlign: =VerticalAlign.Top
+                              Wrap: =true
+                        - lblWeekProblemMeta:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =46
+                              Width: =Parent.TemplateWidth - 52
+                              Height: =44
+                              Size: =11
+                              Color: =clrMuted
+                              Wrap: =true
+                              Text: |-
+                                ="Impact " & LookUp(fxLevelLabels, code = ThisItem.impact.Value).label &
+                                ", urgency " & LookUp(fxLevelLabels, code = ThisItem.urgency.Value).label &
+                                ". Owner " & Coalesce(LookUp(colPeople, email = ThisItem.problem_owner).display_name, "not set") &
+                                ". Raised by " & Coalesce(LookUp(colPeople, email = ThisItem.raised_by).display_name, ThisItem.raised_by)
+                        - icnWeekProblemOpen:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              X: =Parent.TemplateWidth - 48
+                              Y: =24
+                              Width: =44
+                              Height: =44
+                              Icon: =Icon.ChevronRight
+                              Color: =clrAccent
+                              AccessibleLabel: |-
+                                ="Open problem: " & ThisItem.problem_title
+                              TabIndex: =0
+                              OnSelect: =Set(varProblem, ThisItem); Set(varProblemNew, false); Navigate(scrProblem)
+                        - rectWeekProblemLine:
+                            Control: Rectangle@2.3.0
+                            Properties:
+                              X: =0
+                              Y: =Parent.TemplateHeight - 1
+                              Width: =Parent.TemplateWidth
+                              Height: =1
+                              Fill: =ColorValue("#D0D0D0")
