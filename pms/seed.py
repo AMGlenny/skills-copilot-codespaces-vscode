@@ -7,7 +7,7 @@ import random
 from datetime import date, datetime, time, timedelta, timezone
 
 from . import periods as periods_mod
-from . import rules
+from . import rules, workflow
 
 AS_OF = date(2026, 9, 30)
 FIRST_FY, LAST_FY, DAILY_FROM_FY = 2025, 2026, 2026
@@ -93,6 +93,8 @@ SETTINGS = [
     ("reminder_days_before_expected", "5", "Days before expected_by that updaters get a reminder."),
     ("snapshot_library", "snapshots", "Document library that scheduled exports write to."),
     ("reopen_allowed_role", "admin", "App role allowed to reopen an approved value."),
+    ("measures_app_url", "https://apps.powerapps.com/play/REPLACE-WITH-APP-ID", "Link to the measures app, used in notification emails. Replace after publishing the app."),
+    ("weekly_app_url", "https://apps.powerapps.com/play/REPLACE-WITH-APP-ID", "Link to the weekly updates app."),
 ]
 
 # ---------------------------------------------------------------------------
@@ -511,8 +513,10 @@ def build():
                                             sub_dt=None))
                     sub.update(status="draft", current_version=2)
                     add_audit("submissions", skey, "reopen", "status", "approved", "draft", "sam.patel@" + DOMAIN, reopen_dt)
+                    add_comment(skey, 1, "sam.patel@" + DOMAIN, "reopened",
+                                "Reopened: the owner reported that three late joiners were missed from the count.", reopen_dt)
 
-    # rpt_values: one row per approved submission, built exactly as the flow will.
+    # rpt_values: one row per approved submission, built with the same code the flows mirror.
     owners = {r["measure_code"]: r["email"] for r in roles if r["role"] == "owner"}
     ver_by_key = {v["version_key"]: v for v in versions}
     mby = {x["measure_code"]: x for x in measures}
@@ -521,31 +525,16 @@ def build():
         if s["approved_version"]:
             end = by_key[s["period_key"]]["end_date"]
             latest_end[s["measure_code"]] = max(latest_end.get(s["measure_code"], end), end)
-    ref_index = {(r["measure_code"], r["period_key"], r["ref_type"]): r["ref_value"] for r in refs}
     for s in subs:
         if not s["approved_version"]:
             continue
         v = ver_by_key[f"{s['submission_key']}|v{s['approved_version']}"]
         mm, p = mby[s["measure_code"]], by_key[s["period_key"]]
-        ref = lambda t: ref_index.get((s["measure_code"], s["period_key"], t))
-        rpt.append(dict(
-            submission_key=s["submission_key"], measure_code=mm["measure_code"], measure_name=mm["measure_name"],
-            source_ref=mm["source_ref"], parent_measure_code=mm["parent_measure_code"],
-            measure_class=mm["measure_class"], measure_type=mm["measure_type"], category=mm["category"],
-            unit=mm["unit"], polarity=mm["polarity"], frequency=mm["frequency"],
-            aggregation_method=mm["aggregation_method"], owner_name=names[owners[mm["measure_code"]]],
-            owner_email=owners[mm["measure_code"]], org_unit_key=mm["org_unit_key"],
-            period_key=p["period_key"], period_type=p["period_type"], period_label=p["period_label"],
-            period_start=p["start_date"], period_end=p["end_date"], financial_year=p["financial_year"],
-            financial_quarter=p["financial_quarter"], value_number=v["value_number"], value_text=v["value_text"],
-            value_missing=v["value_missing"], narrative=v["narrative"], data_quality=v["data_quality"],
-            version_no=v["version_no"], approved_by=s["approved_by"], approved_date=s["approved_date"],
-            target_value=ref("target"),
-            tolerance_value=ref("tolerance") if mm["measure_class"] in ("kpi", "okr") else None,
-            baseline_value=ref("baseline"), capacity_value=ref("capacity"),
-            rag_status=v["rag_status"], is_latest=p["end_date"] == latest_end[mm["measure_code"]],
-            refreshed_at=_dt(AS_OF, 6),
-        ))
+        refs_here = {r["ref_type"]: r["ref_value"] for r in refs
+                     if r["measure_code"] == s["measure_code"] and r["period_key"] == s["period_key"]}
+        owner = owners[mm["measure_code"]]
+        rpt.append(workflow.rpt_row(s, v, mm, p, owner, names[owner], refs_here,
+                                    p["end_date"] == latest_end[mm["measure_code"]], _dt(AS_OF, 6)))
 
     data.update(reference_values=refs, submissions=subs, submission_versions=versions,
                 review_comments=comments, audit_log=audit, rpt_values=rpt)

@@ -2205,7 +2205,7 @@
     "__metadata": {
      "type": "SP.XmlSchemaFieldCreationInformation"
     },
-    "SchemaXml": "<Field Type=\"Choice\" Name=\"action\" StaticName=\"action\" DisplayName=\"action\" Description=\"returned, approved or comment.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>returned</CHOICE><CHOICE>approved</CHOICE><CHOICE>comment</CHOICE></CHOICES></Field>",
+    "SchemaXml": "<Field Type=\"Choice\" Name=\"action\" StaticName=\"action\" DisplayName=\"action\" Description=\"returned, approved, reopened or comment. Returning and reopening need a comment.\" Required=\"TRUE\" Format=\"Dropdown\" FillInChoice=\"FALSE\"><CHOICES><CHOICE>returned</CHOICE><CHOICE>approved</CHOICE><CHOICE>reopened</CHOICE><CHOICE>comment</CHOICE></CHOICES></Field>",
     "Options": 24
    }
   }
@@ -4027,7 +4027,7 @@
     "type": "SP.Field"
    },
    "Title": "audit_ref",
-   "Description": "Reference, e.g. AUD-0000001.",
+   "Description": "Reference. Flows use AUD- plus a GUID.",
    "Indexed": true,
    "Required": true
   }

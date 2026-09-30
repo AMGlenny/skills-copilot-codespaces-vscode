@@ -37,7 +37,7 @@ SUBMISSION_STATUSES = ["not_started", "draft", "submitted", "returned", "approve
 VERSION_STATUSES = ["draft", "submitted", "returned", "approved", "superseded"]
 DATA_QUALITY = ["verified", "provisional", "estimated", "unverified"]
 RAG_STATUSES = ["green", "amber", "red", "no_target", "no_data", "not_applicable"]
-REVIEW_ACTIONS = ["returned", "approved", "comment"]
+REVIEW_ACTIONS = ["returned", "approved", "reopened", "comment"]
 AUDIT_ACTIONS = ["create", "edit", "status_change", "reopen", "retire"]
 UNIT_LEVELS = ["workstream", "team", "sub_team"]
 WORKLOAD = ["light", "manageable", "heavy", "overloaded"]
@@ -262,7 +262,7 @@ LISTS = [
             Col("submission_key", "text", "Submission.", required=True, indexed=True, ref="submissions.submission_key"),
             Col("version_no", "integer", "Version the comment was made on.", required=True),
             Col("reviewer_email", "text", "Reviewer.", required=True, indexed=True, ref="people.email"),
-            Col("action", "choice", "returned, approved or comment.", required=True, choices=REVIEW_ACTIONS),
+            Col("action", "choice", "returned, approved, reopened or comment. Returning and reopening need a comment.", required=True, choices=REVIEW_ACTIONS),
             Col("comment", "note", "The comment. Required when returning."),
             Col("comment_date", "datetime", "When the comment was made.", required=True),
             Col("resolved", "bool", "Yes once the updater has dealt with it.", default=False, indexed=True),
@@ -402,7 +402,7 @@ LISTS = [
     ListDef(
         "audit_log", "shared",
         "Every create, edit and status change: who, when, old and new value. Written only by flows.",
-        "audit_ref", "Reference, e.g. AUD-0000001.",
+        "audit_ref", "Reference. Flows use AUD- plus a GUID.",
         [
             Col("list_name", "text", "List that changed.", required=True, indexed=True),
             Col("item_key", "text", "Key of the item that changed.", required=True, indexed=True),

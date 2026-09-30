@@ -21,8 +21,8 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 |---|---|---|
 | 1. Data foundation | Lists, columns, indexes, views, periods, sample data, data dictionary, setup | **Done** |
 | 2. Weekly updates app | Daily and weekly tool for tasks, problems, successes, workload and wellbeing | **Done**: [build guide](docs/weekly_app_guide.md) |
-| 3. Measures app | Entry, review, versions, audit, notifications, RAG, admin screens | Next |
-| 4. Exports | On-demand CSV and xlsx with a data dictionary, scheduled snapshots, quarterly report pack, AI prompt template | |
+| 3. Measures app | Entry, review, versions, audit, notifications, reminders, RAG, target setting | **Done**: [build guide](docs/measures_app_guide.md) |
+| 4. Exports | On-demand CSV and xlsx with a data dictionary, scheduled snapshots, quarterly report pack, AI prompt template | Next |
 | 5. Hardening | WCAG 2.2 AA checks, mobile, volume testing | |
 
 ## Getting started
@@ -30,7 +30,8 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 1. Follow [docs/setup_guide.md](docs/setup_guide.md). One Power Automate flow creates everything on your SharePoint site and loads the sample data. No IT request or premium licence is needed.
 2. Read [docs/data_model.md](docs/data_model.md) for how the data fits together.
 3. Build the weekly updates app with [docs/weekly_app_guide.md](docs/weekly_app_guide.md).
-4. To add a measure, see [docs/adding_a_measure.md](docs/adding_a_measure.md).
+4. Build the measures app and its flows with [docs/measures_app_guide.md](docs/measures_app_guide.md).
+5. To add a measure, see [docs/adding_a_measure.md](docs/adding_a_measure.md).
 
 ## What's in the repository
 
@@ -38,14 +39,15 @@ It runs on SharePoint Online lists for the data, a Power Apps canvas app for ent
 |---|---|
 | `pms/schema.py` | **Single source of truth** for every list, column, choice and view |
 | `pms/periods.py` | Period calendar: financial year (Apr to Mar), calendar year, academic year, terms, weeks, fortnights |
-| `pms/rules.py` | Business rules (RAG, validation, expected-by dates). The apps and flows must match these. |
+| `pms/rules.py` | Business rules (RAG, validation, expected-by dates, weekly carry-forward, wellbeing visibility). The apps and flows must match these. |
+| `pms/workflow.py` | The approval workflow (who can do what, versions, audit, reporting rows, scheduled jobs). The flows mirror it step by step. |
 | `pms/seed.py` | Fictional sample data covering every frequency and workflow state |
 | `pms/sharepoint.py`, `pms/docs.py` | Generators for the setup requests, data dictionary and diagram |
 | `dist/setup/*.json` | Setup requests, run by the setup flow or the PnP script |
 | `dist/seed_csv/*.csv` | Sample data as tidy CSV, one file per table. Handy for testing Power BI. |
 | `dist/data_dictionary.csv` | Every column, with its type, allowed values and links |
 | `docs/` | Guides, data model, generated data dictionary and diagram |
-| `powerapps/weekly/` | Weekly updates app: app formulas and four screens as YAML to paste into Power Apps Studio |
+| `powerapps/weekly/`, `powerapps/measures/` | The two apps: app formulas and screens as YAML to paste into Power Apps Studio |
 | `flows/` | Step-by-step builds for Power Automate flows |
 | `scripts/Invoke-PmsSetup.ps1` | PnP PowerShell alternative to the setup flow |
 | `tests/` | Checks that the schema, rules, data and app source are consistent |
@@ -95,6 +97,7 @@ The tests check, among other things:
 
 ## Later (deliberately not built)
 
+- App screens for editing measures, people, roles and periods (admins use the SharePoint list forms for now)
 - Automatic roll-up of child values into parent measures
 - Formatted report packs (PDF or Word)
 - Power BI template with ready-made visuals

@@ -7,3 +7,5 @@ archive_closed_after_days,730,Closed tasks and problems older than this move to 
 reminder_days_before_expected,5,Days before expected_by that updaters get a reminder.
 snapshot_library,snapshots,Document library that scheduled exports write to.
 reopen_allowed_role,admin,App role allowed to reopen an approved value.
+measures_app_url,https://apps.powerapps.com/play/REPLACE-WITH-APP-ID,"Link to the measures app, used in notification emails. Replace after publishing the app."
+weekly_app_url,https://apps.powerapps.com/play/REPLACE-WITH-APP-ID,Link to the weekly updates app.

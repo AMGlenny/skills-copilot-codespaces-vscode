@@ -1,0 +1,740 @@
+# =====================================================================
+# Screen: scrMeasSubmission (enter, review, or view one value)
+#
+# One screen for everyone. What you can do depends on your role and the
+# value's status (the same rules as allowed_actions() in pms/workflow.py):
+#   updater + not_started/draft/returned -> edit, save draft, submit
+#   approver + submitted (not own entry) -> approve or return with comment
+#   admin + approved                     -> reopen with reason
+# Everyone else sees it read-only. Review comments are shown alongside the
+# narrative, never inside it.
+#
+# Needs the PMSSaveValue and PMSReview flows added to the app first.
+#
+# 1. Add a blank screen and rename it scrMeasSubmission.
+# 2. Screen properties:
+#      Fill:      =clrPage
+#      OnVisible: =Select(btnSubLoad)
+# 3. Copy everything below, right-click scrMeasSubmission, "Paste code".
+# =====================================================================
+- conSub:
+    Control: GroupContainer@1.3.0
+    Variant: AutoLayout
+    Properties:
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+      LayoutDirection: =LayoutDirection.Vertical
+      Fill: =clrPage
+    Children:
+      - conSubHeader:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =64
+            Fill: =clrHeader
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutGap: =8
+            PaddingLeft: =8
+            PaddingRight: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - icnSubBack:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  Icon: =Icon.ArrowLeft
+                  Color: =Color.White
+                  Width: =44
+                  Height: =44
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =10
+                  PaddingBottom: =10
+                  AccessibleLabel: ="Back to my measures"
+                  TabIndex: =0
+                  OnSelect: =Navigate(scrMeasHome)
+            - lblSubTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Text: =varMeasure.source_ref & "  " & varMeasure.measure_name
+                  Role: =TextRole.Heading1
+                  Color: =Color.White
+                  FontWeight: =FontWeight.Semibold
+                  Size: =17
+                  Height: =44
+                  FillPortions: =1
+            - btnSubLoad:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Visible: =false
+                  Width: =1
+                  Height: =1
+                  OnSelect: |-
+                    =Set(varSub, LookUp(submissions, submission_key = varSubKey));
+                    Set(varMeasure, LookUp(measures, measure_code = varSub.measure_code));
+                    Set(varPeriod, LookUp(periods, period_key = varSub.period_key));
+                    ClearCollect(colVersions, Filter(submission_versions, submission_key = varSubKey));
+                    Set(varCurrent, LookUp(colVersions, version_no = varSub.current_version));
+                    ClearCollect(colComments, Filter(review_comments, submission_key = varSubKey));
+                    ClearCollect(colRefs, Filter(reference_values, measure_code = varSub.measure_code && period_key = varSub.period_key && active = true));
+                    ClearCollect(colHistory, FirstN(SortByColumns(Filter(rpt_values, measure_code = varSub.measure_code), "period_end", SortOrder.Descending), 6));
+                    Set(varIsUpdater, !IsBlank(LookUp(colMyRoles, measure_code = varSub.measure_code && role.Value = "updater")));
+                    Set(varIsApprover, !IsBlank(LookUp(colMyRoles, measure_code = varSub.measure_code && role.Value = "approver")));
+                    Set(varCanEdit, varIsUpdater && varSub.status.Value in ["not_started", "draft", "returned"]);
+                    Set(varCanReview, varIsApprover && varSub.status.Value = "submitted" && varCurrent.entered_by <> fxMe);
+                    Set(varCanReopen, fxIsAdmin && varSub.status.Value = "approved");
+                    Reset(chkSubMissing); Reset(txtSubValue); Reset(ddSubYesNo); Reset(txtSubValueText);
+                    Reset(txtSubNarrative); Reset(ddSubQuality); Reset(txtSubReviewComment); Reset(txtSubReopenReason)
+      - conSubStatus:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =56
+            Fill: =clrPanel
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutAlignItems: =LayoutAlignItems.Center
+            PaddingLeft: =16
+            PaddingRight: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - lblSubStatus:
+                Control: Label@2.5.1
+                Properties:
+                  Live: =Live.Polite
+                  Color: =clrText
+                  FillPortions: =1
+                  Height: =48
+                  Wrap: =true
+                  Text: |-
+                    =varPeriod.period_label & ". Status: " & LookUp(fxStatusLabels, code = varSub.status.Value).label &
+                    If(IsBlank(varSub.expected_by), "", ". Expected by " & Text(varSub.expected_by, "dd mmm yyyy")) &
+                    If(!IsBlank(varSub.approved_version) && varSub.status.Value <> "approved",
+                       ". Reports still show approved version " & varSub.approved_version & " until a new one is approved.", "")
+      - conSubBody:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            FillPortions: =1
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutWrap: =true
+            LayoutGap: =16
+            LayoutOverflowY: =LayoutOverflow.Scroll
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =16
+            PaddingBottom: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            # ---------------- Left: the value ----------------
+            - conSubValue:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =6
+                  FillPortions: =1
+                  LayoutMinWidth: =320
+                  Height: =If(fxIsNarrow, 900, Parent.Height - 32)
+                  LayoutOverflowY: =LayoutOverflow.Scroll
+                  Fill: =clrPanel
+                  BorderColor: =clrBorder
+                  BorderThickness: =1
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  PaddingBottom: =12
+                Children:
+                  - lblSubValueHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Value"
+                        Role: =TextRole.Heading2
+                        FontWeight: =FontWeight.Semibold
+                        Size: =15
+                        Color: =clrText
+                        Height: =32
+                  - lblSubAbout:
+                      Control: Label@2.5.1
+                      Properties:
+                        AutoHeight: =true
+                        Size: =11
+                        Color: =clrMuted
+                        Text: |-
+                          =varMeasure.definition & Char(10) &
+                          "Unit: " & varMeasure.unit.Value & If(varMeasure.unit.Value = "percent", " (enter 58 for 58%)", "") &
+                          ". " & Switch(varMeasure.polarity.Value, "higher_is_better", "Higher is better", "lower_is_better", "Lower is better", "No better direction") & "."
+                  - lblSubRefs:
+                      Control: Label@2.5.1
+                      Properties:
+                        AutoHeight: =true
+                        Color: =clrText
+                        Text: |-
+                          =With(
+                              {
+                                  t: LookUp(colRefs, ref_type.Value = "target").ref_value,
+                                  tol: LookUp(colRefs, ref_type.Value = "tolerance").ref_value,
+                                  b: LookUp(colRefs, ref_type.Value = "baseline").ref_value,
+                                  c: LookUp(colRefs, ref_type.Value = "capacity").ref_value
+                              },
+                              If(IsBlank(t), "No target set", "Target: " & t) &
+                              If(varMeasure.measure_class.Value in ["kpi", "okr"],
+                                 If(IsBlank(tol), "", ". Tolerance: " & tol),
+                                 ". Tolerance: not used (not a KPI or OKR)") &
+                              If(IsBlank(b), "", ". Baseline: " & b) &
+                              If(IsBlank(c), "", ". Capacity: " & c)
+                          )
+                  - chkSubMissing:
+                      Control: Classic/CheckBox@2.1.0
+                      Properties:
+                        Text: ="No value available for this period"
+                        Default: =varCurrent.value_missing
+                        CheckboxSize: =24
+                        Color: =clrText
+                        DisplayMode: =If(varCanEdit, DisplayMode.Edit, DisplayMode.View)
+                        Height: =40
+                  - lblSubValue:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =!chkSubMissing.Value
+                        Text: =If(varMeasure.unit.Value = "text", "Value (text)", "Value")
+                        Color: =clrText
+                        Height: =24
+                  - txtSubValue:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        Visible: =!chkSubMissing.Value && !(varMeasure.unit.Value in ["text", "yes_no"])
+                        Default: =If(IsBlank(varCurrent.value_number), "", Text(varCurrent.value_number))
+                        Format: =TextFormat.Number
+                        AccessibleLabel: ="Value, " & varMeasure.unit.Value
+                        DisplayMode: =If(varCanEdit, DisplayMode.Edit, DisplayMode.View)
+                        BorderColor: =clrBorder
+                        Height: =40
+                  - ddSubYesNo:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        Visible: =!chkSubMissing.Value && varMeasure.unit.Value = "yes_no"
+                        Items: =["Yes", "No"]
+                        AllowEmptySelection: =true
+                        Default: =If(varCurrent.value_number = 1, "Yes", varCurrent.value_number = 0, "No", "")
+                        AccessibleLabel: ="Value, yes or no"
+                        DisplayMode: =If(varCanEdit, DisplayMode.Edit, DisplayMode.View)
+                        BorderColor: =clrBorder
+                        Height: =40
+                  - txtSubValueText:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        Visible: =!chkSubMissing.Value && varMeasure.unit.Value = "text"
+                        Default: =varCurrent.value_text
+                        Mode: =TextMode.MultiLine
+                        AccessibleLabel: ="Value, text"
+                        DisplayMode: =If(varCanEdit, DisplayMode.Edit, DisplayMode.View)
+                        BorderColor: =clrBorder
+                        Height: =110
+                  - lblSubNarrative:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Narrative (required if there's no value or it's off track)"
+                        Color: =clrText
+                        Height: =24
+                  - txtSubNarrative:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        Default: =varCurrent.narrative
+                        Mode: =TextMode.MultiLine
+                        HintText: ="What's behind the figure, and what's being done about it"
+                        AccessibleLabel: ="Narrative"
+                        DisplayMode: =If(varCanEdit, DisplayMode.Edit, DisplayMode.View)
+                        BorderColor: =clrBorder
+                        Height: =150
+                  - lblSubQuality:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Data quality"
+                        Color: =clrText
+                        Height: =24
+                  - ddSubQuality:
+                      Control: Classic/DropDown@2.3.1
+                      Properties:
+                        Items: =fxQualityLabels
+                        Value: =label
+                        Default: |-
+                          =Coalesce(LookUp(fxQualityLabels, code = varCurrent.data_quality.Value).label, "Unverified: not yet checked")
+                        AccessibleLabel: ="Data quality"
+                        DisplayMode: =If(varCanEdit, DisplayMode.Edit, DisplayMode.View)
+                        BorderColor: =clrBorder
+                        Height: =40
+                  # Hidden helpers so the value, RAG and errors are worked out once.
+                  - lblSubValueParam:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =false
+                        Height: =1
+                        Text: |-
+                          =If(chkSubMissing.Value || varMeasure.unit.Value = "text", "",
+                             varMeasure.unit.Value = "yes_no", If(ddSubYesNo.Selected.Value = "Yes", "1", ddSubYesNo.Selected.Value = "No", "0", ""),
+                             Trim(txtSubValue.Text))
+                  - lblSubTextParam:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =false
+                        Height: =1
+                        Text: =If(chkSubMissing.Value || varMeasure.unit.Value <> "text", "", Trim(txtSubValueText.Text))
+                  - lblSubRag:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =false
+                        Height: =1
+                        Text: |-
+                          =// Same rules as rag_status() in pms/rules.py.
+                          With(
+                              {
+                                  v: If(IsBlank(lblSubValueParam.Text) || IsError(Value(lblSubValueParam.Text)), Blank(), Value(lblSubValueParam.Text)),
+                                  t: LookUp(colRefs, ref_type.Value = "target").ref_value,
+                                  tol: If(varMeasure.measure_class.Value in ["kpi", "okr"], LookUp(colRefs, ref_type.Value = "tolerance").ref_value, Blank()),
+                                  hi: varMeasure.polarity.Value = "higher_is_better"
+                              },
+                              If(
+                                  varMeasure.unit.Value = "text" || varMeasure.polarity.Value = "neither", "not_applicable",
+                                  chkSubMissing.Value || IsBlank(v), "no_data",
+                                  IsBlank(t) && IsBlank(tol), "no_target",
+                                  !IsBlank(t), If(If(hi, v >= t, v <= t), "green", !IsBlank(tol) && If(hi, v >= tol, v <= tol), "amber", "red"),
+                                  If(If(hi, v >= tol, v <= tol), "green", "red")
+                              )
+                          )
+                  - lblSubRagShown:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =varMeasure.unit.Value <> "text"
+                        Live: =Live.Polite
+                        FontWeight: =FontWeight.Semibold
+                        Height: =32
+                        Color: =Switch(lblSubRag.Text, "green", clrGreen, "amber", clrAmber, "red", clrRed, clrMuted)
+                        Text: |-
+                          ="RAG: " & LookUp(fxRagLabels, code = lblSubRag.Text).label
+                  - lblSubErrors:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =varCanEdit && !IsBlank(Self.Text)
+                        Live: =Live.Polite
+                        AutoHeight: =true
+                        Color: =clrError
+                        Text: |-
+                          =// Same rules as validate_value() in pms/rules.py.
+                          With(
+                              {
+                                  u: varMeasure.unit.Value,
+                                  miss: chkSubMissing.Value,
+                                  raw: lblSubValueParam.Text,
+                                  nar: Trim(txtSubNarrative.Text)
+                              },
+                              Concat(
+                                  Filter(
+                                      Table(
+                                          {m: "Add a narrative explaining why there is no value.", show: miss && IsBlank(nar)},
+                                          {m: "Enter a text value.", show: !miss && u = "text" && IsBlank(lblSubTextParam.Text)},
+                                          {m: "Choose yes or no.", show: !miss && u = "yes_no" && IsBlank(raw)},
+                                          {m: "Enter a value, or tick 'No value available'.", show: !miss && !(u in ["text", "yes_no"]) && IsBlank(raw)},
+                                          {m: "Enter a number, for example 58 or 1250.5.", show: !miss && !IsBlank(raw) && IsError(Value(raw))},
+                                          {m: "Counts must be whole numbers of 0 or more.", show: !miss && u = "count" && !IsBlank(raw) && !IsError(Value(raw)) && (Value(raw) < 0 || Value(raw) <> RoundDown(Value(raw), 0))},
+                                          {m: "Add a narrative: the value is off track.", show: !miss && lblSubRag.Text in ["amber", "red"] && IsBlank(nar)}
+                                      ),
+                                      show
+                                  ),
+                                  m,
+                                  Char(10)
+                              )
+                          )
+                  - lblSubLocked:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =!varCanEdit
+                        AutoHeight: =true
+                        Color: =clrMuted
+                        Text: |-
+                          =If(
+                              varSub.status.Value = "submitted", "Submitted for review. It's locked until the approver approves it or returns it.",
+                              varSub.status.Value = "approved", "Approved and locked." & If(fxIsAdmin, " You can reopen it on the right.", " An admin can reopen it if it needs correcting."),
+                              !varIsUpdater, "Only this measure's updaters can enter the value.",
+                              ""
+                          )
+                  - conSubButtons:
+                      Control: GroupContainer@1.3.0
+                      Variant: AutoLayout
+                      Properties:
+                        Visible: =varCanEdit
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =12
+                        Height: =48
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - btnSubDraft:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              Text: =If(varBusy, "Saving...", "Save draft")
+                              DisplayMode: =If(varBusy, DisplayMode.Disabled, DisplayMode.Edit)
+                              Fill: =clrPanel
+                              Color: =clrAccent
+                              BorderColor: =clrAccent
+                              BorderThickness: =1
+                              FocusedBorderThickness: =3
+                              FocusedBorderColor: =clrText
+                              Width: =140
+                              Height: =44
+                              OnSelect: |-
+                                =If(
+                                    !IsBlank(lblSubValueParam.Text) && IsError(Value(lblSubValueParam.Text)),
+                                    Notify("Enter a number, for example 58 or 1250.5.", NotificationType.Error),
+                                    Set(varBusy, true);
+                                    Set(varResult, ParseJSON(PMSSaveValue.Run(
+                                        varSubKey, "false", lblSubValueParam.Text, lblSubTextParam.Text,
+                                        If(chkSubMissing.Value, "true", "false"), Trim(txtSubNarrative.Text), ddSubQuality.Selected.code
+                                    ).result));
+                                    Set(varBusy, false);
+                                    If(Boolean(varResult.ok),
+                                       Notify(Text(varResult.message), NotificationType.Success); Select(btnSubLoad),
+                                       Notify(Text(varResult.message), NotificationType.Error))
+                                )
+                        - btnSubSubmit:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              Text: =If(varBusy, "Saving...", "Submit for review")
+                              DisplayMode: =If(varBusy, DisplayMode.Disabled, DisplayMode.Edit)
+                              Fill: =clrAccent
+                              Color: =Color.White
+                              HoverFill: =clrAccentDark
+                              FocusedBorderThickness: =3
+                              FocusedBorderColor: =clrText
+                              Width: =180
+                              Height: =44
+                              OnSelect: |-
+                                =If(
+                                    !IsBlank(lblSubErrors.Text),
+                                    Notify("Please fix the points listed above before submitting.", NotificationType.Error),
+                                    Set(varBusy, true);
+                                    Set(varResult, ParseJSON(PMSSaveValue.Run(
+                                        varSubKey, "true", lblSubValueParam.Text, lblSubTextParam.Text,
+                                        If(chkSubMissing.Value, "true", "false"), Trim(txtSubNarrative.Text), ddSubQuality.Selected.code
+                                    ).result));
+                                    Set(varBusy, false);
+                                    If(Boolean(varResult.ok),
+                                       Notify(Text(varResult.message), NotificationType.Success); Select(btnSubLoad),
+                                       Notify(Text(varResult.message), NotificationType.Error))
+                                )
+            # ---------------- Right: review, versions, history ----------------
+            - conSubSide:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =8
+                  FillPortions: =1
+                  LayoutMinWidth: =320
+                  Height: =If(fxIsNarrow, 1100, Parent.Height - 32)
+                  LayoutOverflowY: =LayoutOverflow.Scroll
+                  Fill: =clrPanel
+                  BorderColor: =clrBorder
+                  BorderThickness: =1
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  PaddingBottom: =12
+                Children:
+                  # Review (approvers)
+                  - lblSubReviewHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =varCanReview
+                        Text: ="Your review"
+                        Role: =TextRole.Heading2
+                        FontWeight: =FontWeight.Semibold
+                        Size: =15
+                        Color: =clrText
+                        Height: =32
+                  - txtSubReviewComment:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        Visible: =varCanReview
+                        Mode: =TextMode.MultiLine
+                        HintText: ="Comment (required to return, optional to approve). Kept separate from the narrative and never exported."
+                        AccessibleLabel: ="Review comment. Required to return for changes."
+                        BorderColor: =clrBorder
+                        Height: =90
+                  - conSubReviewButtons:
+                      Control: GroupContainer@1.3.0
+                      Variant: AutoLayout
+                      Properties:
+                        Visible: =varCanReview
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =12
+                        Height: =48
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - btnSubApprove:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              Text: =If(varBusy, "Saving...", "Approve")
+                              DisplayMode: =If(varBusy, DisplayMode.Disabled, DisplayMode.Edit)
+                              Fill: =clrAccent
+                              Color: =Color.White
+                              HoverFill: =clrAccentDark
+                              FocusedBorderThickness: =3
+                              FocusedBorderColor: =clrText
+                              Width: =130
+                              Height: =44
+                              OnSelect: |-
+                                =Set(varBusy, true);
+                                Set(varResult, ParseJSON(PMSReview.Run(varSubKey, "approve", Trim(txtSubReviewComment.Text)).result));
+                                Set(varBusy, false);
+                                If(Boolean(varResult.ok),
+                                   Notify(Text(varResult.message), NotificationType.Success); Select(btnSubLoad),
+                                   Notify(Text(varResult.message), NotificationType.Error))
+                        - btnSubReturn:
+                            Control: Classic/Button@2.2.0
+                            Properties:
+                              Text: =If(varBusy, "Saving...", "Return for changes")
+                              DisplayMode: =If(varBusy, DisplayMode.Disabled, DisplayMode.Edit)
+                              Fill: =clrPanel
+                              Color: =clrError
+                              BorderColor: =clrError
+                              BorderThickness: =1
+                              FocusedBorderThickness: =3
+                              FocusedBorderColor: =clrText
+                              Width: =180
+                              Height: =44
+                              OnSelect: |-
+                                =If(
+                                    IsBlank(Trim(txtSubReviewComment.Text)),
+                                    Notify("Add a comment so the updater knows what to change.", NotificationType.Error),
+                                    Set(varBusy, true);
+                                    Set(varResult, ParseJSON(PMSReview.Run(varSubKey, "return", Trim(txtSubReviewComment.Text)).result));
+                                    Set(varBusy, false);
+                                    If(Boolean(varResult.ok),
+                                       Notify(Text(varResult.message), NotificationType.Success); Select(btnSubLoad),
+                                       Notify(Text(varResult.message), NotificationType.Error))
+                                )
+                  - lblSubOwnEntry:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =varIsApprover && varSub.status.Value = "submitted" && varCurrent.entered_by = fxMe
+                        AutoHeight: =true
+                        Color: =clrMuted
+                        Text: ="You entered this value, so another approver needs to review it."
+                  # Reopen (admins)
+                  - txtSubReopenReason:
+                      Control: Classic/TextInput@2.3.2
+                      Properties:
+                        Visible: =varCanReopen
+                        Mode: =TextMode.MultiLine
+                        HintText: ="Why does this approved value need reopening? (required)"
+                        AccessibleLabel: ="Reason for reopening, required"
+                        BorderColor: =clrBorder
+                        Height: =70
+                  - btnSubReopen:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Visible: =varCanReopen
+                        Text: =If(varBusy, "Saving...", "Reopen for correction")
+                        DisplayMode: =If(varBusy, DisplayMode.Disabled, DisplayMode.Edit)
+                        Fill: =clrPanel
+                        Color: =clrAccent
+                        BorderColor: =clrAccent
+                        BorderThickness: =1
+                        FocusedBorderThickness: =3
+                        FocusedBorderColor: =clrText
+                        Width: =200
+                        Height: =44
+                        OnSelect: |-
+                          =If(
+                              IsBlank(Trim(txtSubReopenReason.Text)),
+                              Notify("Give a reason for reopening.", NotificationType.Error),
+                              Set(varBusy, true);
+                              Set(varResult, ParseJSON(PMSReview.Run(varSubKey, "reopen", Trim(txtSubReopenReason.Text)).result));
+                              Set(varBusy, false);
+                              If(Boolean(varResult.ok),
+                                 Notify(Text(varResult.message), NotificationType.Success); Select(btnSubLoad),
+                                 Notify(Text(varResult.message), NotificationType.Error))
+                          )
+                  # Review comments
+                  - lblSubCommentsHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Review comments (" & CountRows(colComments) & ")"
+                        Role: =TextRole.Heading2
+                        FontWeight: =FontWeight.Semibold
+                        Size: =15
+                        Color: =clrText
+                        Height: =32
+                  - galSubComments:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        Items: =SortByColumns(colComments, "comment_date", SortOrder.Descending)
+                        AccessibleLabel: ="Review comments"
+                        TemplateSize: =96
+                        TemplatePadding: =0
+                        Height: =200
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - lblSubCommentWho:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =2
+                              Width: =Parent.TemplateWidth
+                              Height: =26
+                              Size: =11
+                              FontWeight: =FontWeight.Semibold
+                              Color: =clrText
+                              Text: |-
+                                =Proper(ThisItem.action.Value) & " by " &
+                                Coalesce(LookUp(colPeople, email = ThisItem.reviewer_email).display_name, ThisItem.reviewer_email) &
+                                ", " & Text(ThisItem.comment_date, "dd mmm yyyy") & " (version " & ThisItem.version_no & "). " &
+                                If(ThisItem.resolved, "Resolved", "Open")
+                        - lblSubCommentText:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =28
+                              Width: =Parent.TemplateWidth
+                              Height: =64
+                              Wrap: =true
+                              VerticalAlign: =VerticalAlign.Top
+                              Color: =clrText
+                              Text: =ThisItem.comment
+                  # Versions and what changed
+                  - lblSubVersionsHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Versions (" & CountRows(colVersions) & ")"
+                        Role: =TextRole.Heading2
+                        FontWeight: =FontWeight.Semibold
+                        Size: =15
+                        Color: =clrText
+                        Height: =32
+                  - galSubVersions:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        Items: =SortByColumns(colVersions, "version_no", SortOrder.Descending)
+                        AccessibleLabel: ="Versions of this value, newest first"
+                        TemplateSize: =180
+                        TemplatePadding: =0
+                        Height: =360
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - lblSubVersionHead:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =2
+                              Width: =Parent.TemplateWidth
+                              Height: =26
+                              FontWeight: =FontWeight.Semibold
+                              Color: =clrText
+                              Text: |-
+                                ="Version " & ThisItem.version_no & ": " & Proper(ThisItem.version_status.Value) & ", " &
+                                Coalesce(LookUp(colPeople, email = ThisItem.entered_by).display_name, ThisItem.entered_by) & ", " &
+                                Text(Coalesce(ThisItem.submitted_date, ThisItem.entered_date), "dd mmm yyyy hh:mm")
+                        - lblSubVersionValue:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =28
+                              Width: =Parent.TemplateWidth
+                              Height: =26
+                              Size: =11
+                              Color: =clrText
+                              Text: |-
+                                ="Value: " & If(ThisItem.value_missing, "none", Coalesce(Text(ThisItem.value_number), ThisItem.value_text, "blank")) &
+                                ". Quality: " & ThisItem.data_quality.Value &
+                                If(IsBlank(ThisItem.rag_status.Value), "", ". RAG: " & ThisItem.rag_status.Value)
+                        - lblSubVersionChanges:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =54
+                              Width: =Parent.TemplateWidth
+                              Height: =40
+                              Size: =11
+                              Wrap: =true
+                              Color: =clrAccentDark
+                              Text: |-
+                                =With(
+                                    {p: LookUp(colVersions, version_no = ThisItem.version_no - 1)},
+                                    If(
+                                        IsBlank(p),
+                                        "First version.",
+                                        "Changed since version " & p.version_no & ": " &
+                                        Coalesce(
+                                            Concat(
+                                                Filter(
+                                                    Table(
+                                                        {n: "value (" & Coalesce(Text(p.value_number), p.value_text, "blank") & " to " & Coalesce(Text(ThisItem.value_number), ThisItem.value_text, "blank") & ")",
+                                                         c: p.value_number <> ThisItem.value_number || p.value_text <> ThisItem.value_text},
+                                                        {n: "no-value flag", c: p.value_missing <> ThisItem.value_missing},
+                                                        {n: "narrative", c: p.narrative <> ThisItem.narrative},
+                                                        {n: "data quality", c: p.data_quality.Value <> ThisItem.data_quality.Value}
+                                                    ),
+                                                    c
+                                                ),
+                                                n,
+                                                ", "
+                                            ),
+                                            "nothing"
+                                        ) & "."
+                                    )
+                                )
+                        - lblSubVersionNarrative:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =94
+                              Width: =Parent.TemplateWidth
+                              Height: =80
+                              Size: =11
+                              Wrap: =true
+                              VerticalAlign: =VerticalAlign.Top
+                              Color: =clrMuted
+                              Text: |-
+                                ="Narrative: " & Coalesce(ThisItem.narrative, "none")
+                  # Recent approved values for context
+                  - lblSubHistoryHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Recent approved values"
+                        Role: =TextRole.Heading2
+                        FontWeight: =FontWeight.Semibold
+                        Size: =15
+                        Color: =clrText
+                        Height: =32
+                  - galSubHistory:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        Items: =colHistory
+                        AccessibleLabel: ="Recent approved values"
+                        TemplateSize: =36
+                        TemplatePadding: =0
+                        Height: =220
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - lblSubHistoryRow:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =0
+                              Width: =Parent.TemplateWidth
+                              Height: =36
+                              Size: =11
+                              Color: =clrText
+                              Text: |-
+                                =ThisItem.period_label & ": " &
+                                If(ThisItem.value_missing, "no value",
+                                   ThisItem.unit = "text", "see narrative",
+                                   ThisItem.unit = "yes_no", If(ThisItem.value_number = 1, "Yes", "No"),
+                                   ThisItem.unit = "percent", Text(ThisItem.value_number, "0.0") & "%",
+                                   ThisItem.unit = "gbp", "£" & Text(ThisItem.value_number, "#,##0"),
+                                   Text(ThisItem.value_number, "#,##0.##")) &
+                                ". " & LookUp(fxRagLabels, code = ThisItem.rag_status).label

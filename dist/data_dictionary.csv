@@ -82,7 +82,7 @@ review_comments,comment_ref,text,true,true,true,,,"Reference, e.g. RC-00001."
 review_comments,submission_key,text,true,true,false,,submissions.submission_key,Submission.
 review_comments,version_no,whole number,true,false,false,,,Version the comment was made on.
 review_comments,reviewer_email,text,true,true,false,,people.email,Reviewer.
-review_comments,action,choice,true,false,false,returned|approved|comment,,"returned, approved or comment."
+review_comments,action,choice,true,false,false,returned|approved|reopened|comment,,"returned, approved, reopened or comment. Returning and reopening need a comment."
 review_comments,comment,long text,false,false,false,,,The comment. Required when returning.
 review_comments,comment_date,"date-time (UTC, ISO 8601)",true,false,false,,,When the comment was made.
 review_comments,resolved,true/false,false,true,false,,,Yes once the updater has dealt with it.
@@ -154,7 +154,7 @@ lookups,active,true/false,false,false,false,,,Inactive values are hidden from ne
 settings,setting_key,text,true,true,true,,,Setting name. Unique.
 settings,setting_value,text,true,false,false,,,Value.
 settings,description,long text,false,false,false,,,What the setting does.
-audit_log,audit_ref,text,true,true,true,,,"Reference, e.g. AUD-0000001."
+audit_log,audit_ref,text,true,true,true,,,Reference. Flows use AUD- plus a GUID.
 audit_log,list_name,text,true,true,false,,,List that changed.
 audit_log,item_key,text,true,true,false,,,Key of the item that changed.
 audit_log,action,choice,true,false,false,create|edit|status_change|reopen|retire,,"create, edit, status_change, reopen or retire."

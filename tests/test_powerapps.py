@@ -14,8 +14,11 @@ try:
 except ImportError:  # pragma: no cover
     yaml = None
 
-APP = Path(__file__).resolve().parent.parent / "powerapps" / "weekly"
-SCREENS = {p.name.split(".")[0] for p in APP.glob("scr*.pa.yaml")}
+APPS = Path(__file__).resolve().parent.parent / "powerapps"
+EXPECTED_SCREENS = {
+    "weekly": {"scrWeek", "scrTask", "scrProblem", "scrTeam"},
+    "measures": {"scrMeasHome", "scrMeasSubmission", "scrMeasTargets"},
+}
 COLUMNS = {c.name for lst in LISTS for c in lst.all_columns} | {"ID", "sort_open"}
 CONTROL_PREFIX = re.compile(r"\b((?:txt|dd|cmb|dp|btn|chk|gal|lbl|icn|con|rect)[A-Z]\w*)")
 LIST_NAMES = {lst.name for lst in LISTS}
@@ -33,18 +36,20 @@ def strip_comments(formula):
 
 
 @unittest.skipIf(yaml is None, "PyYAML not installed")
-class PowerAppsSourceTests(unittest.TestCase):
+class AppSource(unittest.TestCase):
+    app = None  # set by the subclasses below
+
     @classmethod
     def setUpClass(cls):
+        if cls.app is None:
+            raise unittest.SkipTest("base class")
+        folder = APPS / cls.app
+        cls.screens = {p.name.split(".")[0] for p in folder.glob("scr*.pa.yaml")}
         cls.controls = []
-        cls.by_file = {}
-        for path in sorted(APP.glob("*.pa.yaml")):
-            items = []
-            walk(yaml.safe_load(path.read_text(encoding="utf-8")), items)
-            cls.by_file[path.name] = items
-            cls.controls += items
+        for path in sorted(folder.glob("*.pa.yaml")):
+            walk(yaml.safe_load(path.read_text(encoding="utf-8")), cls.controls)
         cls.names = {n for n, _ in cls.controls}
-        cls.app_pfx = strip_comments((APP / "App.pfx").read_text(encoding="utf-8"))
+        cls.app_pfx = strip_comments((folder / "App.pfx").read_text(encoding="utf-8"))
 
     def formulas(self):
         for name, body in self.controls:
@@ -52,7 +57,7 @@ class PowerAppsSourceTests(unittest.TestCase):
                 yield name, prop, value
 
     def test_every_screen_file_present(self):
-        self.assertEqual(SCREENS, {"scrWeek", "scrTask", "scrProblem", "scrTeam"})
+        self.assertEqual(self.screens, EXPECTED_SCREENS[self.app])
 
     def test_controls_well_formed_and_unique(self):
         self.assertEqual(len(self.names), len(self.controls), "duplicate control names")
@@ -73,13 +78,14 @@ class PowerAppsSourceTests(unittest.TestCase):
     def test_referenced_screens_exist(self):
         for name, prop, value in self.formulas():
             for ref in re.findall(r"Navigate\((\w+)", value):
-                self.assertIn(ref, SCREENS, f"{name}.{prop}")
+                self.assertIn(ref, self.screens, f"{name}.{prop}")
 
     def test_columns_exist(self):
-        pattern = re.compile(r"\b(?:ThisItem|varTask|varProblem|varUpdate|varCheckin|fxPerson|r)\.(\w+)")
+        pattern = re.compile(r"\b(?:ThisItem|varTask|varProblem|varUpdate|varCheckin|fxPerson|varSub|varMeasure|"
+                             r"varPeriod|varCurrent|p|r|ex|s|w)\.(\w+)")
         for name, prop, value in self.formulas():
             for col in pattern.findall(strip_comments(value)):
-                self.assertIn(col, COLUMNS | {"display_name", "type", "key", "label", "code", "path"},
+                self.assertIn(col, COLUMNS | {"type", "key", "label", "code", "path", "grp", "grp_label", "Value"},
                               f"{name}.{prop} uses unknown column {col}")
 
     def test_patched_lists_exist(self):
@@ -93,6 +99,14 @@ class PowerAppsSourceTests(unittest.TestCase):
             v = re.sub(r'"[^"]*"', "", strip_comments(value))
             self.assertEqual(v.count("("), v.count(")"), f"{name}.{prop} brackets")
             self.assertEqual(v.count("{"), v.count("}"), f"{name}.{prop} braces")
+
+
+class WeeklyAppTests(AppSource):
+    app = "weekly"
+
+
+class MeasuresAppTests(AppSource):
+    app = "measures"
 
 
 if __name__ == "__main__":

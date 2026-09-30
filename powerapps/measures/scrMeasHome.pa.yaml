@@ -1,0 +1,327 @@
+# =====================================================================
+# Screen: scrMeasHome ("My measures")
+#
+# Three tabs:
+#   To update  - updater's values: returned, expected not received, drafts, awaiting data
+#   To review  - approver's queue: awaiting review, returned, overdue
+#   All        - every active measure with its latest approved value
+#
+# 1. Add a blank screen and rename it scrMeasHome.
+# 2. Screen properties:
+#      Fill:      =clrPage
+#      OnVisible: =Select(btnMeasLoad)
+# 3. Copy everything below, right-click scrMeasHome, "Paste code".
+# =====================================================================
+- conMeas:
+    Control: GroupContainer@1.3.0
+    Variant: AutoLayout
+    Properties:
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+      LayoutDirection: =LayoutDirection.Vertical
+      Fill: =clrPage
+    Children:
+      - conMeasHeader:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =64
+            Fill: =clrHeader
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutGap: =8
+            PaddingLeft: =16
+            PaddingRight: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - lblMeasAppTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Performance measures"
+                  Role: =TextRole.Heading1
+                  Color: =Color.White
+                  FontWeight: =FontWeight.Semibold
+                  Size: =18
+                  Height: =40
+                  FillPortions: =1
+            - btnMeasTargets:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Visible: =fxIsAdmin
+                  Text: ="Targets"
+                  OnSelect: =Navigate(scrMeasTargets)
+                  Fill: =clrHeader
+                  Color: =Color.White
+                  BorderColor: =Color.White
+                  BorderThickness: =1
+                  HoverFill: =clrAccentDark
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =ColorValue("#FFD166")
+                  Width: =110
+                  Height: =40
+            - btnMeasLoad:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Visible: =false
+                  Width: =1
+                  Height: =1
+                  OnSelect: |-
+                    =ClearCollect(
+                        colOpenSubs,
+                        Filter(submissions, status.Value = "not_started" || status.Value = "draft" || status.Value = "returned" || status.Value = "submitted")
+                    );
+                    ClearCollect(colPeriods, ForAll(Distinct(colOpenSubs, period_key) As d, LookUp(periods, period_key = d.Value)));
+                    // Updater's list, most urgent first.
+                    ClearCollect(
+                        colToUpdate,
+                        AddColumns(
+                            Filter(
+                                colOpenSubs As s,
+                                s.status.Value <> "submitted" &&
+                                !IsBlank(LookUp(colMyRoles, measure_code = s.measure_code && role.Value = "updater"))
+                            ),
+                            grp, If(status.Value = "returned", 1, !IsBlank(expected_by) && expected_by < Today(), 2, status.Value = "draft", 3, 4),
+                            grp_label, If(status.Value = "returned", "Returned for changes", !IsBlank(expected_by) && expected_by < Today(), "Expected, not received", status.Value = "draft", "Draft", "Awaiting data")
+                        )
+                    );
+                    // Approver's queue.
+                    ClearCollect(
+                        colToReview,
+                        Filter(
+                            AddColumns(
+                                Filter(colOpenSubs As s, !IsBlank(LookUp(colMyRoles, measure_code = s.measure_code && role.Value = "approver"))),
+                                grp, If(status.Value = "submitted", 1, status.Value = "returned", 2, !IsBlank(expected_by) && expected_by < Today(), 3, 0),
+                                grp_label, If(status.Value = "submitted", "Awaiting your review", status.Value = "returned", "Returned, waiting on updater", "Overdue")
+                            ),
+                            grp > 0
+                        )
+                    )
+      - conMeasTabs:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =If(fxIsNarrow, 110, 64)
+            Fill: =clrPanel
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutWrap: =true
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutGap: =8
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =8
+            PaddingBottom: =8
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - btnMeasTabUpdate:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="To update (" & CountRows(colToUpdate) & ")"
+                  OnSelect: =Set(varTab, "update")
+                  Fill: =If(varTab = "update", clrAccent, clrPanel)
+                  Color: =If(varTab = "update", Color.White, clrAccent)
+                  BorderColor: =clrAccent
+                  BorderThickness: =1
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =160
+                  Height: =40
+            - btnMeasTabReview:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="To review (" & CountRows(Filter(colToReview, grp = 1)) & ")"
+                  OnSelect: =Set(varTab, "review")
+                  Fill: =If(varTab = "review", clrAccent, clrPanel)
+                  Color: =If(varTab = "review", Color.White, clrAccent)
+                  BorderColor: =clrAccent
+                  BorderThickness: =1
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =160
+                  Height: =40
+            - btnMeasTabAll:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="All measures"
+                  OnSelect: =Set(varTab, "all")
+                  Fill: =If(varTab = "all", clrAccent, clrPanel)
+                  Color: =If(varTab = "all", Color.White, clrAccent)
+                  BorderColor: =clrAccent
+                  BorderThickness: =1
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =160
+                  Height: =40
+            - txtMeasSearch:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Visible: =varTab = "all"
+                  HintText: ="Search by name or reference"
+                  AccessibleLabel: ="Search measures by name or reference"
+                  BorderColor: =clrBorder
+                  Width: =280
+                  Height: =40
+      - conMeasList:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            FillPortions: =1
+            LayoutDirection: =LayoutDirection.Vertical
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =16
+            PaddingBottom: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - lblMeasEmpty:
+                Control: Label@2.5.1
+                Properties:
+                  Live: =Live.Polite
+                  Visible: =CountRows(galMeasWork.AllItems) = 0 && varTab <> "all"
+                  Text: =If(varTab = "update", "Nothing to update right now.", "Nothing waiting for you to review.")
+                  Color: =clrText
+                  Height: =40
+            # Work list for the To update and To review tabs.
+            - galMeasWork:
+                Control: Gallery@2.15.0
+                Variant: Vertical
+                Properties:
+                  Visible: =varTab <> "all"
+                  Items: |-
+                    =SortByColumns(
+                        AddColumns(
+                            If(varTab = "update", colToUpdate, colToReview) As w,
+                            measure_name, LookUp(colMeasures, measure_code = w.measure_code).measure_name,
+                            source_ref, LookUp(colMeasures, measure_code = w.measure_code).source_ref,
+                            period_label, LookUp(colPeriods, period_key = w.period_key).period_label,
+                            period_end, LookUp(colPeriods, period_key = w.period_key).end_date
+                        ),
+                        "grp", SortOrder.Ascending,
+                        "period_end", SortOrder.Ascending
+                    )
+                  AccessibleLabel: =If(varTab = "update", "Values for you to update", "Values for you to review")
+                  TemplateSize: =76
+                  TemplatePadding: =0
+                  FillPortions: =1
+                  AlignInContainer: =AlignInContainer.Stretch
+                Children:
+                  - lblMeasWorkName:
+                      Control: Label@2.5.1
+                      Properties:
+                        X: =0
+                        Y: =4
+                        Width: =Parent.TemplateWidth - 52
+                        Height: =32
+                        Text: =ThisItem.source_ref & "  " & ThisItem.measure_name
+                        FontWeight: =FontWeight.Semibold
+                        Color: =clrText
+                  - lblMeasWorkMeta:
+                      Control: Label@2.5.1
+                      Properties:
+                        X: =0
+                        Y: =36
+                        Width: =Parent.TemplateWidth - 52
+                        Height: =32
+                        Size: =11
+                        Color: =If(ThisItem.grp_label in ["Returned for changes", "Expected, not received", "Overdue"], clrError, clrMuted)
+                        Text: |-
+                          =ThisItem.period_label & ". " & ThisItem.grp_label &
+                          If(IsBlank(ThisItem.expected_by), "", ". Expected by " & Text(ThisItem.expected_by, "dd mmm yyyy"))
+                  - icnMeasWorkOpen:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        X: =Parent.TemplateWidth - 48
+                        Y: =16
+                        Width: =44
+                        Height: =44
+                        Icon: =Icon.ChevronRight
+                        Color: =clrAccent
+                        AccessibleLabel: ="Open " & ThisItem.measure_name & " for " & ThisItem.period_label
+                        TabIndex: =0
+                        OnSelect: =Set(varSubKey, ThisItem.submission_key); Navigate(scrMeasSubmission)
+                  - rectMeasWorkLine:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        X: =0
+                        Y: =Parent.TemplateHeight - 1
+                        Width: =Parent.TemplateWidth
+                        Height: =1
+                        Fill: =ColorValue("#D0D0D0")
+            # All measures, with the latest approved value.
+            - galMeasAll:
+                Control: Gallery@2.15.0
+                Variant: Vertical
+                Properties:
+                  Visible: =varTab = "all"
+                  Items: |-
+                    =SortByColumns(
+                        Filter(colMeasures, IsBlank(txtMeasSearch.Text) || txtMeasSearch.Text in measure_name || txtMeasSearch.Text in source_ref),
+                        "measure_code", SortOrder.Ascending
+                    )
+                  AccessibleLabel: ="All active measures"
+                  TemplateSize: =76
+                  TemplatePadding: =0
+                  FillPortions: =1
+                  AlignInContainer: =AlignInContainer.Stretch
+                Children:
+                  - lblMeasAllName:
+                      Control: Label@2.5.1
+                      Properties:
+                        X: =0
+                        Y: =4
+                        Width: =Parent.TemplateWidth - 52
+                        Height: =32
+                        Text: =ThisItem.source_ref & "  " & ThisItem.measure_name & " (" & ThisItem.measure_code & ")"
+                        FontWeight: =FontWeight.Semibold
+                        Color: =clrText
+                  - lblMeasAllLatest:
+                      Control: Label@2.5.1
+                      Properties:
+                        X: =0
+                        Y: =36
+                        Width: =Parent.TemplateWidth - 52
+                        Height: =32
+                        Size: =11
+                        Color: =clrMuted
+                        Text: |-
+                          =With(
+                              {r: LookUp(rpt_values, measure_code = ThisItem.measure_code && is_latest = true)},
+                              If(
+                                  IsBlank(r),
+                                  "No approved values yet",
+                                  "Latest: " & r.period_label & ", " &
+                                  If(r.value_missing, "no value",
+                                     r.unit = "text", "see narrative",
+                                     r.unit = "yes_no", If(r.value_number = 1, "Yes", "No"),
+                                     r.unit = "percent", Text(r.value_number, "0.0") & "%",
+                                     r.unit = "gbp", "£" & Text(r.value_number, "#,##0"),
+                                     Text(r.value_number, "#,##0.##")) &
+                                  ". " & LookUp(fxRagLabels, code = r.rag_status).label
+                              )
+                          )
+                  - icnMeasAllOpen:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        X: =Parent.TemplateWidth - 48
+                        Y: =16
+                        Width: =44
+                        Height: =44
+                        Icon: =Icon.ChevronRight
+                        Color: =clrAccent
+                        AccessibleLabel: ="Open the latest approved value for " & ThisItem.measure_name
+                        TabIndex: =0
+                        OnSelect: |-
+                          =With(
+                              {r: LookUp(rpt_values, measure_code = ThisItem.measure_code && is_latest = true)},
+                              If(IsBlank(r), Notify("No approved values yet for this measure.", NotificationType.Information),
+                                 Set(varSubKey, r.submission_key); Navigate(scrMeasSubmission))
+                          )
+                  - rectMeasAllLine:
+                      Control: Rectangle@2.3.0
+                      Properties:
+                        X: =0
+                        Y: =Parent.TemplateHeight - 1
+                        Width: =Parent.TemplateWidth
+                        Height: =1
+                        Fill: =ColorValue("#D0D0D0")

@@ -42,14 +42,14 @@ In `measure_links`, add one row per group. The `link_key` is `measure_code|group
 
 ## 5. Add targets (optional)
 
-In `reference_values`, add one row per measure, per period, per type. The `ref_key` is `measure_code|period_key|ref_type`.
+The easiest way is the **Targets** screen in the measures app: pick the measure, the type and a date range, and it writes one row per period. You can also add rows in `reference_values` by hand: one per measure, per period, per type, with `ref_key` set to `measure_code|period_key|ref_type`.
 
 - Leave out targets entirely if there aren't any. The measure will show "No target set".
 - Tolerance only counts for kpi and okr measures.
 
 ## 6. Submissions
 
-You don't need to create anything. From phase 2, a scheduled flow creates a `not_started` submission for every active measure when each period ends.
+You don't need to create anything. The `PMSCreateExpected` flow runs every morning and creates a `not_started` submission for every active measure when each of its periods ends. To create one straight away, for example for a period that has already ended, run that flow manually. It looks back 7 days.
 
 ## Retiring a measure
 

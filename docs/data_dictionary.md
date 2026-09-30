@@ -149,7 +149,7 @@ Reviewer feedback, kept apart from the narrative. Internal only: excluded from s
 | `submission_key` | text | yes | Submission. Links to `submissions.submission_key`. |
 | `version_no` | whole number | yes | Version the comment was made on. |
 | `reviewer_email` | text | yes | Reviewer. Links to `people.email`. |
-| `action` | choice | yes | returned, approved or comment. Values: `returned`, `approved`, `comment`. |
+| `action` | choice | yes | returned, approved, reopened or comment. Returning and reopening need a comment. Values: `returned`, `approved`, `reopened`, `comment`. |
 | `comment` | long text |  | The comment. Required when returning. |
 | `comment_date` | date-time (UTC, ISO 8601) | yes | When the comment was made. |
 | `resolved` | true/false |  | Yes once the updater has dealt with it. |
@@ -288,7 +288,7 @@ Every create, edit and status change: who, when, old and new value. Written only
 
 | column | type | required | notes |
 |---|---|---|---|
-| `audit_ref` | text | yes | **Key** (SharePoint Title column). Reference, e.g. AUD-0000001. |
+| `audit_ref` | text | yes | **Key** (SharePoint Title column). Reference. Flows use AUD- plus a GUID. |
 | `list_name` | text | yes | List that changed. |
 | `item_key` | text | yes | Key of the item that changed. |
 | `action` | choice | yes | create, edit, status_change, reopen or retire. Values: `create`, `edit`, `status_change`, `reopen`, `retire`. |
