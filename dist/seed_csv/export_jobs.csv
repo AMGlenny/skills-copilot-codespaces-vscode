@@ -1,0 +1,4 @@
+job_code,job_name,dataset,format,frequency,run_day,folder_path,keep_history,active,last_run_at,last_run_status
+EXP-FULL-NIGHTLY,"Full data model, nightly",full_model,both,daily,,full_model,true,true,,
+EXP-WEEKLY-WORK,"Weekly work, every Monday",weekly_work,csv,weekly,1,weekly_work,true,true,,
+EXP-QUARTER-PACK,Quarterly report pack,quarter_pack,xlsx,quarterly,10,quarter_pack,true,true,,

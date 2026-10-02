@@ -1,0 +1,253 @@
+# =====================================================================
+# Screen: scrTask (add or edit a task)
+#
+# 1. Add a blank screen and rename it scrTask.
+# 2. Screen properties:
+#      Fill:      =clrPage
+#      OnVisible: =Reset(txtTaskName); Reset(ddTaskPriority); Reset(cmbTaskContrib); Reset(txtTaskContribNote); Reset(cmbTaskAssigned); Reset(ddTaskStatus); Reset(txtTaskNotes)
+# 3. Copy everything below, right-click scrTask, "Paste code".
+#
+# New tasks get a temporary key, then TSK- plus the SharePoint ID, so two
+# people adding tasks at the same moment can never clash.
+# =====================================================================
+- conTask:
+    Control: GroupContainer@1.3.0
+    Variant: AutoLayout
+    Properties:
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+      LayoutDirection: =LayoutDirection.Vertical
+      LayoutAlignItems: =LayoutAlignItems.Center
+      LayoutOverflowY: =LayoutOverflow.Scroll
+      Fill: =clrPage
+    Children:
+      - conTaskHeader:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =64
+            Fill: =clrHeader
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutGap: =8
+            PaddingLeft: =8
+            PaddingRight: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - icnTaskBack:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  Icon: =Icon.ArrowLeft
+                  Color: =Color.White
+                  Width: =44
+                  Height: =44
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =10
+                  PaddingBottom: =10
+                  AccessibleLabel: ="Back to my week without saving"
+                  TabIndex: =0
+                  OnSelect: =Back()
+            - lblTaskTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Text: =If(varTaskNew, "Add a task", "Task " & varTask.task_code)
+                  Role: =TextRole.Heading1
+                  Color: =Color.White
+                  FontWeight: =FontWeight.Semibold
+                  Size: =18
+                  Height: =40
+                  FillPortions: =1
+      - conTaskForm:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Width: =Min(App.Width - 32, 760)
+            Height: =880
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =6
+            Fill: =clrPanel
+            BorderColor: =clrBorder
+            BorderThickness: =1
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =16
+            PaddingBottom: =16
+          Children:
+            - lblTaskName:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Task (required)"
+                  Color: =clrText
+                  Height: =24
+            - txtTaskName:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Default: =varTask.task_name
+                  MaxLength: =255
+                  HintText: ="What needs doing?"
+                  AccessibleLabel: ="Task, required"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTaskPriority:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Priority"
+                  Color: =clrText
+                  Height: =24
+            - ddTaskPriority:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  Items: =fxPriorityLabels
+                  Value: =label
+                  Default: =Coalesce(LookUp(fxPriorityLabels, code = varTask.priority.Value).label, "Should do")
+                  AccessibleLabel: ="Priority"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTaskContrib:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Contributes to (theme, programme, objective or measure)"
+                  Color: =clrText
+                  Height: =24
+            - cmbTaskContrib:
+                Control: Classic/ComboBox@2.4.0
+                Properties:
+                  Items: =colContrib
+                  DisplayFields: =["label"]
+                  SearchFields: =["label"]
+                  SelectMultiple: =false
+                  DefaultSelectedItems: =Filter(colContrib, key = varTask.contributes_to_key)
+                  AccessibleLabel: ="Contributes to"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - txtTaskContribNote:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Default: =varTask.contributes_to_note
+                  Mode: =TextMode.MultiLine
+                  HintText: ="Extra detail on the aim (optional)"
+                  AccessibleLabel: ="Contributes to, extra detail"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =70
+            - lblTaskAssigned:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Who is doing it"
+                  Color: =clrText
+                  Height: =24
+            - cmbTaskAssigned:
+                Control: Classic/ComboBox@2.4.0
+                Properties:
+                  Items: =SortByColumns(colPeople, "display_name", SortOrder.Ascending)
+                  DisplayFields: =["display_name"]
+                  SearchFields: =["display_name"]
+                  SelectMultiple: =false
+                  DefaultSelectedItems: =Filter(colPeople, email = Coalesce(varTask.assigned_to, fxMe))
+                  AccessibleLabel: ="Who is doing it"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTaskStatus:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Status"
+                  Color: =clrText
+                  Height: =24
+            - ddTaskStatus:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  Items: |-
+                    =Table({code: "open", label: "Open"}, {code: "complete", label: "Complete"}, {code: "cancelled", label: "Cancelled"})
+                  Value: =label
+                  Default: =Coalesce(Proper(varTask.status.Value), "Open")
+                  AccessibleLabel: ="Status"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTaskNotes:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Notes"
+                  Color: =clrText
+                  Height: =24
+            - txtTaskNotes:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Default: =varTask.notes
+                  Mode: =TextMode.MultiLine
+                  AccessibleLabel: ="Notes"
+                  DisplayMode: =fxEditMode
+                  BorderColor: =clrBorder
+                  Height: =100
+            - lblTaskRaised:
+                Control: Label@2.5.1
+                Properties:
+                  Visible: =!varTaskNew
+                  Text: |-
+                    ="Raised by " & Coalesce(LookUp(colPeople, email = varTask.raised_by).display_name, varTask.raised_by) &
+                    " on " & Text(varTask.date_raised, "dd mmm yyyy") &
+                    If(IsBlank(varTask.completed_date), "", ". Closed " & Text(varTask.completed_date, "dd mmm yyyy"))
+                  Color: =clrMuted
+                  Size: =11
+                  AutoHeight: =true
+            - btnTaskSave:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="Save task"
+                  DisplayMode: =If(fxCanEdit, DisplayMode.Edit, DisplayMode.Disabled)
+                  Fill: =clrAccent
+                  Color: =Color.White
+                  HoverFill: =clrAccentDark
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =160
+                  Height: =44
+                  OnSelect: |-
+                    =With(
+                        {
+                            status: ddTaskStatus.Selected.code,
+                            f: {
+                                task_name: Trim(txtTaskName.Text),
+                                priority: {Value: ddTaskPriority.Selected.code},
+                                org_unit_key: Coalesce(varTask.org_unit_key, varTeam),
+                                contributes_to_type: If(IsBlank(cmbTaskContrib.Selected), Blank(), {Value: cmbTaskContrib.Selected.type}),
+                                contributes_to_key: cmbTaskContrib.Selected.key,
+                                contributes_to_note: Trim(txtTaskContribNote.Text),
+                                assigned_to: cmbTaskAssigned.Selected.email,
+                                notes: Trim(txtTaskNotes.Text)
+                            }
+                        },
+                        If(
+                            IsBlank(f.task_name),
+                            Notify("Enter the task.", NotificationType.Error),
+                            With(
+                                {
+                                    g: {
+                                        status: {Value: status},
+                                        completed_by: If(status = "complete", Coalesce(varTask.completed_by, fxMe), Blank()),
+                                        completed_date: If(status = "open", Blank(), Coalesce(varTask.completed_date, Today()))
+                                    }
+                                },
+                                If(
+                                    varTaskNew,
+                                    With(
+                                        {r: Patch(tasks, Defaults(tasks), {task_code: Text(GUID()), raised_by: fxMe, date_raised: Today()}, f, g)},
+                                        If(!IsBlank(r), Patch(tasks, r, {task_code: "TSK-" & Text(r.ID, "00000")}))
+                                    ),
+                                    Patch(tasks, varTask, f, g)
+                                );
+                                If(
+                                    IsEmpty(Errors(tasks)),
+                                    Notify("Task saved.", NotificationType.Success); Back(),
+                                    Notify("The task did not save. Check your connection and try again.", NotificationType.Error)
+                                )
+                            )
+                        )
+                    )

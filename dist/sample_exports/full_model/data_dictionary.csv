@@ -1,0 +1,174 @@
+﻿table_name,column_name,data_type,description
+measures,measure_code,text,"System key, e.g. PM-0001. Unique. Every other table links on this."
+measures,measure_name,text,Short name of the measure.
+measures,source_ref,text,"Reference used in the source document, e.g. 1.01. Not unique: parent and child can share it."
+measures,source_document,text,Document or framework the measure comes from.
+measures,parent_measure_code,text,measure_code of the parent summary measure. Blank for top-level measures.
+measures,description,text,"What the measure tells you, in plain English."
+measures,definition,text,Definition and calculation method.
+measures,measure_class,text,"measure, kpi or okr. Tolerance only applies to kpi and okr."
+measures,measure_type,text,"summary, output or outcome."
+measures,unit,text,Unit of the value. percent is stored as 0 to 100 (58 means 58%). gbp is pounds. yes_no is stored as 1 or 0.
+measures,decimal_places,number,Decimal places to show. Does not change the stored value.
+measures,polarity,text,Which direction is good. Used for RAG.
+measures,frequency,text,How often a value is recorded.
+measures,aggregation_method,text,"How to roll values up to a longer period, e.g. monthly to quarterly. do_not_combine for values that must not be added or averaged."
+measures,expected_lag_days,number,"Usual days after period end before data is available. Blank means no expectation, so it is never flagged as late."
+measures,category,text,Category code from the lookups list.
+measures,data_source,text,Where the data comes from.
+measures,org_unit_key,text,Team that owns the measure.
+measures,status,text,active or retired. Measures are never deleted.
+measures,retired_date,date,Date the measure was retired.
+measures,retired_reason,text,Why the measure was retired.
+periods,period_key,text,"Period key, e.g. M-2026-09, Q-2026-27-Q2, T-2026-27-AUT."
+periods,period_type,text,Matches a measure frequency.
+periods,period_label,text,"Display label, e.g. Q2 2026-27 or Autumn Term 2026."
+periods,start_date,date,First day of the period.
+periods,end_date,date,Last day of the period.
+periods,financial_year,text,"UK financial year (April to March) containing the start date, e.g. 2026-27."
+periods,financial_quarter,text,"Financial quarter containing the start date, e.g. 2026-27 Q2. Blank for periods longer than a quarter."
+periods,academic_year,text,Academic year (September to August) containing the start date.
+periods,calendar_year,number,Calendar year containing the start date.
+measure_roles,role_key,text,measure_code|email|role. Unique.
+measure_roles,measure_code,text,Measure.
+measure_roles,email,text,Person.
+measure_roles,role,text,"owner, updater or approver."
+measure_roles,active,bool,Only active roles give access.
+measure_roles,start_date,date,Role start.
+measure_roles,end_date,date,Role end.
+people,email,text,"Work email, lower case. Unique."
+people,display_name,text,Name shown in the app.
+people,org_unit_key,text,Default team. Pre-fills the weekly update.
+people,app_role,text,"admin, standard or viewer. Measure rights come from measure_roles."
+people,active,bool,"Leavers are made inactive, never deleted."
+org_units,org_unit_key,text,"Key, e.g. WS-JOBS, TM-SDS, ST-SDS-A. Unique."
+org_units,unit_name,text,Name as people know it.
+org_units,unit_level,text,"workstream, team or sub_team."
+org_units,parent_key,text,Parent unit. Blank for workstreams.
+org_units,active,bool,Inactive units are hidden from new entries.
+groups,group_key,text,"Group key, e.g. TH-JOBS. Unique."
+groups,group_name,text,"Name of the theme, programme or objective."
+groups,group_type,text,"theme, programme or objective."
+groups,description,text,What it covers.
+groups,active,bool,Inactive groups are hidden from new entries.
+measure_links,link_key,text,measure_code|group_key. Unique.
+measure_links,measure_code,text,Measure.
+measure_links,group_key,text,Group.
+measure_links,relationship_type,text,"primary, contributes_to or related."
+measure_links,active,bool,Inactive links are kept for history.
+reference_values,ref_key,text,measure_code|period_key|ref_type. Unique.
+reference_values,measure_code,text,Measure.
+reference_values,period_key,text,Period.
+reference_values,ref_type,text,"target, tolerance, baseline or capacity. tolerance only for kpi and okr measures."
+reference_values,ref_value,number,"The reference value, in the measure's unit."
+reference_values,notes,text,Where the value came from.
+reference_values,active,bool,Inactive values are ignored.
+submissions,submission_key,text,measure_code|period_key. Unique.
+submissions,measure_code,text,Measure.
+submissions,period_key,text,Period the data relates to.
+submissions,period_end,date,Last day of the period (copied from periods when the row is created) so the app can load recent work only.
+submissions,status,text,"not_started, draft, submitted, returned or approved."
+submissions,expected_by,date,Period end plus the measure's expected lag. Blank if no lag is set.
+submissions,current_version,number,Latest version number. 0 before anything is entered.
+submissions,approved_version,number,Version used in reports. Blank until first approval.
+submissions,submitted_date,datetime,When the latest version was submitted.
+submissions,approved_by,text,Email of the approver.
+submissions,approved_date,datetime,When it was approved.
+approved_values,version_key,text,submission_key|v<version_no>. Unique.
+approved_values,submission_key,text,Submission.
+approved_values,measure_code,text,Measure (copied from the submission for filtering).
+approved_values,period_key,text,Period (copied from the submission for filtering).
+approved_values,version_no,number,"1, 2, 3 and so on."
+approved_values,value_number,number,"The value for all units except text. percent 0 to 100, yes_no 1 or 0."
+approved_values,value_text,text,The value for text measures only.
+approved_values,value_missing,bool,Yes if no value could be provided. Narrative then required.
+approved_values,narrative,text,Updater's commentary. Required if the value is missing or off track.
+approved_values,data_quality,text,"verified, provisional, estimated or unverified."
+approved_values,submitted_date,datetime,When this version was submitted.
+approved_values,rag_status,text,RAG worked out at approval using polarity and the period's target and tolerance.
+values_flat,submission_key,text,measure_code|period_key. Unique.
+values_flat,measure_code,text,Measure.
+values_flat,measure_name,text,Measure name.
+values_flat,source_ref,text,Source document reference.
+values_flat,parent_measure_code,text,Parent measure.
+values_flat,measure_class,text,"measure, kpi or okr."
+values_flat,measure_type,text,"summary, output or outcome."
+values_flat,category,text,Category code.
+values_flat,unit,text,Unit.
+values_flat,polarity,text,Polarity.
+values_flat,frequency,text,Frequency.
+values_flat,aggregation_method,text,How to roll up.
+values_flat,owner_name,text,Measure owner.
+values_flat,owner_email,text,Measure owner email.
+values_flat,org_unit_key,text,Owning team.
+values_flat,period_key,text,Period.
+values_flat,period_type,text,Period type.
+values_flat,period_label,text,Period label.
+values_flat,period_start,date,Period start date.
+values_flat,period_end,date,Period end date.
+values_flat,financial_year,text,Financial year.
+values_flat,financial_quarter,text,Financial quarter.
+values_flat,value_number,number,Approved value (not text measures).
+values_flat,value_text,text,Approved value (text measures).
+values_flat,value_missing,bool,Yes if no value was provided.
+values_flat,narrative,text,Approved narrative.
+values_flat,data_quality,text,Data quality flag.
+values_flat,version_no,number,Approved version number.
+values_flat,approved_by,text,Approver email.
+values_flat,approved_date,datetime,Approval time.
+values_flat,target_value,number,Target for the period.
+values_flat,tolerance_value,number,Tolerance for the period (kpi and okr only).
+values_flat,baseline_value,number,Baseline for the period.
+values_flat,capacity_value,number,Capacity or throughput for the period.
+values_flat,rag_status,text,"green, amber, red, no_target, no_data or not_applicable."
+values_flat,is_latest,bool,Yes on the most recent approved period for the measure.
+values_flat,refreshed_at,datetime,When this row was last rebuilt.
+weekly_updates,update_key,text,email|week_start. Unique.
+weekly_updates,week_start,date,Monday of the week.
+weekly_updates,email,text,Person.
+weekly_updates,person_name,text,Name of the person.
+weekly_updates,org_unit_key,text,Team at the time of the update.
+weekly_updates,team_name,text,Team name.
+weekly_updates,successes,text,Successes had or heard about.
+weekly_updates,communication,text,Anything that would help if more widely known.
+weekly_updates,workload,text,"light, manageable, heavy or overloaded."
+weekly_updates,submitted_at,datetime,When it was saved.
+tasks,task_code,text,"Key, e.g. TSK-00001. Unique."
+tasks,task_name,text,What needs doing.
+tasks,priority,text,"must, should or could."
+tasks,status,text,"open, complete or cancelled."
+tasks,org_unit_key,text,Team.
+tasks,team_name,text,Team name.
+tasks,contributes_to_type,text,group or measure. Blank if it doesn't contribute to anything specific.
+tasks,contributes_to_key,text,group_key or measure_code this work supports.
+tasks,contributes_to_name,text,Name of the group or measure the task supports.
+tasks,contributes_to_note,text,Optional extra detail on the aim.
+tasks,raised_by,text,Who added it.
+tasks,raised_by_name,text,Who raised it.
+tasks,date_raised,date,When it was added.
+tasks,assigned_to,text,Who is doing it.
+tasks,assigned_to_name,text,Who is doing it.
+tasks,completed_by,text,Who completed it.
+tasks,completed_by_name,text,Who completed it.
+tasks,completed_date,date,When it was completed or cancelled.
+tasks,notes,text,Notes.
+problems,problem_code,text,"Key, e.g. PRB-00001. Unique."
+problems,problem_title,text,Short title.
+problems,problem_statement,text,What the problem is.
+problems,status,text,open or closed.
+problems,impact,text,"low, medium or high."
+problems,urgency,text,"low, medium or high."
+problems,org_unit_key,text,Team.
+problems,team_name,text,Team name.
+problems,raised_by,text,Who raised it.
+problems,raised_by_name,text,Who raised it.
+problems,raised_on,date,When it was raised.
+problems,problem_owner,text,Who owns resolving it.
+problems,problem_owner_name,text,Who owns resolving it.
+problems,target_resolution_date,date,When it should be resolved by.
+problems,closed_date,date,When it was closed.
+problems,resolution,text,How it was resolved.
+problems,contributes_to_type,text,group or measure. Blank if it doesn't contribute to anything specific.
+problems,contributes_to_key,text,group_key or measure_code affected.
+problems,contributes_to_name,text,Name of the group or measure affected.
+problems,notes,text,Context.

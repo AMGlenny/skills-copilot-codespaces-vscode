@@ -1,0 +1,124 @@
+﻿table_name,column_name,data_type,description
+quarter_values,submission_key,text,measure_code|period_key. Unique.
+quarter_values,measure_code,text,Measure.
+quarter_values,measure_name,text,Measure name.
+quarter_values,source_ref,text,Source document reference.
+quarter_values,parent_measure_code,text,Parent measure.
+quarter_values,measure_class,text,"measure, kpi or okr."
+quarter_values,measure_type,text,"summary, output or outcome."
+quarter_values,category,text,Category code.
+quarter_values,unit,text,Unit.
+quarter_values,polarity,text,Polarity.
+quarter_values,frequency,text,Frequency.
+quarter_values,aggregation_method,text,How to roll up.
+quarter_values,owner_name,text,Measure owner.
+quarter_values,owner_email,text,Measure owner email.
+quarter_values,org_unit_key,text,Owning team.
+quarter_values,period_key,text,Period.
+quarter_values,period_type,text,Period type.
+quarter_values,period_label,text,Period label.
+quarter_values,period_start,date,Period start date.
+quarter_values,period_end,date,Period end date.
+quarter_values,financial_year,text,Financial year.
+quarter_values,financial_quarter,text,Financial quarter.
+quarter_values,value_number,number,Approved value (not text measures).
+quarter_values,value_text,text,Approved value (text measures).
+quarter_values,value_missing,bool,Yes if no value was provided.
+quarter_values,narrative,text,Approved narrative.
+quarter_values,data_quality,text,Data quality flag.
+quarter_values,version_no,number,Approved version number.
+quarter_values,approved_by,text,Approver email.
+quarter_values,approved_date,datetime,Approval time.
+quarter_values,target_value,number,Target for the period.
+quarter_values,tolerance_value,number,Tolerance for the period (kpi and okr only).
+quarter_values,baseline_value,number,Baseline for the period.
+quarter_values,capacity_value,number,Capacity or throughput for the period.
+quarter_values,rag_status,text,"green, amber, red, no_target, no_data or not_applicable."
+quarter_values,is_latest,bool,Yes on the most recent approved period for the measure.
+quarter_values,refreshed_at,datetime,When this row was last rebuilt.
+latest_values,submission_key,text,measure_code|period_key. Unique.
+latest_values,measure_code,text,Measure.
+latest_values,measure_name,text,Measure name.
+latest_values,source_ref,text,Source document reference.
+latest_values,parent_measure_code,text,Parent measure.
+latest_values,measure_class,text,"measure, kpi or okr."
+latest_values,measure_type,text,"summary, output or outcome."
+latest_values,category,text,Category code.
+latest_values,unit,text,Unit.
+latest_values,polarity,text,Polarity.
+latest_values,frequency,text,Frequency.
+latest_values,aggregation_method,text,How to roll up.
+latest_values,owner_name,text,Measure owner.
+latest_values,owner_email,text,Measure owner email.
+latest_values,org_unit_key,text,Owning team.
+latest_values,period_key,text,Period.
+latest_values,period_type,text,Period type.
+latest_values,period_label,text,Period label.
+latest_values,period_start,date,Period start date.
+latest_values,period_end,date,Period end date.
+latest_values,financial_year,text,Financial year.
+latest_values,financial_quarter,text,Financial quarter.
+latest_values,value_number,number,Approved value (not text measures).
+latest_values,value_text,text,Approved value (text measures).
+latest_values,value_missing,bool,Yes if no value was provided.
+latest_values,narrative,text,Approved narrative.
+latest_values,data_quality,text,Data quality flag.
+latest_values,version_no,number,Approved version number.
+latest_values,approved_by,text,Approver email.
+latest_values,approved_date,datetime,Approval time.
+latest_values,target_value,number,Target for the period.
+latest_values,tolerance_value,number,Tolerance for the period (kpi and okr only).
+latest_values,baseline_value,number,Baseline for the period.
+latest_values,capacity_value,number,Capacity or throughput for the period.
+latest_values,rag_status,text,"green, amber, red, no_target, no_data or not_applicable."
+latest_values,is_latest,bool,Yes on the most recent approved period for the measure.
+latest_values,refreshed_at,datetime,When this row was last rebuilt.
+tasks,task_code,text,"Key, e.g. TSK-00001. Unique."
+tasks,task_name,text,What needs doing.
+tasks,priority,text,"must, should or could."
+tasks,status,text,"open, complete or cancelled."
+tasks,org_unit_key,text,Team.
+tasks,team_name,text,Team name.
+tasks,contributes_to_type,text,group or measure. Blank if it doesn't contribute to anything specific.
+tasks,contributes_to_key,text,group_key or measure_code this work supports.
+tasks,contributes_to_name,text,Name of the group or measure the task supports.
+tasks,contributes_to_note,text,Optional extra detail on the aim.
+tasks,raised_by,text,Who added it.
+tasks,raised_by_name,text,Who raised it.
+tasks,date_raised,date,When it was added.
+tasks,assigned_to,text,Who is doing it.
+tasks,assigned_to_name,text,Who is doing it.
+tasks,completed_by,text,Who completed it.
+tasks,completed_by_name,text,Who completed it.
+tasks,completed_date,date,When it was completed or cancelled.
+tasks,notes,text,Notes.
+problems,problem_code,text,"Key, e.g. PRB-00001. Unique."
+problems,problem_title,text,Short title.
+problems,problem_statement,text,What the problem is.
+problems,status,text,open or closed.
+problems,impact,text,"low, medium or high."
+problems,urgency,text,"low, medium or high."
+problems,org_unit_key,text,Team.
+problems,team_name,text,Team name.
+problems,raised_by,text,Who raised it.
+problems,raised_by_name,text,Who raised it.
+problems,raised_on,date,When it was raised.
+problems,problem_owner,text,Who owns resolving it.
+problems,problem_owner_name,text,Who owns resolving it.
+problems,target_resolution_date,date,When it should be resolved by.
+problems,closed_date,date,When it was closed.
+problems,resolution,text,How it was resolved.
+problems,contributes_to_type,text,group or measure. Blank if it doesn't contribute to anything specific.
+problems,contributes_to_key,text,group_key or measure_code affected.
+problems,contributes_to_name,text,Name of the group or measure affected.
+problems,notes,text,Context.
+weekly_updates,update_key,text,email|week_start. Unique.
+weekly_updates,week_start,date,Monday of the week.
+weekly_updates,email,text,Person.
+weekly_updates,person_name,text,Name of the person.
+weekly_updates,org_unit_key,text,Team at the time of the update.
+weekly_updates,team_name,text,Team name.
+weekly_updates,successes,text,Successes had or heard about.
+weekly_updates,communication,text,Anything that would help if more widely known.
+weekly_updates,workload,text,"light, manageable, heavy or overloaded."
+weekly_updates,submitted_at,datetime,When it was saved.

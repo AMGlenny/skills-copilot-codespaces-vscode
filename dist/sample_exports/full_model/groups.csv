@@ -1,0 +1,10 @@
+﻿group_key,group_name,group_type,description,active
+TH-JOBS,Good jobs and skills,theme,,true
+TH-HOMES,"Safe, decent and affordable homes",theme,,true
+TH-TRANSPORT,An integrated transport network,theme,,true
+TH-NETZERO,Net zero and the environment,theme,,true
+TH-CYP,Children and young people,theme,,true
+PG-BUSREFORM,Bus franchising programme,programme,,true
+PG-BOOTCAMPS,Skills Bootcamps,programme,,true
+OB-DATA,Better use of data in decisions,objective,,true
+OB-SERVICE,"Reliable, responsive corporate services",objective,,true

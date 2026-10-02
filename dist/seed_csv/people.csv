@@ -1,0 +1,15 @@
+email,display_name,org_unit_key,line_manager_email,app_role,active
+sam.patel@example.org,Sam Patel,WS-CORP,,admin,true
+jordan.hughes@example.org,Jordan Hughes,ST-SDS-A,sam.patel@example.org,standard,true
+priya.shah@example.org,Priya Shah,ST-SDS-A,jordan.hughes@example.org,standard,true
+tom.walsh@example.org,Tom Walsh,ST-SDS-A,jordan.hughes@example.org,standard,true
+chloe.bennett@example.org,Chloe Bennett,ST-SDS-A,jordan.hughes@example.org,standard,true
+marcus.reid@example.org,Marcus Reid,ST-SDS-B,jordan.hughes@example.org,standard,true
+aisha.khan@example.org,Aisha Khan,ST-SDS-A,jordan.hughes@example.org,standard,true
+daniel.okafor@example.org,Daniel Okafor,TM-HSG,sam.patel@example.org,standard,true
+ellie.brooks@example.org,Ellie Brooks,TM-HSG,daniel.okafor@example.org,standard,true
+rhys.evans@example.org,Rhys Evans,TM-BUS,sam.patel@example.org,standard,true
+nadia.hassan@example.org,Nadia Hassan,TM-DATA,sam.patel@example.org,standard,true
+owen.price@example.org,Owen Price,TM-EDU,sam.patel@example.org,standard,true
+ruth.clarke@example.org,Ruth Clarke,WS-CORP,sam.patel@example.org,viewer,true
+gary.fox@example.org,Gary Fox,TM-EMP,sam.patel@example.org,standard,false

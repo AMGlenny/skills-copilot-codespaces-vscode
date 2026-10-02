@@ -1,0 +1,301 @@
+# =====================================================================
+# Screen: scrMeasTargets (admins: set a reference value across a range)
+#
+# Writes one reference_values row per period, so a yearly target doesn't
+# have to be typed 12 times. Existing rows for the same measure, period
+# and type are updated, never duplicated. "Stop using" sets active to No:
+# nothing is deleted. Admins are site owners, so this writes directly and
+# SharePoint version history records every change.
+#
+# Tolerance only appears for KPI and OKR measures.
+#
+# 1. Add a blank screen and rename it scrMeasTargets.
+# 2. Screen properties:
+#      Fill:      =clrPage
+#      OnVisible: =If(!fxIsAdmin, Navigate(scrMeasHome))
+# 3. Copy everything below, right-click scrMeasTargets, "Paste code".
+# =====================================================================
+- conTgt:
+    Control: GroupContainer@1.3.0
+    Variant: AutoLayout
+    Properties:
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+      LayoutDirection: =LayoutDirection.Vertical
+      LayoutAlignItems: =LayoutAlignItems.Center
+      LayoutOverflowY: =LayoutOverflow.Scroll
+      Fill: =clrPage
+    Children:
+      - conTgtHeader:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =64
+            Fill: =clrHeader
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutGap: =8
+            PaddingLeft: =8
+            PaddingRight: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - icnTgtBack:
+                Control: Classic/Icon@2.5.0
+                Properties:
+                  Icon: =Icon.ArrowLeft
+                  Color: =Color.White
+                  Width: =44
+                  Height: =44
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =10
+                  PaddingBottom: =10
+                  AccessibleLabel: ="Back to my measures"
+                  TabIndex: =0
+                  OnSelect: =Navigate(scrMeasHome)
+            - lblTgtTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Targets and reference values"
+                  Role: =TextRole.Heading1
+                  Color: =Color.White
+                  FontWeight: =FontWeight.Semibold
+                  Size: =18
+                  Height: =40
+                  FillPortions: =1
+      - conTgtForm:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Width: =Min(App.Width - 32, 760)
+            Height: =980
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =6
+            Fill: =clrPanel
+            BorderColor: =clrBorder
+            BorderThickness: =1
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =16
+            PaddingBottom: =16
+          Children:
+            - lblTgtMeasure:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Measure"
+                  Color: =clrText
+                  Height: =24
+            - cmbTgtMeasure:
+                Control: Classic/ComboBox@2.4.0
+                Properties:
+                  Items: =AddColumns(colMeasures, label, source_ref & " " & measure_name & " (" & measure_code & ")")
+                  DisplayFields: =["label"]
+                  SearchFields: =["label"]
+                  SelectMultiple: =false
+                  AccessibleLabel: ="Measure"
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTgtType:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Type"
+                  Color: =clrText
+                  Height: =24
+            - ddTgtType:
+                Control: Classic/DropDown@2.3.1
+                Properties:
+                  Items: |-
+                    =Filter(
+                        Table({code: "target", label: "Target"}, {code: "tolerance", label: "Tolerance"}, {code: "baseline", label: "Baseline"}, {code: "capacity", label: "Capacity or throughput"}),
+                        code <> "tolerance" || cmbTgtMeasure.Selected.measure_class.Value in ["kpi", "okr"]
+                    )
+                  Value: =label
+                  AccessibleLabel: ="Type of reference value"
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTgtTolNote:
+                Control: Label@2.5.1
+                Properties:
+                  Visible: =!IsBlank(cmbTgtMeasure.Selected) && !(cmbTgtMeasure.Selected.measure_class.Value in ["kpi", "okr"])
+                  Text: |-
+                    ="Tolerance isn't available: this measure is not a KPI or OKR."
+                  Color: =clrMuted
+                  Size: =11
+                  AutoHeight: =true
+            - lblTgtValue:
+                Control: Label@2.5.1
+                Properties:
+                  Text: =If(cmbTgtMeasure.Selected.unit.Value = "percent", "Value (enter 58 for 58%)", "Value")
+                  Color: =clrText
+                  Height: =24
+            - txtTgtValue:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  Format: =TextFormat.Number
+                  AccessibleLabel: ="Value"
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTgtFrom:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Apply to periods starting on or after"
+                  Color: =clrText
+                  Height: =24
+            - dpTgtFrom:
+                Control: Classic/DatePicker@2.6.0
+                Properties:
+                  DefaultDate: =Date(Year(Today()) - If(Month(Today()) < 4, 1, 0), 4, 1)
+                  StartOfWeek: =StartOfWeek.Monday
+                  AccessibleLabel: ="Apply to periods starting on or after"
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTgtTo:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="and ending on or before"
+                  Color: =clrText
+                  Height: =24
+            - dpTgtTo:
+                Control: Classic/DatePicker@2.6.0
+                Properties:
+                  DefaultDate: =Date(Year(Today()) + If(Month(Today()) < 4, 0, 1), 3, 31)
+                  StartOfWeek: =StartOfWeek.Monday
+                  AccessibleLabel: ="And ending on or before"
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTgtNotes:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Notes (where the value comes from)"
+                  Color: =clrText
+                  Height: =24
+            - txtTgtNotes:
+                Control: Classic/TextInput@2.3.2
+                Properties:
+                  AccessibleLabel: ="Notes"
+                  BorderColor: =clrBorder
+                  Height: =40
+            - lblTgtPreview:
+                Control: Label@2.5.1
+                Properties:
+                  Live: =Live.Polite
+                  AutoHeight: =true
+                  Color: =clrText
+                  Text: |-
+                    =If(
+                        IsBlank(cmbTgtMeasure.Selected), "Choose a measure.",
+                        CountRows(galTgtPeriods.AllItems) & " " & cmbTgtMeasure.Selected.frequency.Value &
+                        " period(s) in this range. Existing values of this type are shown and will be replaced."
+                    )
+            - galTgtPeriods:
+                Control: Gallery@2.15.0
+                Variant: Vertical
+                Properties:
+                  Items: |-
+                    =If(
+                        IsBlank(cmbTgtMeasure.Selected),
+                        Blank(),
+                        SortByColumns(
+                            Filter(
+                                periods,
+                                period_type.Value = cmbTgtMeasure.Selected.frequency.Value &&
+                                start_date >= dpTgtFrom.SelectedDate && end_date <= dpTgtTo.SelectedDate
+                            ),
+                            "start_date", SortOrder.Ascending
+                        )
+                    )
+                  AccessibleLabel: ="Periods the value will apply to"
+                  TemplateSize: =32
+                  TemplatePadding: =0
+                  Height: =220
+                  AlignInContainer: =AlignInContainer.Stretch
+                Children:
+                  - lblTgtPeriodRow:
+                      Control: Label@2.5.1
+                      Properties:
+                        X: =0
+                        Y: =0
+                        Width: =Parent.TemplateWidth
+                        Height: =32
+                        Size: =11
+                        Color: =clrText
+                        Text: |-
+                          =ThisItem.period_label & ": " &
+                          Coalesce(
+                              Text(LookUp(reference_values, ref_key = cmbTgtMeasure.Selected.measure_code & "|" & ThisItem.period_key & "|" & ddTgtType.Selected.code && active = true).ref_value),
+                              "not set"
+                          )
+            - conTgtButtons:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =12
+                  Height: =48
+                  AlignInContainer: =AlignInContainer.Stretch
+                Children:
+                  - btnTgtApply:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Text: ="Apply to these periods"
+                        Fill: =clrAccent
+                        Color: =Color.White
+                        HoverFill: =clrAccentDark
+                        FocusedBorderThickness: =3
+                        FocusedBorderColor: =clrText
+                        Width: =220
+                        Height: =44
+                        OnSelect: |-
+                          =If(
+                              IsBlank(cmbTgtMeasure.Selected), Notify("Choose a measure.", NotificationType.Error),
+                              IsBlank(txtTgtValue.Text) || IsError(Value(txtTgtValue.Text)), Notify("Enter a number.", NotificationType.Error),
+                              CountRows(galTgtPeriods.AllItems) = 0, Notify("No periods in that range.", NotificationType.Error),
+                              ForAll(
+                                  galTgtPeriods.AllItems As p,
+                                  With(
+                                      {k: cmbTgtMeasure.Selected.measure_code & "|" & p.period_key & "|" & ddTgtType.Selected.code},
+                                      With(
+                                          {ex: LookUp(reference_values, ref_key = k)},
+                                          If(
+                                              IsBlank(ex),
+                                              Patch(reference_values, Defaults(reference_values), {
+                                                  ref_key: k,
+                                                  measure_code: cmbTgtMeasure.Selected.measure_code,
+                                                  period_key: p.period_key,
+                                                  ref_type: {Value: ddTgtType.Selected.code},
+                                                  ref_value: Value(txtTgtValue.Text),
+                                                  notes: Trim(txtTgtNotes.Text),
+                                                  active: true
+                                              }),
+                                              Patch(reference_values, ex, {ref_value: Value(txtTgtValue.Text), notes: Trim(txtTgtNotes.Text), active: true})
+                                          )
+                                      )
+                                  )
+                              );
+                              If(IsEmpty(Errors(reference_values)),
+                                 Notify("Saved for " & CountRows(galTgtPeriods.AllItems) & " period(s).", NotificationType.Success),
+                                 Notify("Some values did not save. You need site owner rights to change targets.", NotificationType.Error))
+                          )
+                  - btnTgtStop:
+                      Control: Classic/Button@2.2.0
+                      Properties:
+                        Text: ="Stop using in these periods"
+                        Fill: =clrPanel
+                        Color: =clrError
+                        BorderColor: =clrError
+                        BorderThickness: =1
+                        FocusedBorderThickness: =3
+                        FocusedBorderColor: =clrText
+                        Width: =240
+                        Height: =44
+                        OnSelect: |-
+                          =ForAll(
+                              galTgtPeriods.AllItems As p,
+                              With(
+                                  {ex: LookUp(reference_values, ref_key = cmbTgtMeasure.Selected.measure_code & "|" & p.period_key & "|" & ddTgtType.Selected.code)},
+                                  If(!IsBlank(ex), Patch(reference_values, ex, {active: false}))
+                              )
+                          );
+                          Notify("Stopped. The values are kept but no longer used for RAG.", NotificationType.Success)

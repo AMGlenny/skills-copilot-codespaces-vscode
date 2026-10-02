@@ -1,0 +1,53 @@
+update_key,email,week_start,org_unit_key,successes,communication,workload,submitted_at
+jordan.hughes@example.org|2026-08-17,jordan.hughes@example.org,2026-08-17,ST-SDS-A,Dashboard pilot feedback was positive.,Term dates for next year need checking with councils by November.,manageable,2026-08-21T15:30:00Z
+priya.shah@example.org|2026-08-17,priya.shah@example.org,2026-08-17,ST-SDS-A,Providers confirmed September job starts early.,Board deadline moved to the second Thursday.,manageable,2026-08-17T15:30:00Z
+tom.walsh@example.org|2026-08-17,tom.walsh@example.org,2026-08-17,ST-SDS-A,Charter webinar had 60 employers attend.,The refresh now runs automatically at 6am.,overloaded,2026-08-18T15:30:00Z
+chloe.bennett@example.org|2026-08-17,chloe.bennett@example.org,2026-08-17,ST-SDS-A,Providers confirmed September job starts early.,Term dates for next year need checking with councils by November.,light,2026-08-21T15:30:00Z
+marcus.reid@example.org|2026-08-17,marcus.reid@example.org,2026-08-17,ST-SDS-B,Charter webinar had 60 employers attend.,Term dates for next year need checking with councils by November.,manageable,2026-08-20T15:30:00Z
+aisha.khan@example.org|2026-08-17,aisha.khan@example.org,2026-08-17,ST-SDS-A,New starter got portal access in one day after the process change.,The refresh now runs automatically at 6am.,overloaded,2026-08-18T15:30:00Z
+ellie.brooks@example.org|2026-08-17,ellie.brooks@example.org,2026-08-17,TM-HSG,Charter webinar had 60 employers attend.,,manageable,2026-08-21T15:30:00Z
+rhys.evans@example.org|2026-08-17,rhys.evans@example.org,2026-08-17,TM-BUS,,Term dates for next year need checking with councils by November.,manageable,2026-08-17T15:30:00Z
+jordan.hughes@example.org|2026-08-24,jordan.hughes@example.org,2026-08-24,ST-SDS-A,Closed the depot data issue within two days.,Board deadline moved to the second Thursday.,heavy,2026-08-27T15:30:00Z
+priya.shah@example.org|2026-08-24,priya.shah@example.org,2026-08-24,ST-SDS-A,,,manageable,2026-08-26T15:30:00Z
+tom.walsh@example.org|2026-08-24,tom.walsh@example.org,2026-08-24,ST-SDS-A,Dashboard pilot feedback was positive.,Term dates for next year need checking with councils by November.,light,2026-08-25T15:30:00Z
+chloe.bennett@example.org|2026-08-24,chloe.bennett@example.org,2026-08-24,ST-SDS-A,Providers confirmed September job starts early.,Board deadline moved to the second Thursday.,manageable,2026-08-28T15:30:00Z
+marcus.reid@example.org|2026-08-24,marcus.reid@example.org,2026-08-24,ST-SDS-B,New starter got portal access in one day after the process change.,Board deadline moved to the second Thursday.,heavy,2026-08-24T15:30:00Z
+aisha.khan@example.org|2026-08-24,aisha.khan@example.org,2026-08-24,ST-SDS-A,Charter webinar had 60 employers attend.,,heavy,2026-08-27T15:30:00Z
+ellie.brooks@example.org|2026-08-24,ellie.brooks@example.org,2026-08-24,TM-HSG,,Board deadline moved to the second Thursday.,light,2026-08-26T15:30:00Z
+rhys.evans@example.org|2026-08-24,rhys.evans@example.org,2026-08-24,TM-BUS,,Term dates for next year need checking with councils by November.,overloaded,2026-08-24T15:30:00Z
+jordan.hughes@example.org|2026-08-31,jordan.hughes@example.org,2026-08-31,ST-SDS-A,Providers confirmed September job starts early.,Term dates for next year need checking with councils by November.,manageable,2026-09-03T15:30:00Z
+priya.shah@example.org|2026-08-31,priya.shah@example.org,2026-08-31,ST-SDS-A,Closed the depot data issue within two days.,Board deadline moved to the second Thursday.,heavy,2026-09-04T15:30:00Z
+tom.walsh@example.org|2026-08-31,tom.walsh@example.org,2026-08-31,ST-SDS-A,New starter got portal access in one day after the process change.,The refresh now runs automatically at 6am.,manageable,2026-09-02T15:30:00Z
+chloe.bennett@example.org|2026-08-31,chloe.bennett@example.org,2026-08-31,ST-SDS-A,Charter webinar had 60 employers attend.,The refresh now runs automatically at 6am.,heavy,2026-09-01T15:30:00Z
+marcus.reid@example.org|2026-08-31,marcus.reid@example.org,2026-08-31,ST-SDS-B,Providers confirmed September job starts early.,Board deadline moved to the second Thursday.,manageable,2026-09-03T15:30:00Z
+aisha.khan@example.org|2026-08-31,aisha.khan@example.org,2026-08-31,ST-SDS-A,Closed the depot data issue within two days.,Board deadline moved to the second Thursday.,manageable,2026-09-01T15:30:00Z
+ellie.brooks@example.org|2026-08-31,ellie.brooks@example.org,2026-08-31,TM-HSG,,The refresh now runs automatically at 6am.,overloaded,2026-09-04T15:30:00Z
+rhys.evans@example.org|2026-08-31,rhys.evans@example.org,2026-08-31,TM-BUS,Dashboard pilot feedback was positive.,,light,2026-08-31T15:30:00Z
+jordan.hughes@example.org|2026-09-07,jordan.hughes@example.org,2026-09-07,ST-SDS-A,New starter got portal access in one day after the process change.,,heavy,2026-09-11T15:30:00Z
+priya.shah@example.org|2026-09-07,priya.shah@example.org,2026-09-07,ST-SDS-A,,,manageable,2026-09-07T15:30:00Z
+tom.walsh@example.org|2026-09-07,tom.walsh@example.org,2026-09-07,ST-SDS-A,New starter got portal access in one day after the process change.,Term dates for next year need checking with councils by November.,light,2026-09-08T15:30:00Z
+chloe.bennett@example.org|2026-09-07,chloe.bennett@example.org,2026-09-07,ST-SDS-A,New starter got portal access in one day after the process change.,The refresh now runs automatically at 6am.,overloaded,2026-09-11T15:30:00Z
+marcus.reid@example.org|2026-09-07,marcus.reid@example.org,2026-09-07,ST-SDS-B,Dashboard pilot feedback was positive.,The refresh now runs automatically at 6am.,heavy,2026-09-07T15:30:00Z
+aisha.khan@example.org|2026-09-07,aisha.khan@example.org,2026-09-07,ST-SDS-A,Charter webinar had 60 employers attend.,Term dates for next year need checking with councils by November.,overloaded,2026-09-10T15:30:00Z
+ellie.brooks@example.org|2026-09-07,ellie.brooks@example.org,2026-09-07,TM-HSG,Charter webinar had 60 employers attend.,Board deadline moved to the second Thursday.,light,2026-09-11T15:30:00Z
+rhys.evans@example.org|2026-09-07,rhys.evans@example.org,2026-09-07,TM-BUS,Providers confirmed September job starts early.,Board deadline moved to the second Thursday.,light,2026-09-09T15:30:00Z
+jordan.hughes@example.org|2026-09-14,jordan.hughes@example.org,2026-09-14,ST-SDS-A,Charter webinar had 60 employers attend.,The refresh now runs automatically at 6am.,light,2026-09-15T15:30:00Z
+priya.shah@example.org|2026-09-14,priya.shah@example.org,2026-09-14,ST-SDS-A,Dashboard pilot feedback was positive.,Board deadline moved to the second Thursday.,manageable,2026-09-18T15:30:00Z
+tom.walsh@example.org|2026-09-14,tom.walsh@example.org,2026-09-14,ST-SDS-A,Closed the depot data issue within two days.,Term dates for next year need checking with councils by November.,manageable,2026-09-17T15:30:00Z
+chloe.bennett@example.org|2026-09-14,chloe.bennett@example.org,2026-09-14,ST-SDS-A,Closed the depot data issue within two days.,Board deadline moved to the second Thursday.,manageable,2026-09-16T15:30:00Z
+marcus.reid@example.org|2026-09-14,marcus.reid@example.org,2026-09-14,ST-SDS-B,Providers confirmed September job starts early.,Board deadline moved to the second Thursday.,overloaded,2026-09-17T15:30:00Z
+aisha.khan@example.org|2026-09-14,aisha.khan@example.org,2026-09-14,ST-SDS-A,Providers confirmed September job starts early.,Board deadline moved to the second Thursday.,manageable,2026-09-15T15:30:00Z
+ellie.brooks@example.org|2026-09-14,ellie.brooks@example.org,2026-09-14,TM-HSG,Charter webinar had 60 employers attend.,Board deadline moved to the second Thursday.,heavy,2026-09-16T15:30:00Z
+rhys.evans@example.org|2026-09-14,rhys.evans@example.org,2026-09-14,TM-BUS,Dashboard pilot feedback was positive.,Term dates for next year need checking with councils by November.,light,2026-09-18T15:30:00Z
+jordan.hughes@example.org|2026-09-21,jordan.hughes@example.org,2026-09-21,ST-SDS-A,Closed the depot data issue within two days.,Board deadline moved to the second Thursday.,overloaded,2026-09-25T15:30:00Z
+priya.shah@example.org|2026-09-21,priya.shah@example.org,2026-09-21,ST-SDS-A,Providers confirmed September job starts early.,,overloaded,2026-09-22T15:30:00Z
+tom.walsh@example.org|2026-09-21,tom.walsh@example.org,2026-09-21,ST-SDS-A,Providers confirmed September job starts early.,Board deadline moved to the second Thursday.,light,2026-09-24T15:30:00Z
+chloe.bennett@example.org|2026-09-21,chloe.bennett@example.org,2026-09-21,ST-SDS-A,Closed the depot data issue within two days.,Board deadline moved to the second Thursday.,heavy,2026-09-25T15:30:00Z
+marcus.reid@example.org|2026-09-21,marcus.reid@example.org,2026-09-21,ST-SDS-B,Charter webinar had 60 employers attend.,Board deadline moved to the second Thursday.,manageable,2026-09-23T15:30:00Z
+aisha.khan@example.org|2026-09-21,aisha.khan@example.org,2026-09-21,ST-SDS-A,Dashboard pilot feedback was positive.,Term dates for next year need checking with councils by November.,light,2026-09-21T15:30:00Z
+ellie.brooks@example.org|2026-09-21,ellie.brooks@example.org,2026-09-21,TM-HSG,Charter webinar had 60 employers attend.,The refresh now runs automatically at 6am.,manageable,2026-09-23T15:30:00Z
+rhys.evans@example.org|2026-09-21,rhys.evans@example.org,2026-09-21,TM-BUS,,,light,2026-09-21T15:30:00Z
+priya.shah@example.org|2026-09-28,priya.shah@example.org,2026-09-28,ST-SDS-A,,Board deadline moved to the second Thursday.,light,2026-09-28T15:30:00Z
+chloe.bennett@example.org|2026-09-28,chloe.bennett@example.org,2026-09-28,ST-SDS-A,,Term dates for next year need checking with councils by November.,heavy,2026-10-01T15:30:00Z
+marcus.reid@example.org|2026-09-28,marcus.reid@example.org,2026-09-28,ST-SDS-B,Charter webinar had 60 employers attend.,The refresh now runs automatically at 6am.,manageable,2026-09-28T15:30:00Z
+aisha.khan@example.org|2026-09-28,aisha.khan@example.org,2026-09-28,ST-SDS-A,Charter webinar had 60 employers attend.,,heavy,2026-09-28T15:30:00Z

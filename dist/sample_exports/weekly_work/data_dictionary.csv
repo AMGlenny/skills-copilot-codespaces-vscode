@@ -1,0 +1,50 @@
+﻿table_name,column_name,data_type,description
+weekly_updates,update_key,text,email|week_start. Unique.
+weekly_updates,week_start,date,Monday of the week.
+weekly_updates,email,text,Person.
+weekly_updates,person_name,text,Name of the person.
+weekly_updates,org_unit_key,text,Team at the time of the update.
+weekly_updates,team_name,text,Team name.
+weekly_updates,successes,text,Successes had or heard about.
+weekly_updates,communication,text,Anything that would help if more widely known.
+weekly_updates,workload,text,"light, manageable, heavy or overloaded."
+weekly_updates,submitted_at,datetime,When it was saved.
+tasks,task_code,text,"Key, e.g. TSK-00001. Unique."
+tasks,task_name,text,What needs doing.
+tasks,priority,text,"must, should or could."
+tasks,status,text,"open, complete or cancelled."
+tasks,org_unit_key,text,Team.
+tasks,team_name,text,Team name.
+tasks,contributes_to_type,text,group or measure. Blank if it doesn't contribute to anything specific.
+tasks,contributes_to_key,text,group_key or measure_code this work supports.
+tasks,contributes_to_name,text,Name of the group or measure the task supports.
+tasks,contributes_to_note,text,Optional extra detail on the aim.
+tasks,raised_by,text,Who added it.
+tasks,raised_by_name,text,Who raised it.
+tasks,date_raised,date,When it was added.
+tasks,assigned_to,text,Who is doing it.
+tasks,assigned_to_name,text,Who is doing it.
+tasks,completed_by,text,Who completed it.
+tasks,completed_by_name,text,Who completed it.
+tasks,completed_date,date,When it was completed or cancelled.
+tasks,notes,text,Notes.
+problems,problem_code,text,"Key, e.g. PRB-00001. Unique."
+problems,problem_title,text,Short title.
+problems,problem_statement,text,What the problem is.
+problems,status,text,open or closed.
+problems,impact,text,"low, medium or high."
+problems,urgency,text,"low, medium or high."
+problems,org_unit_key,text,Team.
+problems,team_name,text,Team name.
+problems,raised_by,text,Who raised it.
+problems,raised_by_name,text,Who raised it.
+problems,raised_on,date,When it was raised.
+problems,problem_owner,text,Who owns resolving it.
+problems,problem_owner_name,text,Who owns resolving it.
+problems,target_resolution_date,date,When it should be resolved by.
+problems,closed_date,date,When it was closed.
+problems,resolution,text,How it was resolved.
+problems,contributes_to_type,text,group or measure. Blank if it doesn't contribute to anything specific.
+problems,contributes_to_key,text,group_key or measure_code affected.
+problems,contributes_to_name,text,Name of the group or measure affected.
+problems,notes,text,Context.

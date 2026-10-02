@@ -1,0 +1,433 @@
+# =====================================================================
+# Screen: scrTeam ("My team")
+#
+# Needs the PMSWellbeingView flow (flows/wellbeing_view.md) added to the
+# app first: Power Automate pane > Add flow.
+#
+# 1. Add a blank screen and rename it scrTeam.
+# 2. Screen properties:
+#      Fill:      =clrPage
+#      OnVisible: =Select(btnLoadTeam)
+# 3. Copy everything below, right-click scrTeam, "Paste code".
+#
+# Everyone can read weekly updates, so successes and workload come
+# straight from the list. Wellbeing comes only from the flow, which
+# returns team totals (5 or more answers) and, for line managers, their
+# own direct reports.
+# =====================================================================
+- conTeam:
+    Control: GroupContainer@1.3.0
+    Variant: AutoLayout
+    Properties:
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =Parent.Height
+      LayoutDirection: =LayoutDirection.Vertical
+      Fill: =clrPage
+    Children:
+      - conTeamHeader:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =64
+            Fill: =clrHeader
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutGap: =8
+            PaddingLeft: =16
+            PaddingRight: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - lblTeamAppTitle:
+                Control: Label@2.5.1
+                Properties:
+                  Text: ="Team view"
+                  Role: =TextRole.Heading1
+                  Color: =Color.White
+                  FontWeight: =FontWeight.Semibold
+                  Size: =18
+                  Height: =40
+                  FillPortions: =1
+            - btnTeamNavWeek:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="My week"
+                  OnSelect: =Navigate(scrWeek)
+                  Fill: =clrHeader
+                  Color: =Color.White
+                  BorderColor: =Color.White
+                  BorderThickness: =1
+                  HoverFill: =clrAccentDark
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =ColorValue("#FFD166")
+                  Width: =110
+                  Height: =40
+            - btnTeamNavTeam:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="My team"
+                  OnSelect: =Select(btnLoadTeam)
+                  Fill: =clrPanel
+                  Color: =clrHeader
+                  BorderColor: =clrPanel
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =ColorValue("#FFD166")
+                  Width: =110
+                  Height: =40
+      - conTeamToolbar:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            Height: =If(fxIsNarrow, 230, 84)
+            Fill: =clrPanel
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutWrap: =true
+            LayoutAlignItems: =LayoutAlignItems.End
+            LayoutGap: =12
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =8
+            PaddingBottom: =8
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            - conTeamPickWeek:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  Width: =200
+                  Height: =66
+                Children:
+                  - lblTeamPickWeek:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Week commencing (Monday)"
+                        Color: =clrText
+                        Size: =11
+                        Height: =24
+                  - dpTeamWeek:
+                      Control: Classic/DatePicker@2.6.0
+                      Properties:
+                        DefaultDate: =varWeek
+                        StartOfWeek: =StartOfWeek.Monday
+                        AccessibleLabel: ="Week commencing"
+                        BorderColor: =clrBorder
+                        Height: =40
+                        OnChange: |-
+                          =Set(varWeek, DateAdd(Self.SelectedDate, -(Weekday(Self.SelectedDate, StartOfWeek.Monday) - 1), TimeUnit.Days));
+                          Set(varLoaded, false);
+                          Select(btnLoadTeam)
+            - conTeamPickTeam:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  Width: =If(fxIsNarrow, App.Width - 32, 380)
+                  Height: =66
+                Children:
+                  - lblTeamPickTeam:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Team"
+                        Color: =clrText
+                        Size: =11
+                        Height: =24
+                  - cmbTeamTeam:
+                      Control: Classic/ComboBox@2.4.0
+                      Properties:
+                        Items: =colTeams
+                        DisplayFields: =["path"]
+                        SearchFields: =["path"]
+                        SelectMultiple: =false
+                        DefaultSelectedItems: =Filter(colTeams, org_unit_key = varTeam)
+                        AccessibleLabel: ="Team"
+                        BorderColor: =clrBorder
+                        Height: =40
+                        OnChange: =Set(varTeam, Self.Selected.org_unit_key); Select(btnLoadTeam)
+            - btnTeamExport:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Text: ="Export this team's work"
+                  Fill: =clrPanel
+                  Color: =clrAccent
+                  BorderColor: =clrAccent
+                  BorderThickness: =1
+                  FocusedBorderThickness: =3
+                  FocusedBorderColor: =clrText
+                  Width: =220
+                  Height: =40
+                  OnSelect: |-
+                    =Patch(export_requests, Defaults(export_requests), {
+                        request_ref: "REQ-" & Text(Now(), "yyyymmdd-hhmmss") & "-" & Left(Text(GUID()), 4),
+                        dataset: {Value: "weekly_work"},
+                        odata_filter: "org_unit_key eq '" & varTeam & "'",
+                        filter_label: "Team: " & LookUp(colTeams, org_unit_key = varTeam).path,
+                        folder_path: "on_demand",
+                        requested_by: fxMe,
+                        requested_at: Now(),
+                        status: {Value: "queued"}
+                    });
+                    If(IsEmpty(Errors(export_requests)),
+                       Notify("Export requested. You'll get an email with a link in a few minutes. Wellbeing is never included.", NotificationType.Success),
+                       Notify("The export request didn't save. Please try again.", NotificationType.Error))
+            - btnLoadTeam:
+                Control: Classic/Button@2.2.0
+                Properties:
+                  Visible: =false
+                  Width: =1
+                  Height: =1
+                  OnSelect: |-
+                    =// Weeks are 7 days apart, so a one-day window either side of the Monday
+                    // finds the week however SharePoint stored the date.
+                    ClearCollect(
+                        colTeamUpdates,
+                        Filter(
+                            weekly_updates,
+                            org_unit_key = varTeam &&
+                            week_start >= DateAdd(varWeek, -1, TimeUnit.Days) &&
+                            week_start <= DateAdd(varWeek, 1, TimeUnit.Days)
+                        )
+                    );
+                    Set(varWellbeing, ParseJSON(PMSWellbeingView.Run(Text(varWeek, "yyyy-mm-dd"), varTeam).result));
+                    ClearCollect(
+                        colReports,
+                        ForAll(
+                            Table(varWellbeing.direct_reports),
+                            {
+                                email: Text(ThisRecord.Value.email),
+                                wellbeing: Text(ThisRecord.Value.wellbeing),
+                                comments: Text(ThisRecord.Value.comments)
+                            }
+                        )
+                    )
+      - conTeamBody:
+          Control: GroupContainer@1.3.0
+          Variant: AutoLayout
+          Properties:
+            FillPortions: =1
+            LayoutDirection: =LayoutDirection.Horizontal
+            LayoutWrap: =true
+            LayoutGap: =16
+            LayoutOverflowY: =LayoutOverflow.Scroll
+            PaddingLeft: =16
+            PaddingRight: =16
+            PaddingTop: =16
+            PaddingBottom: =16
+            AlignInContainer: =AlignInContainer.Stretch
+          Children:
+            # ---------- Column 1: who has updated, workload ----------
+            - conTeamPeople:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =6
+                  FillPortions: =1
+                  LayoutMinWidth: =300
+                  Height: =If(fxIsNarrow, 520, Parent.Height - 32)
+                  Fill: =clrPanel
+                  BorderColor: =clrBorder
+                  BorderThickness: =1
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  PaddingBottom: =12
+                Children:
+                  - lblTeamPeopleHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: |-
+                          ="Updates this week (" & CountRows(colTeamUpdates) & " of " &
+                          CountRows(Filter(colPeople, org_unit_key = varTeam)) & ")"
+                        Role: =TextRole.Heading2
+                        FontWeight: =FontWeight.Semibold
+                        Size: =15
+                        Color: =clrText
+                        Height: =36
+                  - lblTeamWorkload:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: |-
+                          ="Workload. " & Concat(fxWorkloadLabels As w, w.label & ": " & CountIf(colTeamUpdates, workload.Value = w.code), ", ")
+                        Color: =clrText
+                        AutoHeight: =true
+                  - galTeamPeople:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        Items: =SortByColumns(Filter(colPeople, org_unit_key = varTeam), "display_name", SortOrder.Ascending)
+                        AccessibleLabel: ="Team members and whether they have updated this week"
+                        TemplateSize: =44
+                        TemplatePadding: =0
+                        FillPortions: =1
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - lblTeamPersonName:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =2
+                              Width: =Parent.TemplateWidth * 0.6
+                              Height: =40
+                              Text: =ThisItem.display_name
+                              Color: =clrText
+                        - lblTeamPersonDone:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =Parent.TemplateWidth * 0.6
+                              Y: =2
+                              Width: =Parent.TemplateWidth * 0.4
+                              Height: =40
+                              Align: =Align.Right
+                              Color: =If(IsBlank(LookUp(colTeamUpdates, email = ThisItem.email)), clrMuted, clrSuccess)
+                              Text: =If(IsBlank(LookUp(colTeamUpdates, email = ThisItem.email)), "Not yet", "Updated")
+            # ---------- Column 2: successes and communication ----------
+            - conTeamNews:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =6
+                  FillPortions: =2
+                  LayoutMinWidth: =300
+                  Height: =If(fxIsNarrow, 600, Parent.Height - 32)
+                  Fill: =clrPanel
+                  BorderColor: =clrBorder
+                  BorderThickness: =1
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  PaddingBottom: =12
+                Children:
+                  - lblTeamNewsHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Successes and communication"
+                        Role: =TextRole.Heading2
+                        FontWeight: =FontWeight.Semibold
+                        Size: =15
+                        Color: =clrText
+                        Height: =36
+                  - galTeamNews:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        Items: =Filter(colTeamUpdates, !IsBlank(successes) || !IsBlank(communication))
+                        AccessibleLabel: ="Successes and communication from the team"
+                        TemplateSize: =120
+                        TemplatePadding: =4
+                        FillPortions: =1
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - lblTeamNewsWho:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =0
+                              Width: =Parent.TemplateWidth
+                              Height: =28
+                              Text: =Coalesce(LookUp(colPeople, email = ThisItem.email).display_name, ThisItem.email)
+                              FontWeight: =FontWeight.Semibold
+                              Color: =clrText
+                        - lblTeamNewsText:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =28
+                              Width: =Parent.TemplateWidth
+                              Height: =Parent.TemplateHeight - 32
+                              VerticalAlign: =VerticalAlign.Top
+                              Wrap: =true
+                              Color: =clrText
+                              Text: |-
+                                =If(IsBlank(ThisItem.successes), "", "Success: " & ThisItem.successes) &
+                                If(IsBlank(ThisItem.successes) || IsBlank(ThisItem.communication), "", Char(10)) &
+                                If(IsBlank(ThisItem.communication), "", "Worth knowing: " & ThisItem.communication)
+            # ---------- Column 3: wellbeing ----------
+            - conTeamWellbeing:
+                Control: GroupContainer@1.3.0
+                Variant: AutoLayout
+                Properties:
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =6
+                  FillPortions: =1
+                  LayoutMinWidth: =300
+                  Height: =If(fxIsNarrow, 520, Parent.Height - 32)
+                  Fill: =clrPanel
+                  BorderColor: =clrBorder
+                  BorderThickness: =1
+                  PaddingLeft: =12
+                  PaddingRight: =12
+                  PaddingTop: =12
+                  PaddingBottom: =12
+                Children:
+                  - lblTeamWellbeingHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Text: ="Team wellbeing"
+                        Role: =TextRole.Heading2
+                        FontWeight: =FontWeight.Semibold
+                        Size: =15
+                        Color: =clrText
+                        Height: =36
+                  - lblTeamWellbeingCounts:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =clrText
+                        AutoHeight: =true
+                        Text: |-
+                          =If(
+                              Boolean(varWellbeing.show_counts),
+                              "Thriving: " & Value(varWellbeing.counts.thriving) &
+                              ", OK: " & Value(varWellbeing.counts.ok) &
+                              ", Struggling: " & Value(varWellbeing.counts.struggling) &
+                              " (" & Value(varWellbeing.responses) & " answers)",
+                              "Totals are hidden until at least 5 people in the team have answered this week (" &
+                              Coalesce(Value(varWellbeing.responses), 0) & " so far)."
+                          )
+                  - lblTeamReportsHeading:
+                      Control: Label@2.5.1
+                      Properties:
+                        Visible: =fxHasReports
+                        Text: ="Your direct reports (only you can see this)"
+                        Role: =TextRole.Heading3
+                        FontWeight: =FontWeight.Semibold
+                        Color: =clrText
+                        Height: =36
+                  - galTeamReports:
+                      Control: Gallery@2.15.0
+                      Variant: Vertical
+                      Properties:
+                        Visible: =fxHasReports
+                        Items: =SortByColumns(Filter(colPeople, line_manager_email = fxMe), "display_name", SortOrder.Ascending)
+                        AccessibleLabel: ="Wellbeing of your direct reports this week"
+                        TemplateSize: =84
+                        TemplatePadding: =0
+                        FillPortions: =1
+                        AlignInContainer: =AlignInContainer.Stretch
+                      Children:
+                        - lblTeamReportName:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =2
+                              Width: =Parent.TemplateWidth
+                              Height: =28
+                              FontWeight: =FontWeight.Semibold
+                              Color: =clrText
+                              Text: |-
+                                =ThisItem.display_name & ": " &
+                                Coalesce(LookUp(fxWellbeingLabels, code = LookUp(colReports, email = ThisItem.email).wellbeing).label, "No check-in yet")
+                        - lblTeamReportComments:
+                            Control: Label@2.5.1
+                            Properties:
+                              X: =0
+                              Y: =30
+                              Width: =Parent.TemplateWidth
+                              Height: =50
+                              Size: =11
+                              Wrap: =true
+                              VerticalAlign: =VerticalAlign.Top
+                              Color: =clrMuted
+                              Text: =LookUp(colReports, email = ThisItem.email).comments

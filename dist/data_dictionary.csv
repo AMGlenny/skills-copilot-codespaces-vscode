@@ -1,0 +1,227 @@
+table_name,column_name,data_type,required,indexed,unique,allowed_values,references,description
+measures,measure_code,text,true,true,true,,,"System key, e.g. PM-0001. Unique. Every other table links on this."
+measures,measure_name,text,true,false,false,,,Short name of the measure.
+measures,source_ref,text,false,true,false,,,"Reference used in the source document, e.g. 1.01. Not unique: parent and child can share it."
+measures,source_document,text,false,false,false,,,Document or framework the measure comes from.
+measures,parent_measure_code,text,false,true,false,,measures.measure_code,measure_code of the parent summary measure. Blank for top-level measures.
+measures,description,long text,false,false,false,,,"What the measure tells you, in plain English."
+measures,definition,long text,false,false,false,,,Definition and calculation method.
+measures,measure_class,choice,true,true,false,measure|kpi|okr,,"measure, kpi or okr. Tolerance only applies to kpi and okr."
+measures,measure_type,choice,true,false,false,summary|output|outcome,,"summary, output or outcome."
+measures,unit,choice,true,false,false,number|percent|gbp|count|yes_no|text,,Unit of the value. percent is stored as 0 to 100 (58 means 58%). gbp is pounds. yes_no is stored as 1 or 0.
+measures,decimal_places,whole number,false,false,false,,,Decimal places to show. Does not change the stored value.
+measures,polarity,choice,true,false,false,higher_is_better|lower_is_better|neither,,Which direction is good. Used for RAG.
+measures,frequency,choice,true,true,false,daily|weekly|fortnightly|monthly|quarterly|annual|calendar_year|academic_year|term,,How often a value is recorded.
+measures,aggregation_method,choice,true,false,false,sum|average|latest|max|min|do_not_combine,,"How to roll values up to a longer period, e.g. monthly to quarterly. do_not_combine for values that must not be added or averaged."
+measures,expected_lag_days,whole number,false,false,false,,,"Usual days after period end before data is available. Blank means no expectation, so it is never flagged as late."
+measures,category,text,false,true,false,,lookups.code,Category code from the lookups list.
+measures,data_source,text,false,false,false,,,Where the data comes from.
+measures,org_unit_key,text,false,true,false,,org_units.org_unit_key,Team that owns the measure.
+measures,status,choice,true,true,false,active|retired,,active or retired. Measures are never deleted.
+measures,retired_date,date (YYYY-MM-DD),false,false,false,,,Date the measure was retired.
+measures,retired_reason,long text,false,false,false,,,Why the measure was retired.
+periods,period_key,text,true,true,true,,,"Period key, e.g. M-2026-09, Q-2026-27-Q2, T-2026-27-AUT."
+periods,period_type,choice,true,true,false,daily|weekly|fortnightly|monthly|quarterly|annual|calendar_year|academic_year|term,,Matches a measure frequency.
+periods,period_label,text,true,false,false,,,"Display label, e.g. Q2 2026-27 or Autumn Term 2026."
+periods,start_date,date (YYYY-MM-DD),true,true,false,,,First day of the period.
+periods,end_date,date (YYYY-MM-DD),true,true,false,,,Last day of the period.
+periods,financial_year,text,false,true,false,,,"UK financial year (April to March) containing the start date, e.g. 2026-27."
+periods,financial_quarter,text,false,false,false,,,"Financial quarter containing the start date, e.g. 2026-27 Q2. Blank for periods longer than a quarter."
+periods,academic_year,text,false,false,false,,,Academic year (September to August) containing the start date.
+periods,calendar_year,whole number,false,false,false,,,Calendar year containing the start date.
+measure_roles,role_key,text,true,true,true,,,measure_code|email|role. Unique.
+measure_roles,measure_code,text,true,true,false,,measures.measure_code,Measure.
+measure_roles,email,text,true,true,false,,people.email,Person.
+measure_roles,role,choice,true,true,false,owner|updater|approver,,"owner, updater or approver."
+measure_roles,active,true/false,false,true,false,,,Only active roles give access.
+measure_roles,start_date,date (YYYY-MM-DD),false,false,false,,,Role start.
+measure_roles,end_date,date (YYYY-MM-DD),false,false,false,,,Role end.
+groups,group_key,text,true,true,true,,,"Group key, e.g. TH-JOBS. Unique."
+groups,group_name,text,true,false,false,,,"Name of the theme, programme or objective."
+groups,group_type,choice,true,true,false,theme|programme|objective,,"theme, programme or objective."
+groups,description,long text,false,false,false,,,What it covers.
+groups,active,true/false,false,true,false,,,Inactive groups are hidden from new entries.
+measure_links,link_key,text,true,true,true,,,measure_code|group_key. Unique.
+measure_links,measure_code,text,true,true,false,,measures.measure_code,Measure.
+measure_links,group_key,text,true,true,false,,groups.group_key,Group.
+measure_links,relationship_type,choice,true,false,false,primary|contributes_to|related,,"primary, contributes_to or related."
+measure_links,active,true/false,false,false,false,,,Inactive links are kept for history.
+reference_values,ref_key,text,true,true,true,,,measure_code|period_key|ref_type. Unique.
+reference_values,measure_code,text,true,true,false,,measures.measure_code,Measure.
+reference_values,period_key,text,true,true,false,,periods.period_key,Period.
+reference_values,ref_type,choice,true,false,false,target|tolerance|baseline|capacity,,"target, tolerance, baseline or capacity. tolerance only for kpi and okr measures."
+reference_values,ref_value,number,true,false,false,,,"The reference value, in the measure's unit."
+reference_values,notes,long text,false,false,false,,,Where the value came from.
+reference_values,active,true/false,false,true,false,,,Inactive values are ignored.
+submissions,submission_key,text,true,true,true,,,measure_code|period_key. Unique.
+submissions,measure_code,text,true,true,false,,measures.measure_code,Measure.
+submissions,period_key,text,true,true,false,,periods.period_key,Period the data relates to.
+submissions,period_end,date (YYYY-MM-DD),true,true,false,,,Last day of the period (copied from periods when the row is created) so the app can load recent work only.
+submissions,status,choice,true,true,false,not_started|draft|submitted|returned|approved,,"not_started, draft, submitted, returned or approved."
+submissions,expected_by,date (YYYY-MM-DD),false,true,false,,,Period end plus the measure's expected lag. Blank if no lag is set.
+submissions,current_version,whole number,false,false,false,,,Latest version number. 0 before anything is entered.
+submissions,approved_version,whole number,false,false,false,,,Version used in reports. Blank until first approval.
+submissions,submitted_date,"date-time (UTC, ISO 8601)",false,false,false,,,When the latest version was submitted.
+submissions,approved_by,text,false,false,false,,people.email,Email of the approver.
+submissions,approved_date,"date-time (UTC, ISO 8601)",false,false,false,,,When it was approved.
+submission_versions,version_key,text,true,true,true,,,submission_key|v<version_no>. Unique.
+submission_versions,submission_key,text,true,true,false,,submissions.submission_key,Submission.
+submission_versions,measure_code,text,true,true,false,,measures.measure_code,Measure (copied from the submission for filtering).
+submission_versions,period_key,text,true,true,false,,periods.period_key,Period (copied from the submission for filtering).
+submission_versions,version_no,whole number,true,false,false,,,"1, 2, 3 and so on."
+submission_versions,value_number,number,false,false,false,,,"The value for all units except text. percent 0 to 100, yes_no 1 or 0."
+submission_versions,value_text,long text,false,false,false,,,The value for text measures only.
+submission_versions,value_missing,true/false,false,false,false,,,Yes if no value could be provided. Narrative then required.
+submission_versions,narrative,long text,false,false,false,,,Updater's commentary. Required if the value is missing or off track.
+submission_versions,data_quality,choice,true,false,false,verified|provisional|estimated|unverified,,"verified, provisional, estimated or unverified."
+submission_versions,entered_by,text,true,true,false,,people.email,Email of the updater.
+submission_versions,entered_date,"date-time (UTC, ISO 8601)",true,false,false,,,When the value was first entered.
+submission_versions,submitted_date,"date-time (UTC, ISO 8601)",false,false,false,,,When this version was submitted.
+submission_versions,version_status,choice,true,true,false,draft|submitted|returned|approved|superseded,,"draft, submitted, returned, approved or superseded. Only approved versions flow into reports."
+submission_versions,rag_status,choice,false,false,false,green|amber|red|no_target|no_data|not_applicable,,RAG worked out at approval using polarity and the period's target and tolerance.
+review_comments,comment_ref,text,true,true,true,,,"Reference, e.g. RC-00001."
+review_comments,submission_key,text,true,true,false,,submissions.submission_key,Submission.
+review_comments,version_no,whole number,true,false,false,,,Version the comment was made on.
+review_comments,reviewer_email,text,true,true,false,,people.email,Reviewer.
+review_comments,action,choice,true,false,false,returned|approved|reopened|comment,,"returned, approved, reopened or comment. Returning and reopening need a comment."
+review_comments,comment,long text,false,false,false,,,The comment. Required when returning.
+review_comments,comment_date,"date-time (UTC, ISO 8601)",true,false,false,,,When the comment was made.
+review_comments,resolved,true/false,false,true,false,,,Yes once the updater has dealt with it.
+review_comments,resolved_by,text,false,false,false,,people.email,Who marked it resolved.
+review_comments,resolved_date,"date-time (UTC, ISO 8601)",false,false,false,,,When it was resolved.
+org_units,org_unit_key,text,true,true,true,,,"Key, e.g. WS-JOBS, TM-SDS, ST-SDS-A. Unique."
+org_units,unit_name,text,true,false,false,,,Name as people know it.
+org_units,unit_level,choice,true,true,false,workstream|team|sub_team,,"workstream, team or sub_team."
+org_units,parent_key,text,false,true,false,,org_units.org_unit_key,Parent unit. Blank for workstreams.
+org_units,active,true/false,false,true,false,,,Inactive units are hidden from new entries.
+people,email,text,true,true,true,,,"Work email, lower case. Unique."
+people,display_name,text,true,false,false,,,Name shown in the app.
+people,org_unit_key,text,false,true,false,,org_units.org_unit_key,Default team. Pre-fills the weekly update.
+people,line_manager_email,text,false,true,false,,people.email,Line manager. Only they can see this person's individual wellbeing responses.
+people,app_role,choice,true,false,false,admin|standard|viewer,,"admin, standard or viewer. Measure rights come from measure_roles."
+people,active,true/false,false,true,false,,,"Leavers are made inactive, never deleted."
+weekly_updates,update_key,text,true,true,true,,,email|week_start. Unique.
+weekly_updates,email,text,true,true,false,,people.email,Person.
+weekly_updates,week_start,date (YYYY-MM-DD),true,true,false,,,Monday of the week.
+weekly_updates,org_unit_key,text,true,true,false,,org_units.org_unit_key,Team at the time of the update.
+weekly_updates,successes,long text,false,false,false,,,Successes had or heard about.
+weekly_updates,communication,long text,false,false,false,,,Anything that would help if more widely known.
+weekly_updates,workload,choice,false,false,false,light|manageable|heavy|overloaded,,"light, manageable, heavy or overloaded."
+weekly_updates,submitted_at,"date-time (UTC, ISO 8601)",true,false,false,,,When it was saved.
+wellbeing_checkins,checkin_key,text,true,true,true,,,email|week_start. Unique.
+wellbeing_checkins,email,text,true,true,false,,people.email,Person.
+wellbeing_checkins,line_manager_email,text,false,true,false,,people.email,"Line manager at the time of the check-in. Only they can see it. Blank if the person has no line manager, so only they see it."
+wellbeing_checkins,org_unit_key,text,true,true,false,,org_units.org_unit_key,"Team at the time, for team counts."
+wellbeing_checkins,week_start,date (YYYY-MM-DD),true,true,false,,,Monday of the week.
+wellbeing_checkins,wellbeing,choice,true,false,false,thriving|ok|struggling,,"thriving, ok or struggling."
+wellbeing_checkins,comments,long text,false,false,false,,,Optional comments.
+wellbeing_checkins,submitted_at,"date-time (UTC, ISO 8601)",true,false,false,,,When it was saved.
+tasks,task_code,text,true,true,true,,,"Key, e.g. TSK-00001. Unique."
+tasks,task_name,text,true,false,false,,,What needs doing.
+tasks,priority,choice,true,false,false,must|should|could,,"must, should or could."
+tasks,org_unit_key,text,true,true,false,,org_units.org_unit_key,Team.
+tasks,contributes_to_type,choice,false,false,false,group|measure,,group or measure. Blank if it doesn't contribute to anything specific.
+tasks,contributes_to_key,text,false,true,false,,,group_key or measure_code this work supports.
+tasks,contributes_to_note,long text,false,false,false,,,Optional extra detail on the aim.
+tasks,raised_by,text,true,true,false,,people.email,Who added it.
+tasks,date_raised,date (YYYY-MM-DD),true,true,false,,,When it was added.
+tasks,assigned_to,text,false,true,false,,people.email,Who is doing it.
+tasks,status,choice,true,true,false,open|complete|cancelled,,"open, complete or cancelled."
+tasks,completed_by,text,false,false,false,,people.email,Who completed it.
+tasks,completed_date,date (YYYY-MM-DD),false,true,false,,,When it was completed or cancelled.
+tasks,notes,long text,false,false,false,,,Notes.
+problems,problem_code,text,true,true,true,,,"Key, e.g. PRB-00001. Unique."
+problems,problem_title,text,true,false,false,,,Short title.
+problems,problem_statement,long text,false,false,false,,,What the problem is.
+problems,org_unit_key,text,true,true,false,,org_units.org_unit_key,Team.
+problems,raised_by,text,true,true,false,,people.email,Who raised it.
+problems,raised_on,date (YYYY-MM-DD),true,true,false,,,When it was raised.
+problems,problem_owner,text,false,true,false,,people.email,Who owns resolving it.
+problems,impact,choice,true,false,false,low|medium|high,,"low, medium or high."
+problems,urgency,choice,true,false,false,low|medium|high,,"low, medium or high."
+problems,target_resolution_date,date (YYYY-MM-DD),false,false,false,,,When it should be resolved by.
+problems,status,choice,true,true,false,open|closed,,open or closed.
+problems,closed_date,date (YYYY-MM-DD),false,true,false,,,When it was closed.
+problems,resolution,long text,false,false,false,,,How it was resolved.
+problems,contributes_to_type,choice,false,false,false,group|measure,,group or measure. Blank if it doesn't contribute to anything specific.
+problems,contributes_to_key,text,false,true,false,,,group_key or measure_code affected.
+problems,notes,long text,false,false,false,,,Context.
+lookups,lookup_key,text,true,true,true,,,lookup_type|code. Unique.
+lookups,lookup_type,choice,true,true,false,category|data_source,,Which pick list.
+lookups,code,text,true,true,false,,,Stored code.
+lookups,label,text,true,false,false,,,Label shown to people.
+lookups,sort_order,whole number,false,false,false,,,Order in dropdowns.
+lookups,active,true/false,false,false,false,,,Inactive values are hidden from new entries.
+settings,setting_key,text,true,true,true,,,Setting name. Unique.
+settings,setting_value,text,true,false,false,,,Value.
+settings,description,long text,false,false,false,,,What the setting does.
+audit_log,audit_ref,text,true,true,true,,,Reference. Flows use AUD- plus a GUID.
+audit_log,list_name,text,true,true,false,,,List that changed.
+audit_log,item_key,text,true,true,false,,,Key of the item that changed.
+audit_log,action,choice,true,false,false,create|edit|status_change|reopen|retire,,"create, edit, status_change, reopen or retire."
+audit_log,field_name,text,false,false,false,,,Column that changed. Blank for create.
+audit_log,old_value,long text,false,false,false,,,Value before.
+audit_log,new_value,long text,false,false,false,,,Value after.
+audit_log,changed_by,text,true,true,false,,people.email,Who made the change.
+audit_log,changed_at,"date-time (UTC, ISO 8601)",true,true,false,,,When.
+export_jobs,job_code,text,true,true,true,,,"Key, e.g. EXP-FULL-NIGHTLY. Unique."
+export_jobs,job_name,text,true,false,false,,,Name.
+export_jobs,dataset,choice,true,false,false,full_model|measures|weekly_work|quarter_pack,,"full_model, measures, weekly_work or quarter_pack."
+export_jobs,format,choice,true,false,false,csv|xlsx|both,,"csv, xlsx or both."
+export_jobs,frequency,choice,true,false,false,daily|weekly|monthly|quarterly,,"daily, weekly, monthly or quarterly."
+export_jobs,run_day,whole number,false,false,false,,,Weekly: 1 (Mon) to 7. Monthly or quarterly: day of month. Ignored for daily.
+export_jobs,folder_path,text,true,false,false,,,Folder in the snapshots library.
+export_jobs,keep_history,true/false,false,false,false,,,Keep dated copies as well as /latest. Dated copies are always kept for now; automatic clean-up is a later feature.
+export_jobs,active,true/false,false,true,false,,,Only active jobs run.
+export_jobs,last_run_at,"date-time (UTC, ISO 8601)",false,false,false,,,Written by the flow.
+export_jobs,last_run_status,text,false,false,false,,,Written by the flow.
+export_requests,request_ref,text,true,true,true,,,"Reference, e.g. REQ-20261001-0930-ab12. Unique."
+export_requests,dataset,choice,true,false,false,full_model|measures|weekly_work|quarter_pack,,"full_model, measures, weekly_work or quarter_pack."
+export_requests,job_code,text,false,false,false,,export_jobs.job_code,The export_jobs row that asked for it. Blank for on-demand exports.
+export_requests,quarter_label,text,false,false,false,,,"For quarter packs: the financial quarter, e.g. 2026-27 Q2."
+export_requests,odata_filter,long text,false,false,false,,,"Optional filter applied to the dataset's main tables, e.g. financial_year eq '2026-27'."
+export_requests,filter_label,text,false,false,false,,,"The filter in plain English, shown in the email and README."
+export_requests,folder_path,text,true,false,false,,,Folder in the snapshots library.
+export_requests,requested_by,text,false,true,false,,,Who asked for it. Blank for scheduled jobs.
+export_requests,requested_at,"date-time (UTC, ISO 8601)",true,false,false,,,When it was asked for.
+export_requests,status,choice,true,true,false,queued|running|done|failed,,"queued, running, done or failed."
+export_requests,output_url,long text,false,false,false,,,Link to the folder holding the files.
+export_requests,message,long text,false,false,false,,,"What happened, including any error."
+export_requests,completed_at,"date-time (UTC, ISO 8601)",false,false,false,,,When it finished.
+rpt_values,submission_key,text,true,true,true,,,measure_code|period_key. Unique.
+rpt_values,measure_code,text,true,true,false,,measures.measure_code,Measure.
+rpt_values,measure_name,text,false,false,false,,,Measure name.
+rpt_values,source_ref,text,false,false,false,,,Source document reference.
+rpt_values,parent_measure_code,text,false,false,false,,,Parent measure.
+rpt_values,measure_class,text,false,false,false,,,"measure, kpi or okr."
+rpt_values,measure_type,text,false,false,false,,,"summary, output or outcome."
+rpt_values,category,text,false,false,false,,,Category code.
+rpt_values,unit,text,false,false,false,,,Unit.
+rpt_values,polarity,text,false,false,false,,,Polarity.
+rpt_values,frequency,text,false,false,false,,,Frequency.
+rpt_values,aggregation_method,text,false,false,false,,,How to roll up.
+rpt_values,owner_name,text,false,false,false,,,Measure owner.
+rpt_values,owner_email,text,false,false,false,,,Measure owner email.
+rpt_values,org_unit_key,text,false,false,false,,,Owning team.
+rpt_values,period_key,text,true,true,false,,periods.period_key,Period.
+rpt_values,period_type,text,false,false,false,,,Period type.
+rpt_values,period_label,text,false,false,false,,,Period label.
+rpt_values,period_start,date (YYYY-MM-DD),false,false,false,,,Period start date.
+rpt_values,period_end,date (YYYY-MM-DD),false,true,false,,,Period end date.
+rpt_values,financial_year,text,false,true,false,,,Financial year.
+rpt_values,financial_quarter,text,false,true,false,,,Financial quarter.
+rpt_values,value_number,number,false,false,false,,,Approved value (not text measures).
+rpt_values,value_text,long text,false,false,false,,,Approved value (text measures).
+rpt_values,value_missing,true/false,false,false,false,,,Yes if no value was provided.
+rpt_values,narrative,long text,false,false,false,,,Approved narrative.
+rpt_values,data_quality,text,false,false,false,,,Data quality flag.
+rpt_values,version_no,whole number,false,false,false,,,Approved version number.
+rpt_values,approved_by,text,false,false,false,,,Approver email.
+rpt_values,approved_date,"date-time (UTC, ISO 8601)",false,false,false,,,Approval time.
+rpt_values,target_value,number,false,false,false,,,Target for the period.
+rpt_values,tolerance_value,number,false,false,false,,,Tolerance for the period (kpi and okr only).
+rpt_values,baseline_value,number,false,false,false,,,Baseline for the period.
+rpt_values,capacity_value,number,false,false,false,,,Capacity or throughput for the period.
+rpt_values,rag_status,text,false,false,false,,,"green, amber, red, no_target, no_data or not_applicable."
+rpt_values,is_latest,true/false,false,true,false,,,Yes on the most recent approved period for the measure.
+rpt_values,refreshed_at,"date-time (UTC, ISO 8601)",false,false,false,,,When this row was last rebuilt.

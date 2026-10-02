@@ -1,0 +1,12 @@
+lookup_key,lookup_type,code,label,sort_order,active
+category|economy,category,economy,Economy and jobs,1,true
+category|housing,category,housing,Housing,2,true
+category|transport,category,transport,Transport,3,true
+category|environment,category,environment,Environment,4,true
+category|education,category,education,Education,5,true
+category|corporate,category,corporate,Corporate,6,true
+data_source|internal_mi,data_source,internal_mi,Internal management information,1,true
+data_source|ons,data_source,ons,Office for National Statistics,2,true
+data_source|dfe,data_source,dfe,Department for Education,3,true
+data_source|dluhc,data_source,dluhc,MHCLG returns,4,true
+data_source|operator,data_source,operator,Bus operator returns,5,true
